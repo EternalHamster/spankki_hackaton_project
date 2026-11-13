@@ -1,0 +1,97 @@
+KEY INSIGHTS ABOUT THE DATA
+Source: Data_analysis_results (full details there)
+
+HOW THE FILES CONNECT
+  tx_customers_junction.csv          customer_id  (5,100 customers)
+  tx_junction_transactions.csv       customer_id  (all 5,100 customers, one account each)
+  mtg_tx_customer_link_and_final_mtg_infio.csv
+                                     customer_id <-> mortgage_customer_id  (200 mortgage customers)
+  mtg_negotiation_history.csv        mortgage_customer_id  (event log for the same 200)
+
+  All IDs resolve. No orphans in any direction.
+
+GENERAL FORMAT GOTCHAS (ALL FILES)
+  - Every file starts with a UTF-8 BOM. Open with encoding "utf-8-sig".
+  - Read IDs, postal codes and MCC codes as strings. Postal codes have leading
+    zeros (00100), which are lost if read as numbers.
+  - Timestamps use the SAS format 26MAY26:00:00:00.
+    Python: datetime.strptime(s, "%d%b%y:%H:%M:%S")
+
+
+1. tx_customers_junction.csv - customer master (5,100 rows)
+  - Columns: customer_id, customer_postal_code, customer_age.
+  - CUST00001-CUST05100, unique, no gaps, no missing values.
+  - Postal codes: 290 distinct, all Helsinki/Espoo/Vantaa (00xxx, 01xxx, 02xxx).
+  - Age 18-90, median 44, strong peak in the 40s.
+  - Only 200 customers (ages 32-77) have a mortgage application.
+
+
+2. mtg_tx_customer_link_and_final_mtg_infio.csv - final mortgage outcome (200 rows)
+  - One row per mortgage customer; the link between the two ID systems.
+  - 150 approved, 50 rejected. Rejection reasons: insufficient_collateral 34,
+    insufficient_income 8, insufficient_equity 6, existing_debt 2.
+  - Derived columns (exact formulas):
+      loan + equity = property price
+      lfinal_loan_to_value = loan / price         (column name has a typo: "lfinal_")
+      required_monthly_income = loan x 0.0184086  (6% stress rate, 25-year annuity,
+                                                   35% debt-to-income cap)
+  - Final collateral counts only the primary apartment valuation; any second
+    ("other_apartment") collateral is ignored.
+  - Collateral is below the loan in 198 of 200 cases, yet most are approved.
+  - No single variable cleanly separates approved from rejected (LTV ranges overlap).
+
+
+3. mtg_negotiation_history.csv - mortgage event log (3,452 rows, 200 customers)
+  - Jan-Sep 2026; 11-25 events per customer over 13-45 days.
+  - Rows sorted by time within each customer; no duplicate timestamps.
+  - 12 event types following the same fixed process for every customer:
+      application_created -> property search -> loan_calculation -> income ->
+      expenses -> collateral -> valuations -> documents -> loan_decision
+  - Sparse table: which columns are filled depends on the event type.
+  - The final decision is always on the LAST property added; earlier properties
+    are abandoned (1-3 properties per customer).
+  - Expense types use a small fixed set of amounts; "existing_loan" is often 0.
+  - The "note" column is generated from 21 templates and repeats the structured
+    columns. It adds no information.
+  - Pitfalls:
+      * "decision" is also filled on the customer_contact after the decision
+        (336 rows, not 200). Use only event_type = loan_decision.
+      * The last event is often a customer_contact, not the decision.
+      * collateral_status says "approved" even for rejected applications.
+  - Fully consistent with file 2.
+
+
+4. tx_junction_transactions.csv - bank transactions (3,626,755 rows, 343 MB, Git LFS)
+  - Oct 2024 - Sep 2026 (24 full months), ~150k transactions per month.
+  - Too big for Excel. A streaming pass in plain Python takes ~3 minutes.
+  - Very clean: no duplicates, no zero amounts, sorted by account and time.
+  - Balance chain is exact (previous balance + amount = balance_after on every
+    row), so a full daily balance history can be rebuilt for any account.
+  - category and transaction_type map 1:1; one of them is enough.
+      Outflows: purchase, utilities_payment, housing_payment,
+                investment_deposit, salary_sweep
+      Inflows:  salary, other_income, investment_withdrawal
+      No transfers, refunds or reversals exist.
+  - Merchants: no names or descriptions, only IDs (515 merchants, e.g.
+    MRC-GRO-0035; the middle part is the category) and 36 standard MCC codes.
+    Each merchant has exactly one category and one MCC.
+  - 160,624 purchases have no merchant_id / mcc_code (mostly Transportation).
+    These are not errors: category is still filled.
+  - Salary: exactly one per customer per month, mostly on the 15th, otherwise at
+    month end. Very stable per customer. Often followed by a salary_sweep
+    (money moved out, apparently to savings).
+  - Overdrafts are normal: 3,526 of 5,100 accounts go negative at some point
+    (lowest -1,985 EUR), mostly for a few days.
+  - Outliers: 104 single purchases of 5,000 EUR or more (max 30,935 EUR);
+    a few balances grow very large (max 408k EUR).
+
+
+CROSS-FILE INSIGHTS
+  - Mortgage customers' real average monthly income is almost exactly their
+    required_monthly_income (ratio ~1.00 for approved and rejected alike).
+    Loans seem to have been sized to income, so income alone does not explain
+    the decisions, not even for "insufficient_income" rejections.
+  - Approved mortgages do not appear as new payments in the transactions:
+    housing payments stay the same (+/-5%) after the decision.
+  - The transaction window (Oct 2024 - Sep 2026) fully covers the mortgage
+    period, so up to ~15 months of behaviour before each application is available.
