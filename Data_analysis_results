@@ -1,0 +1,59 @@
+1. tx_customers_junction.csv: customer master data (5,100 rows)
+Column	Findings
+customer_id	CUST00001–CUST05100, unique, no gaps
+customer_postal_code	5-character strings with leading zeros (00990). There are 290 distinct codes, all starting 00/01/02, so it's all Helsinki/Espoo/Vantaa. Top codes: 00940, 01300, 02230
+customer_age	18–90, median 44. Heavy peak in the 40s (2,096 people). 56 people are 80+
+Edge cases:
+
+Read postal code as a string. Read as a number, 00100 becomes 100.
+Every file starts with a UTF-8 BOM (byte-order mark), so open them with utf-8-sig. Otherwise the first column name gets a hidden prefix.
+Only 200 of the 5,100 customers have a mortgage. Their ages run 32–77 (median 47).
+2. mtg_tx_customer_link_and_final_mtg_infio.csv: final outcome per mortgage (200 rows)
+Mapping: maps C0004…C1000 to CUSTxxxxx one-to-one. Every ID resolves in the customer file.
+Decisions: 150 approved and 50 rejected. The rejection reasons are insufficient_collateral (34), insufficient_income (8), insufficient_equity (6) and existing_debt (2).
+Ranges:
+Property price: €156k–538k
+Loan: €121k–528k
+Equity: €10k–81.5k
+Loan-to-value (LTV): 0.76–0.98
+Required income: €2.2k–9.7k per month
+Formulas I confirmed:
+loan + equity = price for all 200 rows.
+lfinal_loan_to_value = loan / price exactly. The column name has a typo (lfinal_).
+required_monthly_income = loan × 0.0184086 for every row. That is exactly a 6% stress rate, 25-year annuity, divided by a 35% debt-to-income cap. This is how the bank tests affordability.
+Odd points:
+The final collateral value is below the loan in 198 of 200 cases, and 150 of those are still approved. The other two have collateral exactly equal to the loan.
+The final collateral value counts only the primary apartment's valuation. The second "other_apartment" valuation is ignored in 114 cases (see below).
+There is no clean threshold between approved and rejected. Approved LTVs run 0.76–0.98 and rejected ones 0.79–0.97. "Insufficient equity" cases cluster at LTV ≥ 0.91 with equity of roughly €13k–17.5k.
+3. mtg_negotiation_history.csv: event log (3,452 rows, 200 customers)
+Time: 2 Jan 2026 – 10 Sep 2026. Timestamps use the SAS format 26MAY26:00:00:00, which parses with %d%b%y:%H:%M:%S. Only 5 events fall in September, so the data looks cut off there.
+
+Size per customer: 11–25 events (median 17), spanning 13–45 days (median 25). Rows are already sorted by time within each customer, and no customer has two events at the same timestamp.
+
+The process is the same for every application: application_created (always at 00:00:00) → contacts / property_added / price updates → loan_calculation → income_information_received → expense_recorded → collateral_added → collateral_valuation → additional_collateral_requested → a second valuation → document_received → loan_decision → often a follow-up customer_contact.
+
+Properties: 1–3 per customer (113 / 58 / 29 customers). The decision is always on the last property added. Earlier properties are abandoned, which is why prices in the history reach €647.5k while the final maximum is €538k. Price updates move the price −6% to +8%, and 85 of the 188 updates are decreases.
+
+Valuations: the bank values the primary apartment at 65–80% of the price (median 72%). The second "other_apartment" is valued at €51k–243k.
+
+Expenses: six types, each with a fixed set of amounts:
+
+Type	Range
+Bank fee	€100–350
+Valuation fee	€250–450
+Maintenance fee	€180–550 per month
+Transfer tax	€2.5k–18k
+Renovation	€5k–30k
+Existing loan	€0–1,200
+Existing loan is often exactly €0. Only 37 customers have an existing loan above zero, and 30 of them were still approved. A customer can record the same expense type twice; C0004 has two transfer_tax entries.
+
+Notes: free text, but generated from only 21 templates. Every number in them is already in the structured columns, so the notes add no information.
+
+Edge cases in the history:
+
+Columns are sparse, and which ones are filled depends on the event type. For example, customer_contact rows sometimes carry property, loan or decision values copied forward and sometimes nothing.
+decision is filled on 336 rows, not 200, because the contact after a decision repeats it (136 rows). Use only loan_decision rows for the outcome.
+The last event is not always the decision: 136 of the 200 histories end with a customer_contact.
+collateral_status reads approved even for applications that were rejected.
+78 customers had extra collateral requested but never got a second valuation. 8 approved customers had no extra collateral request at all.
+The final table matches the history exactly: same decision, reason, loan, equity and last price, and its collateral equals the primary valuation on the loan_decision row.
