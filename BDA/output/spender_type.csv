@@ -66,12 +66,12 @@ CUST00064,Shopper,You spend more than most people your age on shopping & persona
 CUST00065,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST00066,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",53
 CUST00067,Balanced spender,Your spending is close to people your age in every area.,,57
-CUST00068,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",69
+CUST00068,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",69
 CUST00069,Balanced spender,Your spending is close to people your age in every area.,,52
 CUST00070,Foodie,You spend more than most people your age on restaurants & cafés.,restaurants,48
 CUST00071,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",68
 CUST00072,Experience seeker and Big-ticket buyer,You spend more than most people your age on entertainment and big one-off purchases.,"entertainment,big_purchase",55
-CUST00073,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",54
+CUST00073,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",54
 CUST00074,Balanced spender,Your spending is close to people your age in every area.,,54
 CUST00075,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",54
 CUST00076,Traveller and Driver,You spend more than most people your age on travel and parking.,"travel,parking",59
@@ -143,7 +143,7 @@ CUST00141,Experience seeker (and a saver),You spend more than most people your a
 CUST00142,On-the-go,You spend more than most people your age on taxis.,taxi,56
 CUST00143,Balanced spender,Your spending is close to people your age in every area.,,46
 CUST00144,Traveller and Social butterfly (and a saver),You spend more than most people your age on travel and bars.,"travel,bars",53
-CUST00145,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",60
+CUST00145,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",60
 CUST00146,Shopper and Foodie,You spend more than most people your age on shopping & personal care and restaurants & cafés.,"lifestyle,restaurants",62
 CUST00147,Balanced spender (and a saver),Your spending is close to people your age in every area.,,39
 CUST00148,Balanced spender (and a saver),Your spending is close to people your age in every area.,,59
@@ -212,7 +212,7 @@ CUST00210,Home & gadget investor and Experience seeker,You spend more than most 
 CUST00211,Experience seeker and Driver,You spend more than most people your age on entertainment and parking.,"entertainment,parking",54
 CUST00212,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",53
 CUST00213,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and other transport.,"big_purchase,transport_other",62
-CUST00214,Traveller and On-the-go,You spend more than most people your age on travel and taxis.,"travel,taxi",61
+CUST00214,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",61
 CUST00215,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",69
 CUST00216,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",57
 CUST00217,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",61
@@ -227,7 +227,7 @@ CUST00225,On-the-go and Driver,You spend more than most people your age on taxis
 CUST00226,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST00227,Balanced spender,Your spending is close to people your age in every area.,,39
 CUST00228,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",69
-CUST00229,On-the-go and Driver (and a saver),You spend more than most people your age on other transport and parking.,"transport_other,parking",65
+CUST00229,Driver and On-the-go (and a saver),You spend more than most people your age on parking and other transport.,"parking,transport_other",65
 CUST00230,Balanced spender (and a saver),Your spending is close to people your age in every area.,,47
 CUST00231,On-the-go,You spend more than most people your age on taxis.,taxi,57
 CUST00232,On-the-go and Experience seeker,You spend more than most people your age on other transport and entertainment.,"transport_other,entertainment",57
@@ -336,7 +336,7 @@ CUST00334,Experience seeker and Home & gadget investor,You spend more than most 
 CUST00335,Balanced spender (and a saver),Your spending is close to people your age in every area.,,43
 CUST00336,Balanced spender (and a saver),Your spending is close to people your age in every area.,,34
 CUST00337,Balanced spender,Your spending is close to people your age in every area.,,52
-CUST00338,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",44
+CUST00338,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",44
 CUST00339,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,63
 CUST00340,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",62
 CUST00341,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
@@ -356,7 +356,7 @@ CUST00354,Balanced spender,Your spending is close to people your age in every ar
 CUST00355,Balanced spender (and a saver),Your spending is close to people your age in every area.,,52
 CUST00356,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,50
 CUST00357,Experience seeker and Takeaway lover,You spend more than most people your age on entertainment and fast food & takeaway.,"entertainment,fast_food",67
-CUST00358,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",58
+CUST00358,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",58
 CUST00359,Balanced spender,Your spending is close to people your age in every area.,,50
 CUST00360,Foodie and Traveller,You spend more than most people your age on restaurants & cafés and travel.,"restaurants,travel",64
 CUST00361,Experience seeker and Driver,You spend more than most people your age on entertainment and parking.,"entertainment,parking",63
@@ -388,13 +388,13 @@ CUST00386,Big-ticket buyer and On-the-go,You spend more than most people your ag
 CUST00387,Big-ticket buyer and Shopper,You spend more than most people your age on big one-off purchases and shopping & personal care.,"big_purchase,lifestyle",58
 CUST00388,Balanced spender,Your spending is close to people your age in every area.,,36
 CUST00389,Driver and Traveller,You spend more than most people your age on parking and travel.,"parking,travel",41
-CUST00390,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",62
+CUST00390,Home & gadget investor and Takeaway lover,You spend more than most people your age on home & tech and fast food & takeaway.,"home_tech,fast_food",62
 CUST00391,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",63
 CUST00392,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",67
 CUST00393,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",64
 CUST00394,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
 CUST00395,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",67
-CUST00396,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",61
+CUST00396,Foodie and Big-ticket buyer,You spend more than most people your age on restaurants & cafés and big one-off purchases.,"restaurants,big_purchase",61
 CUST00397,Balanced spender,Your spending is close to people your age in every area.,,30
 CUST00398,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST00399,Driver and Traveller,You spend more than most people your age on parking and travel.,"parking,travel",42
@@ -403,7 +403,7 @@ CUST00401,Takeaway lover and Foodie,You spend more than most people your age on 
 CUST00402,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,56
 CUST00403,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",49
 CUST00404,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,47
-CUST00405,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",62
+CUST00405,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",62
 CUST00406,Balanced spender (and a saver),Your spending is close to people your age in every area.,,42
 CUST00407,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and taxis.,"big_purchase,taxi",62
 CUST00408,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,47
@@ -412,7 +412,7 @@ CUST00410,On-the-go,You spend more than most people your age on taxis and other 
 CUST00411,Balanced spender (and a saver),Your spending is close to people your age in every area.,,95
 CUST00412,On-the-go and Traveller,You spend more than most people your age on taxis and travel.,"taxi,travel",58
 CUST00413,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
-CUST00414,Foodie and Experience seeker,You spend more than most people your age on restaurants & cafés and entertainment.,"restaurants,entertainment",63
+CUST00414,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",63
 CUST00415,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",56
 CUST00416,Balanced spender,Your spending is close to people your age in every area.,,30
 CUST00417,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,66
@@ -430,7 +430,7 @@ CUST00428,Takeaway lover and Traveller,You spend more than most people your age 
 CUST00429,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST00430,On-the-go and Traveller,You spend more than most people your age on other transport and travel.,"transport_other,travel",69
 CUST00431,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",66
-CUST00432,Big-ticket buyer and On-the-go (and a saver),You spend more than most people your age on big one-off purchases and taxis.,"big_purchase,taxi",60
+CUST00432,Big-ticket buyer and Foodie (and a saver),You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",60
 CUST00433,Takeaway lover and Traveller,You spend more than most people your age on fast food & takeaway and travel.,"fast_food,travel",71
 CUST00434,Balanced spender (and a saver),Your spending is close to people your age in every area.,,39
 CUST00435,Social butterfly and On-the-go,You spend more than most people your age on bars and other transport.,"bars,transport_other",54
@@ -460,7 +460,7 @@ CUST00458,On-the-go and Shopper (and a saver),You spend more than most people yo
 CUST00459,On-the-go,You spend more than most people your age on other transport.,transport_other,53
 CUST00460,Social butterfly and Home & gadget investor,You spend more than most people your age on bars and home & tech.,"bars,home_tech",66
 CUST00461,Balanced spender,Your spending is close to people your age in every area.,,41
-CUST00462,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",58
+CUST00462,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",58
 CUST00463,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",57
 CUST00464,Balanced spender (and a saver),Your spending is close to people your age in every area.,,43
 CUST00465,Driver and Experience seeker,You spend more than most people your age on parking and entertainment.,"parking,entertainment",61
@@ -542,16 +542,16 @@ CUST00540,On-the-go,You spend more than most people your age on taxis and other 
 CUST00541,Shopper and Takeaway lover,You spend more than most people your age on shopping & personal care and fast food & takeaway.,"lifestyle,fast_food",64
 CUST00542,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST00543,Balanced spender,Your spending is close to people your age in every area.,,39
-CUST00544,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",63
+CUST00544,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",63
 CUST00545,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",51
 CUST00546,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",65
-CUST00547,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",66
+CUST00547,On-the-go and Shopper,You spend more than most people your age on taxis and shopping & personal care.,"taxi,lifestyle",66
 CUST00548,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",69
 CUST00549,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,50
 CUST00550,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,57
 CUST00551,Balanced spender,Your spending is close to people your age in every area.,,37
 CUST00552,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",52
-CUST00553,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",56
+CUST00553,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",56
 CUST00554,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,58
 CUST00555,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,51
 CUST00556,Balanced spender,Your spending is close to people your age in every area.,,49
@@ -566,7 +566,7 @@ CUST00564,Big-ticket buyer and Foodie,You spend more than most people your age o
 CUST00565,Traveller and On-the-go,You spend more than most people your age on travel and other transport.,"travel,transport_other",51
 CUST00566,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
 CUST00567,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",60
-CUST00568,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",64
+CUST00568,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",64
 CUST00569,On-the-go,You spend more than most people your age on other transport.,transport_other,53
 CUST00570,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",70
 CUST00571,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",64
@@ -612,7 +612,7 @@ CUST00610,Balanced spender (and a saver),Your spending is close to people your a
 CUST00611,Balanced spender,Your spending is close to people your age in every area.,,39
 CUST00612,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",67
 CUST00613,Driver and Home & gadget investor,You spend more than most people your age on parking and home & tech.,"parking,home_tech",59
-CUST00614,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",69
+CUST00614,On-the-go,You spend more than most people your age on other transport and taxis.,"transport_other,taxi",69
 CUST00615,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",59
 CUST00616,Experience seeker,You spend more than most people your age on entertainment.,entertainment,58
 CUST00617,Takeaway lover and Big-ticket buyer,You spend more than most people your age on fast food & takeaway and big one-off purchases.,"fast_food,big_purchase",67
@@ -622,7 +622,7 @@ CUST00620,Traveller and Home & gadget investor,You spend more than most people y
 CUST00621,Balanced spender,Your spending is close to people your age in every area.,,43
 CUST00622,Balanced spender,Your spending is close to people your age in every area.,,58
 CUST00623,Balanced spender,Your spending is close to people your age in every area.,,48
-CUST00624,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",64
+CUST00624,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",64
 CUST00625,Balanced spender,Your spending is close to people your age in every area.,,61
 CUST00626,Balanced spender,Your spending is close to people your age in every area.,,41
 CUST00627,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,46
@@ -720,7 +720,7 @@ CUST00718,Social butterfly and Traveller,You spend more than most people your ag
 CUST00719,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",66
 CUST00720,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",51
 CUST00721,Balanced spender,Your spending is close to people your age in every area.,,52
-CUST00722,Shopper and Social butterfly (and a saver),You spend more than most people your age on shopping & personal care and bars.,"lifestyle,bars",62
+CUST00722,Social butterfly and Shopper (and a saver),You spend more than most people your age on bars and shopping & personal care.,"bars,lifestyle",62
 CUST00723,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,48
 CUST00724,Balanced spender (and a saver),Your spending is close to people your age in every area.,,59
 CUST00725,Balanced spender (and a saver),Your spending is close to people your age in every area.,,53
@@ -778,7 +778,7 @@ CUST00776,On-the-go,You spend more than most people your age on taxis and other 
 CUST00777,On-the-go,You spend more than most people your age on other transport.,transport_other,49
 CUST00778,Balanced spender (and a saver),Your spending is close to people your age in every area.,,95
 CUST00779,Balanced spender,Your spending is close to people your age in every area.,,53
-CUST00780,On-the-go and Social butterfly,You spend more than most people your age on taxis and bars.,"taxi,bars",63
+CUST00780,On-the-go and Home & gadget investor,You spend more than most people your age on taxis and home & tech.,"taxi,home_tech",63
 CUST00781,Balanced spender (and a saver),Your spending is close to people your age in every area.,,63
 CUST00782,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",68
 CUST00783,Traveller and Big-ticket buyer,You spend more than most people your age on travel and big one-off purchases.,"travel,big_purchase",49
@@ -841,7 +841,7 @@ CUST00839,Experience seeker and Home & gadget investor,You spend more than most 
 CUST00840,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",52
 CUST00841,Balanced spender (and a saver),Your spending is close to people your age in every area.,,55
 CUST00842,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",65
-CUST00843,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",69
+CUST00843,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",69
 CUST00844,On-the-go and Big-ticket buyer,You spend more than most people your age on other transport and big one-off purchases.,"transport_other,big_purchase",69
 CUST00845,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",64
 CUST00846,Home & gadget investor and Takeaway lover,You spend more than most people your age on home & tech and fast food & takeaway.,"home_tech,fast_food",61
@@ -854,8 +854,8 @@ CUST00852,On-the-go,You spend more than most people your age on other transport.
 CUST00853,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",63
 CUST00854,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",62
 CUST00855,Driver and Home & gadget investor,You spend more than most people your age on parking and home & tech.,"parking,home_tech",59
-CUST00856,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",74
-CUST00857,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",64
+CUST00856,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",74
+CUST00857,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",64
 CUST00858,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",61
 CUST00859,Balanced spender (and a saver),Your spending is close to people your age in every area.,,87
 CUST00860,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",63
@@ -907,7 +907,7 @@ CUST00905,Social butterfly and On-the-go,You spend more than most people your ag
 CUST00906,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",61
 CUST00907,Balanced spender,Your spending is close to people your age in every area.,,31
 CUST00908,Balanced spender,Your spending is close to people your age in every area.,,37
-CUST00909,Home & gadget investor and Takeaway lover,You spend more than most people your age on home & tech and fast food & takeaway.,"home_tech,fast_food",62
+CUST00909,Takeaway lover and Home & gadget investor,You spend more than most people your age on fast food & takeaway and home & tech.,"fast_food,home_tech",62
 CUST00910,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST00911,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST00912,Balanced spender,Your spending is close to people your age in every area.,,50
@@ -943,13 +943,13 @@ CUST00941,On-the-go and Big-ticket buyer (and a saver),You spend more than most 
 CUST00942,Balanced spender (and a saver),Your spending is close to people your age in every area.,,95
 CUST00943,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",59
 CUST00944,Balanced spender,Your spending is close to people your age in every area.,,43
-CUST00945,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",71
+CUST00945,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",71
 CUST00946,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST00947,Balanced spender,Your spending is close to people your age in every area.,,54
-CUST00948,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",45
+CUST00948,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",45
 CUST00949,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",55
 CUST00950,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,58
-CUST00951,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",70
+CUST00951,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",70
 CUST00952,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",47
 CUST00953,Balanced spender (and a saver),Your spending is close to people your age in every area.,,43
 CUST00954,Balanced spender,Your spending is close to people your age in every area.,,60
@@ -969,7 +969,7 @@ CUST00967,Balanced spender,Your spending is close to people your age in every ar
 CUST00968,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",49
 CUST00969,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",72
 CUST00970,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,55
-CUST00971,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",57
+CUST00971,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",57
 CUST00972,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,60
 CUST00973,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",59
 CUST00974,Balanced spender (and a saver),Your spending is close to people your age in every area.,,92
@@ -996,7 +996,7 @@ CUST00994,Big-ticket buyer and Social butterfly,You spend more than most people 
 CUST00995,Balanced spender,Your spending is close to people your age in every area.,,53
 CUST00996,Social butterfly,You spend more than most people your age on bars.,bars,55
 CUST00997,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",64
-CUST00998,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",44
+CUST00998,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",44
 CUST00999,On-the-go and Foodie,You spend more than most people your age on other transport and restaurants & cafés.,"transport_other,restaurants",57
 CUST01000,Foodie and Big-ticket buyer,You spend more than most people your age on restaurants & cafés and big one-off purchases.,"restaurants,big_purchase",65
 CUST01001,Balanced spender,Your spending is close to people your age in every area.,,43
@@ -1090,7 +1090,7 @@ CUST01088,Experience seeker and Shopper,You spend more than most people your age
 CUST01089,Traveller and Home & gadget investor (and a saver),You spend more than most people your age on travel and home & tech.,"travel,home_tech",66
 CUST01090,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",59
 CUST01091,Balanced spender (and a saver),Your spending is close to people your age in every area.,,55
-CUST01092,Takeaway lover and Traveller,You spend more than most people your age on fast food & takeaway and travel.,"fast_food,travel",68
+CUST01092,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",68
 CUST01093,Balanced spender,Your spending is close to people your age in every area.,,42
 CUST01094,Driver and Traveller (and a saver),You spend more than most people your age on parking and travel.,"parking,travel",55
 CUST01095,Balanced spender,Your spending is close to people your age in every area.,,19
@@ -1107,7 +1107,7 @@ CUST01105,Balanced spender (and a saver),Your spending is close to people your a
 CUST01106,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",63
 CUST01107,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,42
 CUST01108,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,51
-CUST01109,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",69
+CUST01109,Takeaway lover and On-the-go,You spend more than most people your age on fast food & takeaway and other transport.,"fast_food,transport_other",69
 CUST01110,Takeaway lover and Experience seeker,You spend more than most people your age on fast food & takeaway and entertainment.,"fast_food,entertainment",60
 CUST01111,Foodie and Home & gadget investor,You spend more than most people your age on restaurants & cafés and home & tech.,"restaurants,home_tech",64
 CUST01112,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",50
@@ -1118,7 +1118,7 @@ CUST01116,Driver and On-the-go,You spend more than most people your age on parki
 CUST01117,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",59
 CUST01118,Balanced spender,Your spending is close to people your age in every area.,,61
 CUST01119,Balanced spender (and a saver),Your spending is close to people your age in every area.,,40
-CUST01120,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",64
+CUST01120,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",64
 CUST01121,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",57
 CUST01122,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",56
 CUST01123,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",67
@@ -1136,7 +1136,7 @@ CUST01134,Big-ticket buyer and Social butterfly,You spend more than most people 
 CUST01135,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",61
 CUST01136,Driver and Big-ticket buyer (and a saver),You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",56
 CUST01137,On-the-go and Experience seeker,You spend more than most people your age on taxis and entertainment.,"taxi,entertainment",59
-CUST01138,Shopper and Traveller,You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",68
+CUST01138,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",68
 CUST01139,Traveller,You spend more than most people your age on travel.,travel,57
 CUST01140,Balanced spender,Your spending is close to people your age in every area.,,31
 CUST01141,Social butterfly and Experience seeker,You spend more than most people your age on bars and entertainment.,"bars,entertainment",57
@@ -1146,7 +1146,7 @@ CUST01144,Home & gadget investor and Shopper,You spend more than most people you
 CUST01145,Balanced spender (and a saver),Your spending is close to people your age in every area.,,50
 CUST01146,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",47
 CUST01147,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",65
-CUST01148,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",71
+CUST01148,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",71
 CUST01149,Experience seeker and Social butterfly,You spend more than most people your age on entertainment and bars.,"entertainment,bars",73
 CUST01150,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",49
 CUST01151,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",61
@@ -1208,7 +1208,7 @@ CUST01206,Shopper and Home & gadget investor,You spend more than most people you
 CUST01207,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,62
 CUST01208,Driver and Foodie,You spend more than most people your age on parking and restaurants & cafés.,"parking,restaurants",59
 CUST01209,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",68
-CUST01210,Takeaway lover and On-the-go,You spend more than most people your age on fast food & takeaway and other transport.,"fast_food,transport_other",59
+CUST01210,Takeaway lover and Driver,You spend more than most people your age on fast food & takeaway and parking.,"fast_food,parking",59
 CUST01211,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",65
 CUST01212,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",55
 CUST01213,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",62
@@ -1216,7 +1216,7 @@ CUST01214,Balanced spender,Your spending is close to people your age in every ar
 CUST01215,Takeaway lover,You spend more than most people your age on fast food & takeaway.,fast_food,57
 CUST01216,Balanced spender,Your spending is close to people your age in every area.,,52
 CUST01217,Balanced spender,Your spending is close to people your age in every area.,,42
-CUST01218,Home & gadget investor and Foodie,You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",72
+CUST01218,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",72
 CUST01219,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",70
 CUST01220,Traveller and Takeaway lover,You spend more than most people your age on travel and fast food & takeaway.,"travel,fast_food",65
 CUST01221,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
@@ -1231,7 +1231,7 @@ CUST01229,Traveller and Home & gadget investor,You spend more than most people y
 CUST01230,Balanced spender,Your spending is close to people your age in every area.,,53
 CUST01231,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",65
 CUST01232,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,53
-CUST01233,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",66
+CUST01233,Shopper and Foodie,You spend more than most people your age on shopping & personal care and restaurants & cafés.,"lifestyle,restaurants",66
 CUST01234,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,54
 CUST01235,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",62
 CUST01236,Balanced spender,Your spending is close to people your age in every area.,,63
@@ -1239,7 +1239,7 @@ CUST01237,Experience seeker and On-the-go,You spend more than most people your a
 CUST01238,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST01239,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST01240,Balanced spender,Your spending is close to people your age in every area.,,47
-CUST01241,Experience seeker and Traveller,You spend more than most people your age on entertainment and travel.,"entertainment,travel",57
+CUST01241,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",57
 CUST01242,Balanced spender,Your spending is close to people your age in every area.,,61
 CUST01243,Balanced spender,Your spending is close to people your age in every area.,,35
 CUST01244,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,54
@@ -1278,7 +1278,7 @@ CUST01276,Balanced spender (and a saver),Your spending is close to people your a
 CUST01277,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,52
 CUST01278,On-the-go and Experience seeker,You spend more than most people your age on other transport and entertainment.,"transport_other,entertainment",58
 CUST01279,Balanced spender,Your spending is close to people your age in every area.,,58
-CUST01280,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",60
+CUST01280,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",60
 CUST01281,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",67
 CUST01282,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",45
 CUST01283,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",63
@@ -1300,7 +1300,7 @@ CUST01298,Balanced spender (and a saver),Your spending is close to people your a
 CUST01299,Balanced spender,Your spending is close to people your age in every area.,,54
 CUST01300,Balanced spender,Your spending is close to people your age in every area.,,23
 CUST01301,Social butterfly and Home & gadget investor,You spend more than most people your age on bars and home & tech.,"bars,home_tech",57
-CUST01302,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",48
+CUST01302,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",48
 CUST01303,Home & gadget investor and Foodie,You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",61
 CUST01304,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",53
 CUST01305,Balanced spender,Your spending is close to people your age in every area.,,50
@@ -1335,7 +1335,7 @@ CUST01333,Balanced spender,Your spending is close to people your age in every ar
 CUST01334,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",57
 CUST01335,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST01336,Balanced spender,Your spending is close to people your age in every area.,,31
-CUST01337,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",63
+CUST01337,Experience seeker and Takeaway lover,You spend more than most people your age on entertainment and fast food & takeaway.,"entertainment,fast_food",63
 CUST01338,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",48
 CUST01339,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",55
 CUST01340,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",60
@@ -1343,7 +1343,7 @@ CUST01341,Balanced spender,Your spending is close to people your age in every ar
 CUST01342,Experience seeker,You spend more than most people your age on entertainment.,entertainment,58
 CUST01343,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",56
 CUST01344,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",64
-CUST01345,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",70
+CUST01345,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",70
 CUST01346,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",68
 CUST01347,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST01348,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,60
@@ -1382,7 +1382,7 @@ CUST01380,Balanced spender,Your spending is close to people your age in every ar
 CUST01381,Home & gadget investor and On-the-go (and a saver),You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",66
 CUST01382,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",59
 CUST01383,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and taxis.,"big_purchase,taxi",67
-CUST01384,Traveller and On-the-go,You spend more than most people your age on travel and other transport.,"travel,transport_other",70
+CUST01384,On-the-go and Traveller,You spend more than most people your age on other transport and travel.,"transport_other,travel",70
 CUST01385,On-the-go and Shopper,You spend more than most people your age on taxis and shopping & personal care.,"taxi,lifestyle",59
 CUST01386,Driver and On-the-go (and a saver),You spend more than most people your age on parking and other transport.,"parking,transport_other",70
 CUST01387,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",62
@@ -1440,8 +1440,8 @@ CUST01438,Balanced spender,Your spending is close to people your age in every ar
 CUST01439,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",52
 CUST01440,On-the-go and Home & gadget investor,You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",64
 CUST01441,On-the-go (and a saver),You spend more than most people your age on taxis.,taxi,54
-CUST01442,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",62
-CUST01443,On-the-go (and a saver),You spend more than most people your age on taxis and other transport.,"taxi,transport_other",65
+CUST01442,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",62
+CUST01443,On-the-go and Takeaway lover (and a saver),You spend more than most people your age on taxis and fast food & takeaway.,"taxi,fast_food",65
 CUST01444,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST01445,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,51
 CUST01446,Balanced spender,Your spending is close to people your age in every area.,,44
@@ -1480,7 +1480,7 @@ CUST01478,On-the-go,You spend more than most people your age on taxis and other 
 CUST01479,On-the-go,You spend more than most people your age on taxis.,taxi,55
 CUST01480,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",67
 CUST01481,Experience seeker and On-the-go,You spend more than most people your age on entertainment and taxis.,"entertainment,taxi",51
-CUST01482,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",74
+CUST01482,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",74
 CUST01483,Balanced spender,Your spending is close to people your age in every area.,,49
 CUST01484,Foodie,You spend more than most people your age on restaurants & cafés.,restaurants,61
 CUST01485,Balanced spender,Your spending is close to people your age in every area.,,65
@@ -1583,7 +1583,7 @@ CUST01581,On-the-go and Experience seeker,You spend more than most people your a
 CUST01582,Experience seeker,You spend more than most people your age on entertainment.,entertainment,53
 CUST01583,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",67
 CUST01584,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,52
-CUST01585,On-the-go and Takeaway lover,You spend more than most people your age on taxis and fast food & takeaway.,"taxi,fast_food",59
+CUST01585,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",59
 CUST01586,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST01587,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,52
 CUST01588,Balanced spender,Your spending is close to people your age in every area.,,53
@@ -1624,7 +1624,7 @@ CUST01622,Shopper and On-the-go,You spend more than most people your age on shop
 CUST01623,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",58
 CUST01624,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST01625,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",64
-CUST01626,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",67
+CUST01626,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",67
 CUST01627,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST01628,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",58
 CUST01629,Foodie,You spend more than most people your age on restaurants & cafés.,restaurants,57
@@ -1661,10 +1661,10 @@ CUST01659,Balanced spender,Your spending is close to people your age in every ar
 CUST01660,Traveller and Home & gadget investor (and a saver),You spend more than most people your age on travel and home & tech.,"travel,home_tech",57
 CUST01661,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,54
 CUST01662,Big-ticket buyer and Social butterfly (and a saver),You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",57
-CUST01663,Social butterfly and Experience seeker,You spend more than most people your age on bars and entertainment.,"bars,entertainment",64
+CUST01663,Experience seeker and Social butterfly,You spend more than most people your age on entertainment and bars.,"entertainment,bars",64
 CUST01664,Balanced spender,Your spending is close to people your age in every area.,,45
 CUST01665,On-the-go and Takeaway lover,You spend more than most people your age on taxis and fast food & takeaway.,"taxi,fast_food",66
-CUST01666,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",62
+CUST01666,Foodie and On-the-go,You spend more than most people your age on restaurants & cafés and taxis.,"restaurants,taxi",62
 CUST01667,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
 CUST01668,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST01669,Takeaway lover and Driver,You spend more than most people your age on fast food & takeaway and parking.,"fast_food,parking",56
@@ -1691,11 +1691,11 @@ CUST01689,Social butterfly and Big-ticket buyer,You spend more than most people 
 CUST01690,Traveller and Social butterfly,You spend more than most people your age on travel and bars.,"travel,bars",41
 CUST01691,Experience seeker,You spend more than most people your age on entertainment.,entertainment,51
 CUST01692,Balanced spender,Your spending is close to people your age in every area.,,63
-CUST01693,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",63
+CUST01693,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",63
 CUST01694,Home & gadget investor and Big-ticket buyer (and a saver),You spend more than most people your age on home & tech and big one-off purchases.,"home_tech,big_purchase",51
 CUST01695,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",64
 CUST01696,Balanced spender (and a saver),Your spending is close to people your age in every area.,,30
-CUST01697,Driver and On-the-go (and a saver),You spend more than most people your age on parking and taxis.,"parking,taxi",53
+CUST01697,On-the-go and Driver (and a saver),You spend more than most people your age on taxis and parking.,"taxi,parking",53
 CUST01698,Balanced spender,Your spending is close to people your age in every area.,,41
 CUST01699,Balanced spender,Your spending is close to people your age in every area.,,56
 CUST01700,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",69
@@ -1767,7 +1767,7 @@ CUST01765,Traveller and Experience seeker,You spend more than most people your a
 CUST01766,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",67
 CUST01767,Balanced spender,Your spending is close to people your age in every area.,,40
 CUST01768,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",58
-CUST01769,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",73
+CUST01769,Social butterfly and Experience seeker,You spend more than most people your age on bars and entertainment.,"bars,entertainment",73
 CUST01770,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
 CUST01771,Social butterfly and Driver,You spend more than most people your age on bars and parking.,"bars,parking",54
 CUST01772,Balanced spender,Your spending is close to people your age in every area.,,30
@@ -1781,7 +1781,7 @@ CUST01779,Home & gadget investor and Foodie,You spend more than most people your
 CUST01780,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",64
 CUST01781,Foodie and Experience seeker,You spend more than most people your age on restaurants & cafés and entertainment.,"restaurants,entertainment",68
 CUST01782,Shopper and Experience seeker (and a saver),You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",68
-CUST01783,On-the-go,You spend more than most people your age on other transport and taxis.,"transport_other,taxi",75
+CUST01783,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",75
 CUST01784,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",61
 CUST01785,Experience seeker and Takeaway lover,You spend more than most people your age on entertainment and fast food & takeaway.,"entertainment,fast_food",67
 CUST01786,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",54
@@ -1802,7 +1802,7 @@ CUST01800,Balanced spender (and a saver),Your spending is close to people your a
 CUST01801,Balanced spender,Your spending is close to people your age in every area.,,32
 CUST01802,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,56
 CUST01803,Driver,You spend more than most people your age on parking.,parking,48
-CUST01804,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",71
+CUST01804,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",71
 CUST01805,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",49
 CUST01806,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,65
 CUST01807,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
@@ -1923,7 +1923,7 @@ CUST01921,Balanced spender,Your spending is close to people your age in every ar
 CUST01922,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",58
 CUST01923,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",41
 CUST01924,Balanced spender,Your spending is close to people your age in every area.,,45
-CUST01925,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",62
+CUST01925,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",62
 CUST01926,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",49
 CUST01927,Balanced spender (and a saver),Your spending is close to people your age in every area.,,41
 CUST01928,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",63
@@ -1932,7 +1932,7 @@ CUST01930,Balanced spender,Your spending is close to people your age in every ar
 CUST01931,Foodie and Takeaway lover (and a saver),You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",45
 CUST01932,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",67
 CUST01933,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",68
-CUST01934,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",55
+CUST01934,Traveller and Social butterfly,You spend more than most people your age on travel and bars.,"travel,bars",55
 CUST01935,Takeaway lover and Experience seeker,You spend more than most people your age on fast food & takeaway and entertainment.,"fast_food,entertainment",58
 CUST01936,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",70
 CUST01937,Shopper and Social butterfly,You spend more than most people your age on shopping & personal care and bars.,"lifestyle,bars",56
@@ -2039,7 +2039,7 @@ CUST02037,On-the-go,You spend more than most people your age on taxis and other 
 CUST02038,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,59
 CUST02039,Shopper and Traveller,You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",62
 CUST02040,Balanced spender,Your spending is close to people your age in every area.,,51
-CUST02041,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",59
+CUST02041,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",59
 CUST02042,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",60
 CUST02043,Balanced spender,Your spending is close to people your age in every area.,,54
 CUST02044,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",61
@@ -2053,7 +2053,7 @@ CUST02051,Big-ticket buyer and Foodie,You spend more than most people your age o
 CUST02052,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST02053,Balanced spender,Your spending is close to people your age in every area.,,56
 CUST02054,Balanced spender,Your spending is close to people your age in every area.,,52
-CUST02055,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",66
+CUST02055,Takeaway lover and Big-ticket buyer,You spend more than most people your age on fast food & takeaway and big one-off purchases.,"fast_food,big_purchase",66
 CUST02056,On-the-go,You spend more than most people your age on taxis.,taxi,53
 CUST02057,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",61
 CUST02058,Balanced spender (and a saver),Your spending is close to people your age in every area.,,63
@@ -2079,7 +2079,7 @@ CUST02077,Balanced spender,Your spending is close to people your age in every ar
 CUST02078,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",62
 CUST02079,Home & gadget investor (and a saver),You spend more than most people your age on home & tech.,home_tech,49
 CUST02080,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",69
-CUST02081,Foodie and Social butterfly,You spend more than most people your age on restaurants & cafés and bars.,"restaurants,bars",74
+CUST02081,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",74
 CUST02082,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,60
 CUST02083,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST02084,Balanced spender (and a saver),Your spending is close to people your age in every area.,,44
@@ -2090,9 +2090,9 @@ CUST02088,Balanced spender,Your spending is close to people your age in every ar
 CUST02089,Shopper and Social butterfly,You spend more than most people your age on shopping & personal care and bars.,"lifestyle,bars",55
 CUST02090,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",48
 CUST02091,Big-ticket buyer and Home & gadget investor,You spend more than most people your age on big one-off purchases and home & tech.,"big_purchase,home_tech",51
-CUST02092,Takeaway lover and On-the-go,You spend more than most people your age on fast food & takeaway and taxis.,"fast_food,taxi",65
+CUST02092,Takeaway lover and Driver,You spend more than most people your age on fast food & takeaway and parking.,"fast_food,parking",65
 CUST02093,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",56
-CUST02094,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",62
+CUST02094,On-the-go and Home & gadget investor,You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",62
 CUST02095,Balanced spender (and a saver),Your spending is close to people your age in every area.,,97
 CUST02096,Balanced spender,Your spending is close to people your age in every area.,,49
 CUST02097,Experience seeker and Takeaway lover,You spend more than most people your age on entertainment and fast food & takeaway.,"entertainment,fast_food",50
@@ -2124,7 +2124,7 @@ CUST02122,Shopper and Experience seeker,You spend more than most people your age
 CUST02123,Traveller,You spend more than most people your age on travel.,travel,64
 CUST02124,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",63
 CUST02125,Balanced spender,Your spending is close to people your age in every area.,,58
-CUST02126,Shopper and Traveller,You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",73
+CUST02126,Traveller and Shopper,You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",73
 CUST02127,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",64
 CUST02128,Shopper and Experience seeker (and a saver),You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",54
 CUST02129,On-the-go and Home & gadget investor,You spend more than most people your age on taxis and home & tech.,"taxi,home_tech",44
@@ -2135,7 +2135,7 @@ CUST02133,Balanced spender (and a saver),Your spending is close to people your a
 CUST02134,Experience seeker and Social butterfly,You spend more than most people your age on entertainment and bars.,"entertainment,bars",66
 CUST02135,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST02136,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",68
-CUST02137,On-the-go and Takeaway lover,You spend more than most people your age on taxis and fast food & takeaway.,"taxi,fast_food",56
+CUST02137,Takeaway lover and Big-ticket buyer,You spend more than most people your age on fast food & takeaway and big one-off purchases.,"fast_food,big_purchase",56
 CUST02138,Balanced spender (and a saver),Your spending is close to people your age in every area.,,30
 CUST02139,Balanced spender,Your spending is close to people your age in every area.,,53
 CUST02140,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",50
@@ -2160,7 +2160,7 @@ CUST02158,Balanced spender (and a saver),Your spending is close to people your a
 CUST02159,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
 CUST02160,Experience seeker,You spend more than most people your age on entertainment.,entertainment,47
 CUST02161,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",62
-CUST02162,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",69
+CUST02162,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",69
 CUST02163,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,56
 CUST02164,Balanced spender,Your spending is close to people your age in every area.,,29
 CUST02165,Balanced spender,Your spending is close to people your age in every area.,,54
@@ -2193,7 +2193,7 @@ CUST02191,Experience seeker and Traveller,You spend more than most people your a
 CUST02192,Driver,You spend more than most people your age on parking.,parking,60
 CUST02193,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",62
 CUST02194,Balanced spender,Your spending is close to people your age in every area.,,66
-CUST02195,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",70
+CUST02195,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",70
 CUST02196,Balanced spender,Your spending is close to people your age in every area.,,27
 CUST02197,Balanced spender (and a saver),Your spending is close to people your age in every area.,,57
 CUST02198,Driver and Home & gadget investor,You spend more than most people your age on parking and home & tech.,"parking,home_tech",58
@@ -2266,7 +2266,7 @@ CUST02264,Shopper and Traveller,You spend more than most people your age on shop
 CUST02265,Balanced spender,Your spending is close to people your age in every area.,,50
 CUST02266,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",60
 CUST02267,Balanced spender (and a saver),Your spending is close to people your age in every area.,,64
-CUST02268,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",68
+CUST02268,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",68
 CUST02269,Balanced spender,Your spending is close to people your age in every area.,,55
 CUST02270,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,45
 CUST02271,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",61
@@ -2296,7 +2296,7 @@ CUST02294,Social butterfly and Shopper,You spend more than most people your age 
 CUST02295,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST02296,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,61
 CUST02297,Balanced spender,Your spending is close to people your age in every area.,,62
-CUST02298,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",63
+CUST02298,Experience seeker and Traveller,You spend more than most people your age on entertainment and travel.,"entertainment,travel",63
 CUST02299,Balanced spender,Your spending is close to people your age in every area.,,43
 CUST02300,Balanced spender (and a saver),Your spending is close to people your age in every area.,,38
 CUST02301,Balanced spender,Your spending is close to people your age in every area.,,56
@@ -2361,13 +2361,13 @@ CUST02359,Experience seeker and Shopper,You spend more than most people your age
 CUST02360,Experience seeker and Traveller (and a saver),You spend more than most people your age on entertainment and travel.,"entertainment,travel",52
 CUST02361,Balanced spender (and a saver),Your spending is close to people your age in every area.,,51
 CUST02362,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,61
-CUST02363,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",63
+CUST02363,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",63
 CUST02364,Balanced spender (and a saver),Your spending is close to people your age in every area.,,97
 CUST02365,Balanced spender,Your spending is close to people your age in every area.,,52
 CUST02366,Experience seeker and Home & gadget investor (and a saver),You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",65
 CUST02367,Balanced spender,Your spending is close to people your age in every area.,,52
 CUST02368,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,63
-CUST02369,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",61
+CUST02369,On-the-go and Experience seeker,You spend more than most people your age on other transport and entertainment.,"transport_other,entertainment",61
 CUST02370,Balanced spender,Your spending is close to people your age in every area.,,32
 CUST02371,Social butterfly and On-the-go,You spend more than most people your age on bars and taxis.,"bars,taxi",53
 CUST02372,Big-ticket buyer and Experience seeker,You spend more than most people your age on big one-off purchases and entertainment.,"big_purchase,entertainment",54
@@ -2476,7 +2476,7 @@ CUST02474,Balanced spender,Your spending is close to people your age in every ar
 CUST02475,Balanced spender,Your spending is close to people your age in every area.,,46
 CUST02476,Foodie and Home & gadget investor,You spend more than most people your age on restaurants & cafés and home & tech.,"restaurants,home_tech",59
 CUST02477,Balanced spender,Your spending is close to people your age in every area.,,60
-CUST02478,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",76
+CUST02478,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",76
 CUST02479,Balanced spender,Your spending is close to people your age in every area.,,56
 CUST02480,On-the-go and Takeaway lover,You spend more than most people your age on taxis and fast food & takeaway.,"taxi,fast_food",68
 CUST02481,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",66
@@ -2513,7 +2513,7 @@ CUST02511,Balanced spender,Your spending is close to people your age in every ar
 CUST02512,Driver and Social butterfly,You spend more than most people your age on parking and bars.,"parking,bars",61
 CUST02513,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",61
 CUST02514,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",66
-CUST02515,On-the-go and Traveller,You spend more than most people your age on other transport and travel.,"transport_other,travel",64
+CUST02515,On-the-go and Home & gadget investor,You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",64
 CUST02516,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and other transport.,"big_purchase,transport_other",53
 CUST02517,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,49
 CUST02518,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
@@ -2591,7 +2591,7 @@ CUST02589,Shopper and Experience seeker,You spend more than most people your age
 CUST02590,Takeaway lover and Experience seeker (and a saver),You spend more than most people your age on fast food & takeaway and entertainment.,"fast_food,entertainment",54
 CUST02591,Balanced spender,Your spending is close to people your age in every area.,,45
 CUST02592,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",61
-CUST02593,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",58
+CUST02593,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",58
 CUST02594,Social butterfly (and a saver),You spend more than most people your age on bars.,bars,49
 CUST02595,Balanced spender (and a saver),Your spending is close to people your age in every area.,,96
 CUST02596,Balanced spender,Your spending is close to people your age in every area.,,43
@@ -2615,7 +2615,7 @@ CUST02613,Shopper and Home & gadget investor,You spend more than most people you
 CUST02614,Balanced spender,Your spending is close to people your age in every area.,,55
 CUST02615,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST02616,Home & gadget investor and Foodie (and a saver),You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",63
-CUST02617,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",66
+CUST02617,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",66
 CUST02618,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",71
 CUST02619,Balanced spender,Your spending is close to people your age in every area.,,43
 CUST02620,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",55
@@ -2627,7 +2627,7 @@ CUST02625,Shopper,You spend more than most people your age on shopping & persona
 CUST02626,Balanced spender (and a saver),Your spending is close to people your age in every area.,,97
 CUST02627,Balanced spender,Your spending is close to people your age in every area.,,58
 CUST02628,Social butterfly,You spend more than most people your age on bars.,bars,34
-CUST02629,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",64
+CUST02629,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",64
 CUST02630,Balanced spender,Your spending is close to people your age in every area.,,38
 CUST02631,On-the-go (and a saver),You spend more than most people your age on other transport.,transport_other,51
 CUST02632,Balanced spender,Your spending is close to people your age in every area.,,42
@@ -2673,7 +2673,7 @@ CUST02671,Experience seeker,You spend more than most people your age on entertai
 CUST02672,On-the-go,You spend more than most people your age on taxis.,taxi,62
 CUST02673,Balanced spender,Your spending is close to people your age in every area.,,45
 CUST02674,Experience seeker and Traveller (and a saver),You spend more than most people your age on entertainment and travel.,"entertainment,travel",48
-CUST02675,Social butterfly and Experience seeker,You spend more than most people your age on bars and entertainment.,"bars,entertainment",53
+CUST02675,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",53
 CUST02676,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",50
 CUST02677,Experience seeker and Traveller,You spend more than most people your age on entertainment and travel.,"entertainment,travel",47
 CUST02678,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",53
@@ -2723,7 +2723,7 @@ CUST02721,Driver and On-the-go,You spend more than most people your age on parki
 CUST02722,Driver and Home & gadget investor,You spend more than most people your age on parking and home & tech.,"parking,home_tech",60
 CUST02723,Balanced spender,Your spending is close to people your age in every area.,,44
 CUST02724,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,52
-CUST02725,On-the-go,You spend more than most people your age on other transport and taxis.,"transport_other,taxi",61
+CUST02725,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",61
 CUST02726,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",62
 CUST02727,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",66
 CUST02728,Balanced spender,Your spending is close to people your age in every area.,,31
@@ -2732,7 +2732,7 @@ CUST02730,Shopper and Experience seeker,You spend more than most people your age
 CUST02731,On-the-go and Shopper,You spend more than most people your age on taxis and shopping & personal care.,"taxi,lifestyle",63
 CUST02732,Balanced spender (and a saver),Your spending is close to people your age in every area.,,44
 CUST02733,Balanced spender (and a saver),Your spending is close to people your age in every area.,,52
-CUST02734,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",56
+CUST02734,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",56
 CUST02735,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and taxis.,"lifestyle,taxi",56
 CUST02736,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",58
 CUST02737,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",57
@@ -2785,10 +2785,10 @@ CUST02783,Balanced spender,Your spending is close to people your age in every ar
 CUST02784,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,65
 CUST02785,Balanced spender,Your spending is close to people your age in every area.,,49
 CUST02786,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",59
-CUST02787,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",57
+CUST02787,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",57
 CUST02788,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",62
 CUST02789,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
-CUST02790,Foodie and Shopper,You spend more than most people your age on restaurants & cafés and shopping & personal care.,"restaurants,lifestyle",63
+CUST02790,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",63
 CUST02791,Balanced spender (and a saver),Your spending is close to people your age in every area.,,46
 CUST02792,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,58
 CUST02793,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",65
@@ -2899,7 +2899,7 @@ CUST02897,Big-ticket buyer and On-the-go,You spend more than most people your ag
 CUST02898,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,50
 CUST02899,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,50
 CUST02900,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",63
-CUST02901,On-the-go and Home & gadget investor,You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",73
+CUST02901,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",73
 CUST02902,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",63
 CUST02903,Foodie (and a saver),You spend more than most people your age on restaurants & cafés.,restaurants,64
 CUST02904,On-the-go,You spend more than most people your age on taxis.,taxi,68
@@ -3004,7 +3004,7 @@ CUST03002,Driver and On-the-go,You spend more than most people your age on parki
 CUST03003,Balanced spender (and a saver),Your spending is close to people your age in every area.,,37
 CUST03004,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,59
 CUST03005,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",52
-CUST03006,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",65
+CUST03006,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",65
 CUST03007,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",59
 CUST03008,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",60
 CUST03009,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,61
@@ -3167,7 +3167,7 @@ CUST03165,Takeaway lover and Traveller (and a saver),You spend more than most pe
 CUST03166,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",60
 CUST03167,Balanced spender,Your spending is close to people your age in every area.,,44
 CUST03168,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",69
-CUST03169,Traveller and Driver,You spend more than most people your age on travel and parking.,"travel,parking",63
+CUST03169,Traveller and On-the-go,You spend more than most people your age on travel and taxis.,"travel,taxi",63
 CUST03170,Balanced spender (and a saver),Your spending is close to people your age in every area.,,50
 CUST03171,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST03172,On-the-go and Takeaway lover,You spend more than most people your age on other transport and fast food & takeaway.,"transport_other,fast_food",62
@@ -3213,7 +3213,7 @@ CUST03211,Experience seeker and Traveller,You spend more than most people your a
 CUST03212,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,65
 CUST03213,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",61
 CUST03214,Balanced spender,Your spending is close to people your age in every area.,,62
-CUST03215,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",77
+CUST03215,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",77
 CUST03216,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",57
 CUST03217,On-the-go,You spend more than most people your age on other transport.,transport_other,54
 CUST03218,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",67
@@ -3236,7 +3236,7 @@ CUST03234,Traveller,You spend more than most people your age on travel.,travel,6
 CUST03235,Balanced spender,Your spending is close to people your age in every area.,,62
 CUST03236,Balanced spender,Your spending is close to people your age in every area.,,41
 CUST03237,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",54
-CUST03238,On-the-go and Foodie,You spend more than most people your age on taxis and restaurants & cafés.,"taxi,restaurants",63
+CUST03238,On-the-go and Social butterfly,You spend more than most people your age on taxis and bars.,"taxi,bars",63
 CUST03239,Big-ticket buyer and Experience seeker,You spend more than most people your age on big one-off purchases and entertainment.,"big_purchase,entertainment",60
 CUST03240,Balanced spender,Your spending is close to people your age in every area.,,44
 CUST03241,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,56
@@ -3374,7 +3374,7 @@ CUST03372,Big-ticket buyer and Takeaway lover,You spend more than most people yo
 CUST03373,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST03374,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",62
 CUST03375,Balanced spender (and a saver),Your spending is close to people your age in every area.,,44
-CUST03376,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",53
+CUST03376,Experience seeker and Traveller,You spend more than most people your age on entertainment and travel.,"entertainment,travel",53
 CUST03377,Balanced spender,Your spending is close to people your age in every area.,,30
 CUST03378,Traveller and Foodie (and a saver),You spend more than most people your age on travel and restaurants & cafés.,"travel,restaurants",54
 CUST03379,Balanced spender,Your spending is close to people your age in every area.,,28
@@ -3388,7 +3388,7 @@ CUST03386,Home & gadget investor (and a saver),You spend more than most people y
 CUST03387,Traveller,You spend more than most people your age on travel.,travel,50
 CUST03388,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",49
 CUST03389,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",69
-CUST03390,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",72
+CUST03390,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",72
 CUST03391,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",55
 CUST03392,Traveller and Shopper,You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",50
 CUST03393,Balanced spender (and a saver),Your spending is close to people your age in every area.,,51
@@ -3396,7 +3396,7 @@ CUST03394,Big-ticket buyer (and a saver),You spend more than most people your ag
 CUST03395,Experience seeker (and a saver),You spend more than most people your age on entertainment.,entertainment,47
 CUST03396,Takeaway lover,You spend more than most people your age on fast food & takeaway.,fast_food,46
 CUST03397,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",57
-CUST03398,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",46
+CUST03398,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",46
 CUST03399,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",60
 CUST03400,Experience seeker,You spend more than most people your age on entertainment.,entertainment,47
 CUST03401,Balanced spender,Your spending is close to people your age in every area.,,51
@@ -3410,7 +3410,7 @@ CUST03408,Home & gadget investor and Takeaway lover,You spend more than most peo
 CUST03409,Balanced spender (and a saver),Your spending is close to people your age in every area.,,94
 CUST03410,Balanced spender,Your spending is close to people your age in every area.,,38
 CUST03411,Foodie and Big-ticket buyer,You spend more than most people your age on restaurants & cafés and big one-off purchases.,"restaurants,big_purchase",59
-CUST03412,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",64
+CUST03412,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",64
 CUST03413,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",43
 CUST03414,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST03415,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",74
@@ -3461,7 +3461,7 @@ CUST03459,Big-ticket buyer,You spend more than most people your age on big one-o
 CUST03460,Balanced spender,Your spending is close to people your age in every area.,,42
 CUST03461,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and taxis.,"big_purchase,taxi",51
 CUST03462,Experience seeker and Traveller,You spend more than most people your age on entertainment and travel.,"entertainment,travel",53
-CUST03463,On-the-go and Foodie,You spend more than most people your age on other transport and restaurants & cafés.,"transport_other,restaurants",67
+CUST03463,On-the-go and Takeaway lover,You spend more than most people your age on other transport and fast food & takeaway.,"transport_other,fast_food",67
 CUST03464,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,55
 CUST03465,Balanced spender (and a saver),Your spending is close to people your age in every area.,,50
 CUST03466,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",60
@@ -3574,7 +3574,7 @@ CUST03572,Balanced spender,Your spending is close to people your age in every ar
 CUST03573,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST03574,Home & gadget investor and Social butterfly,You spend more than most people your age on home & tech and bars.,"home_tech,bars",60
 CUST03575,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",59
-CUST03576,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",63
+CUST03576,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",63
 CUST03577,On-the-go and Traveller,You spend more than most people your age on other transport and travel.,"transport_other,travel",64
 CUST03578,Social butterfly and On-the-go,You spend more than most people your age on bars and other transport.,"bars,transport_other",59
 CUST03579,Balanced spender,Your spending is close to people your age in every area.,,47
@@ -3588,7 +3588,7 @@ CUST03586,Traveller and Experience seeker,You spend more than most people your a
 CUST03587,Balanced spender,Your spending is close to people your age in every area.,,55
 CUST03588,Balanced spender,Your spending is close to people your age in every area.,,59
 CUST03589,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",69
-CUST03590,Traveller and Shopper,You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",53
+CUST03590,Shopper and Traveller,You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",53
 CUST03591,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,59
 CUST03592,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,51
 CUST03593,Driver and On-the-go,You spend more than most people your age on parking and taxis.,"parking,taxi",58
@@ -3626,12 +3626,12 @@ CUST03624,Shopper,You spend more than most people your age on shopping & persona
 CUST03625,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,44
 CUST03626,Foodie and Home & gadget investor,You spend more than most people your age on restaurants & cafés and home & tech.,"restaurants,home_tech",62
 CUST03627,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",51
-CUST03628,Traveller and Shopper,You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",75
+CUST03628,Traveller and On-the-go,You spend more than most people your age on travel and other transport.,"travel,transport_other",75
 CUST03629,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",61
 CUST03630,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",56
 CUST03631,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST03632,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",64
-CUST03633,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",65
+CUST03633,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",65
 CUST03634,Balanced spender,Your spending is close to people your age in every area.,,43
 CUST03635,Balanced spender (and a saver),Your spending is close to people your age in every area.,,42
 CUST03636,On-the-go and Experience seeker,You spend more than most people your age on taxis and entertainment.,"taxi,entertainment",60
@@ -3662,7 +3662,7 @@ CUST03660,Home & gadget investor and Traveller,You spend more than most people y
 CUST03661,Balanced spender (and a saver),Your spending is close to people your age in every area.,,43
 CUST03662,Balanced spender,Your spending is close to people your age in every area.,,61
 CUST03663,Social butterfly,You spend more than most people your age on bars.,bars,43
-CUST03664,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",66
+CUST03664,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",66
 CUST03665,Balanced spender (and a saver),Your spending is close to people your age in every area.,,41
 CUST03666,Big-ticket buyer and Experience seeker,You spend more than most people your age on big one-off purchases and entertainment.,"big_purchase,entertainment",51
 CUST03667,Balanced spender (and a saver),Your spending is close to people your age in every area.,,74
@@ -3674,8 +3674,8 @@ CUST03672,Balanced spender (and a saver),Your spending is close to people your a
 CUST03673,Traveller,You spend more than most people your age on travel.,travel,51
 CUST03674,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,61
 CUST03675,Home & gadget investor and Foodie (and a saver),You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",63
-CUST03676,Traveller and Social butterfly,You spend more than most people your age on travel and bars.,"travel,bars",60
-CUST03677,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",61
+CUST03676,On-the-go and Traveller,You spend more than most people your age on taxis and travel.,"taxi,travel",60
+CUST03677,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",61
 CUST03678,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",48
 CUST03679,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",67
 CUST03680,On-the-go and Shopper,You spend more than most people your age on taxis and shopping & personal care.,"taxi,lifestyle",68
@@ -3706,7 +3706,7 @@ CUST03704,On-the-go and Experience seeker,You spend more than most people your a
 CUST03705,Big-ticket buyer and Foodie,You spend more than most people your age on big one-off purchases and restaurants & cafés.,"big_purchase,restaurants",61
 CUST03706,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,55
 CUST03707,Balanced spender,Your spending is close to people your age in every area.,,60
-CUST03708,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",69
+CUST03708,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",69
 CUST03709,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",70
 CUST03710,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",61
 CUST03711,Balanced spender (and a saver),Your spending is close to people your age in every area.,,37
@@ -3775,7 +3775,7 @@ CUST03773,Foodie and Takeaway lover,You spend more than most people your age on 
 CUST03774,On-the-go and Shopper,You spend more than most people your age on taxis and shopping & personal care.,"taxi,lifestyle",62
 CUST03775,Traveller and Experience seeker,You spend more than most people your age on travel and entertainment.,"travel,entertainment",55
 CUST03776,On-the-go,You spend more than most people your age on taxis.,taxi,51
-CUST03777,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",69
+CUST03777,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",69
 CUST03778,Balanced spender (and a saver),Your spending is close to people your age in every area.,,44
 CUST03779,Balanced spender,Your spending is close to people your age in every area.,,57
 CUST03780,On-the-go,You spend more than most people your age on other transport and taxis.,"transport_other,taxi",62
@@ -3920,8 +3920,8 @@ CUST03918,Big-ticket buyer and Foodie,You spend more than most people your age o
 CUST03919,Driver,You spend more than most people your age on parking.,parking,53
 CUST03920,On-the-go and Shopper,You spend more than most people your age on other transport and shopping & personal care.,"transport_other,lifestyle",58
 CUST03921,Experience seeker and Big-ticket buyer,You spend more than most people your age on entertainment and big one-off purchases.,"entertainment,big_purchase",59
-CUST03922,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",73
-CUST03923,Experience seeker and On-the-go,You spend more than most people your age on entertainment and other transport.,"entertainment,transport_other",77
+CUST03922,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",73
+CUST03923,On-the-go and Experience seeker,You spend more than most people your age on other transport and entertainment.,"transport_other,entertainment",77
 CUST03924,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",62
 CUST03925,On-the-go,You spend more than most people your age on other transport.,transport_other,60
 CUST03926,Balanced spender,Your spending is close to people your age in every area.,,42
@@ -3951,12 +3951,12 @@ CUST03949,Balanced spender,Your spending is close to people your age in every ar
 CUST03950,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,46
 CUST03951,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,52
 CUST03952,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",59
-CUST03953,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",50
+CUST03953,On-the-go and Shopper,You spend more than most people your age on other transport and shopping & personal care.,"transport_other,lifestyle",50
 CUST03954,Balanced spender,Your spending is close to people your age in every area.,,46
 CUST03955,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",58
 CUST03956,Traveller and Shopper,You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",66
 CUST03957,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",61
-CUST03958,Foodie and Home & gadget investor,You spend more than most people your age on restaurants & cafés and home & tech.,"restaurants,home_tech",71
+CUST03958,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",71
 CUST03959,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST03960,Foodie and Experience seeker,You spend more than most people your age on restaurants & cafés and entertainment.,"restaurants,entertainment",56
 CUST03961,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",57
@@ -4032,7 +4032,7 @@ CUST04030,Takeaway lover and Foodie,You spend more than most people your age on 
 CUST04031,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",63
 CUST04032,Balanced spender,Your spending is close to people your age in every area.,,49
 CUST04033,Balanced spender,Your spending is close to people your age in every area.,,46
-CUST04034,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",62
+CUST04034,Social butterfly and Takeaway lover,You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",62
 CUST04035,Traveller,You spend more than most people your age on travel.,travel,54
 CUST04036,Balanced spender (and a saver),Your spending is close to people your age in every area.,,53
 CUST04037,Balanced spender,Your spending is close to people your age in every area.,,49
@@ -4042,9 +4042,9 @@ CUST04040,Foodie and Social butterfly,You spend more than most people your age o
 CUST04041,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,55
 CUST04042,Balanced spender,Your spending is close to people your age in every area.,,53
 CUST04043,Balanced spender (and a saver),Your spending is close to people your age in every area.,,91
-CUST04044,Foodie and Home & gadget investor,You spend more than most people your age on restaurants & cafés and home & tech.,"restaurants,home_tech",62
+CUST04044,Foodie and Traveller,You spend more than most people your age on restaurants & cafés and travel.,"restaurants,travel",62
 CUST04045,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",66
-CUST04046,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",56
+CUST04046,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",56
 CUST04047,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,61
 CUST04048,Balanced spender,Your spending is close to people your age in every area.,,51
 CUST04049,On-the-go (and a saver),You spend more than most people your age on taxis.,taxi,52
@@ -4055,7 +4055,7 @@ CUST04053,Big-ticket buyer,You spend more than most people your age on big one-o
 CUST04054,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",54
 CUST04055,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,42
 CUST04056,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",64
-CUST04057,Foodie and Takeaway lover (and a saver),You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",57
+CUST04057,Foodie and Big-ticket buyer (and a saver),You spend more than most people your age on restaurants & cafés and big one-off purchases.,"restaurants,big_purchase",57
 CUST04058,Traveller,You spend more than most people your age on travel.,travel,55
 CUST04059,Balanced spender,Your spending is close to people your age in every area.,,62
 CUST04060,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",63
@@ -4087,7 +4087,7 @@ CUST04085,Balanced spender,Your spending is close to people your age in every ar
 CUST04086,Driver and Social butterfly,You spend more than most people your age on parking and bars.,"parking,bars",56
 CUST04087,Big-ticket buyer and Traveller (and a saver),You spend more than most people your age on big one-off purchases and travel.,"big_purchase,travel",55
 CUST04088,Balanced spender,Your spending is close to people your age in every area.,,49
-CUST04089,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and other transport.,"big_purchase,transport_other",72
+CUST04089,On-the-go and Big-ticket buyer,You spend more than most people your age on other transport and big one-off purchases.,"transport_other,big_purchase",72
 CUST04090,Social butterfly and On-the-go (and a saver),You spend more than most people your age on bars and taxis.,"bars,taxi",59
 CUST04091,Traveller and Driver,You spend more than most people your age on travel and parking.,"travel,parking",56
 CUST04092,Balanced spender,Your spending is close to people your age in every area.,,53
@@ -4119,7 +4119,7 @@ CUST04117,Balanced spender (and a saver),Your spending is close to people your a
 CUST04118,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",54
 CUST04119,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,54
 CUST04120,Balanced spender,Your spending is close to people your age in every area.,,52
-CUST04121,Foodie and Takeaway lover,You spend more than most people your age on restaurants & cafés and fast food & takeaway.,"restaurants,fast_food",69
+CUST04121,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",69
 CUST04122,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",58
 CUST04123,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST04124,Driver and Social butterfly,You spend more than most people your age on parking and bars.,"parking,bars",62
@@ -4203,7 +4203,7 @@ CUST04201,Home & gadget investor and Traveller,You spend more than most people y
 CUST04202,Traveller,You spend more than most people your age on travel.,travel,59
 CUST04203,Balanced spender,Your spending is close to people your age in every area.,,60
 CUST04204,Balanced spender,Your spending is close to people your age in every area.,,48
-CUST04205,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",53
+CUST04205,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",53
 CUST04206,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",72
 CUST04207,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,67
 CUST04208,Takeaway lover,You spend more than most people your age on fast food & takeaway.,fast_food,49
@@ -4222,7 +4222,7 @@ CUST04220,Shopper and Driver,You spend more than most people your age on shoppin
 CUST04221,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",68
 CUST04222,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",64
 CUST04223,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,61
-CUST04224,Takeaway lover and On-the-go,You spend more than most people your age on fast food & takeaway and taxis.,"fast_food,taxi",65
+CUST04224,Takeaway lover and Foodie,You spend more than most people your age on fast food & takeaway and restaurants & cafés.,"fast_food,restaurants",65
 CUST04225,On-the-go and Driver (and a saver),You spend more than most people your age on taxis and parking.,"taxi,parking",54
 CUST04226,Home & gadget investor and Shopper,You spend more than most people your age on home & tech and shopping & personal care.,"home_tech,lifestyle",70
 CUST04227,On-the-go and Home & gadget investor,You spend more than most people your age on taxis and home & tech.,"taxi,home_tech",56
@@ -4283,7 +4283,7 @@ CUST04281,Foodie and Big-ticket buyer,You spend more than most people your age o
 CUST04282,Driver,You spend more than most people your age on parking.,parking,62
 CUST04283,Home & gadget investor and Takeaway lover,You spend more than most people your age on home & tech and fast food & takeaway.,"home_tech,fast_food",60
 CUST04284,On-the-go,You spend more than most people your age on taxis.,taxi,65
-CUST04285,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",70
+CUST04285,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",70
 CUST04286,Balanced spender,Your spending is close to people your age in every area.,,35
 CUST04287,Balanced spender (and a saver),Your spending is close to people your age in every area.,,56
 CUST04288,Shopper (and a saver),You spend more than most people your age on shopping & personal care.,lifestyle,52
@@ -4321,7 +4321,7 @@ CUST04319,Balanced spender,Your spending is close to people your age in every ar
 CUST04320,Balanced spender (and a saver),Your spending is close to people your age in every area.,,57
 CUST04321,Traveller and Home & gadget investor (and a saver),You spend more than most people your age on travel and home & tech.,"travel,home_tech",47
 CUST04322,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",52
-CUST04323,Takeaway lover and Home & gadget investor,You spend more than most people your age on fast food & takeaway and home & tech.,"fast_food,home_tech",70
+CUST04323,Home & gadget investor and Takeaway lover,You spend more than most people your age on home & tech and fast food & takeaway.,"home_tech,fast_food",70
 CUST04324,Balanced spender,Your spending is close to people your age in every area.,,50
 CUST04325,Balanced spender,Your spending is close to people your age in every area.,,33
 CUST04326,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,54
@@ -4364,7 +4364,7 @@ CUST04362,Shopper and Traveller,You spend more than most people your age on shop
 CUST04363,Balanced spender,Your spending is close to people your age in every area.,,20
 CUST04364,On-the-go and Shopper,You spend more than most people your age on other transport and shopping & personal care.,"transport_other,lifestyle",70
 CUST04365,Balanced spender,Your spending is close to people your age in every area.,,51
-CUST04366,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",63
+CUST04366,On-the-go and Big-ticket buyer,You spend more than most people your age on taxis and big one-off purchases.,"taxi,big_purchase",63
 CUST04367,Social butterfly (and a saver),You spend more than most people your age on bars.,bars,57
 CUST04368,Balanced spender (and a saver),Your spending is close to people your age in every area.,,40
 CUST04369,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",55
@@ -4393,7 +4393,7 @@ CUST04391,Balanced spender,Your spending is close to people your age in every ar
 CUST04392,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",51
 CUST04393,Driver and Experience seeker (and a saver),You spend more than most people your age on parking and entertainment.,"parking,entertainment",64
 CUST04394,Balanced spender,Your spending is close to people your age in every area.,,62
-CUST04395,Shopper and Driver,You spend more than most people your age on shopping & personal care and parking.,"lifestyle,parking",65
+CUST04395,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",65
 CUST04396,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST04397,Balanced spender,Your spending is close to people your age in every area.,,38
 CUST04398,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,64
@@ -4402,7 +4402,7 @@ CUST04400,Balanced spender,Your spending is close to people your age in every ar
 CUST04401,Balanced spender (and a saver),Your spending is close to people your age in every area.,,60
 CUST04402,On-the-go and Big-ticket buyer,You spend more than most people your age on other transport and big one-off purchases.,"transport_other,big_purchase",60
 CUST04403,On-the-go,You spend more than most people your age on taxis and other transport.,"taxi,transport_other",72
-CUST04404,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",59
+CUST04404,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and other transport.,"home_tech,transport_other",59
 CUST04405,Balanced spender,Your spending is close to people your age in every area.,,43
 CUST04406,Shopper and Social butterfly,You spend more than most people your age on shopping & personal care and bars.,"lifestyle,bars",65
 CUST04407,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",65
@@ -4414,10 +4414,10 @@ CUST04412,On-the-go and Social butterfly,You spend more than most people your ag
 CUST04413,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,65
 CUST04414,Social butterfly and Foodie,You spend more than most people your age on bars and restaurants & cafés.,"bars,restaurants",71
 CUST04415,Balanced spender (and a saver),Your spending is close to people your age in every area.,,93
-CUST04416,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",71
+CUST04416,Experience seeker and Home & gadget investor,You spend more than most people your age on entertainment and home & tech.,"entertainment,home_tech",71
 CUST04417,Foodie,You spend more than most people your age on restaurants & cafés.,restaurants,56
 CUST04418,Balanced spender,Your spending is close to people your age in every area.,,43
-CUST04419,On-the-go and Home & gadget investor,You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",65
+CUST04419,On-the-go and Traveller,You spend more than most people your age on other transport and travel.,"transport_other,travel",65
 CUST04420,Experience seeker,You spend more than most people your age on entertainment.,entertainment,66
 CUST04421,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,59
 CUST04422,Balanced spender (and a saver),Your spending is close to people your age in every area.,,60
@@ -4528,10 +4528,10 @@ CUST04526,Home & gadget investor and On-the-go (and a saver),You spend more than
 CUST04527,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",60
 CUST04528,On-the-go and Social butterfly,You spend more than most people your age on other transport and bars.,"transport_other,bars",54
 CUST04529,Traveller and Driver,You spend more than most people your age on travel and parking.,"travel,parking",55
-CUST04530,Driver and On-the-go,You spend more than most people your age on parking and other transport.,"parking,transport_other",61
+CUST04530,On-the-go and Driver,You spend more than most people your age on other transport and parking.,"transport_other,parking",61
 CUST04531,Foodie and Traveller (and a saver),You spend more than most people your age on restaurants & cafés and travel.,"restaurants,travel",53
 CUST04532,On-the-go and Foodie,You spend more than most people your age on other transport and restaurants & cafés.,"transport_other,restaurants",62
-CUST04533,Social butterfly and On-the-go,You spend more than most people your age on bars and taxis.,"bars,taxi",76
+CUST04533,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",76
 CUST04534,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",54
 CUST04535,Balanced spender (and a saver),Your spending is close to people your age in every area.,,47
 CUST04536,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",56
@@ -4549,7 +4549,7 @@ CUST04547,Social butterfly and Big-ticket buyer,You spend more than most people 
 CUST04548,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,55
 CUST04549,Balanced spender,Your spending is close to people your age in every area.,,53
 CUST04550,Balanced spender,Your spending is close to people your age in every area.,,52
-CUST04551,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",62
+CUST04551,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",62
 CUST04552,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",58
 CUST04553,Balanced spender (and a saver),Your spending is close to people your age in every area.,,64
 CUST04554,Balanced spender,Your spending is close to people your age in every area.,,47
@@ -4562,7 +4562,7 @@ CUST04560,Experience seeker and Takeaway lover,You spend more than most people y
 CUST04561,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",56
 CUST04562,Experience seeker and Traveller (and a saver),You spend more than most people your age on entertainment and travel.,"entertainment,travel",59
 CUST04563,Balanced spender,Your spending is close to people your age in every area.,,55
-CUST04564,Takeaway lover and Big-ticket buyer,You spend more than most people your age on fast food & takeaway and big one-off purchases.,"fast_food,big_purchase",63
+CUST04564,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",63
 CUST04565,Balanced spender,Your spending is close to people your age in every area.,,54
 CUST04566,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",61
 CUST04567,Balanced spender (and a saver),Your spending is close to people your age in every area.,,45
@@ -4617,7 +4617,7 @@ CUST04615,Balanced spender,Your spending is close to people your age in every ar
 CUST04616,Balanced spender (and a saver),Your spending is close to people your age in every area.,,41
 CUST04617,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",44
 CUST04618,Foodie and Social butterfly,You spend more than most people your age on restaurants & cafés and bars.,"restaurants,bars",54
-CUST04619,Traveller and Home & gadget investor (and a saver),You spend more than most people your age on travel and home & tech.,"travel,home_tech",54
+CUST04619,Home & gadget investor and Traveller (and a saver),You spend more than most people your age on home & tech and travel.,"home_tech,travel",54
 CUST04620,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",64
 CUST04621,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",57
 CUST04622,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",68
@@ -4662,7 +4662,7 @@ CUST04660,Shopper,You spend more than most people your age on shopping & persona
 CUST04661,Balanced spender,Your spending is close to people your age in every area.,,48
 CUST04662,Balanced spender,Your spending is close to people your age in every area.,,47
 CUST04663,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",67
-CUST04664,Traveller and Takeaway lover,You spend more than most people your age on travel and fast food & takeaway.,"travel,fast_food",70
+CUST04664,Traveller and Social butterfly,You spend more than most people your age on travel and bars.,"travel,bars",70
 CUST04665,Big-ticket buyer and Traveller,You spend more than most people your age on big one-off purchases and travel.,"big_purchase,travel",57
 CUST04666,Balanced spender,Your spending is close to people your age in every area.,,46
 CUST04667,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,57
@@ -4696,7 +4696,7 @@ CUST04694,Big-ticket buyer and Social butterfly,You spend more than most people 
 CUST04695,Traveller and On-the-go,You spend more than most people your age on travel and taxis.,"travel,taxi",65
 CUST04696,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",66
 CUST04697,Shopper and On-the-go,You spend more than most people your age on shopping & personal care and other transport.,"lifestyle,transport_other",71
-CUST04698,Traveller and On-the-go,You spend more than most people your age on travel and other transport.,"travel,transport_other",47
+CUST04698,Traveller and Driver,You spend more than most people your age on travel and parking.,"travel,parking",47
 CUST04699,Balanced spender,Your spending is close to people your age in every area.,,45
 CUST04700,Foodie and On-the-go,You spend more than most people your age on restaurants & cafés and taxis.,"restaurants,taxi",53
 CUST04701,Experience seeker and Shopper,You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",61
@@ -4780,7 +4780,7 @@ CUST04778,Balanced spender (and a saver),Your spending is close to people your a
 CUST04779,Balanced spender (and a saver),Your spending is close to people your age in every area.,,44
 CUST04780,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",67
 CUST04781,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and taxis.,"big_purchase,taxi",66
-CUST04782,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",61
+CUST04782,Shopper and Big-ticket buyer,You spend more than most people your age on shopping & personal care and big one-off purchases.,"lifestyle,big_purchase",61
 CUST04783,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,64
 CUST04784,Balanced spender,Your spending is close to people your age in every area.,,58
 CUST04785,Balanced spender (and a saver),Your spending is close to people your age in every area.,,98
@@ -4800,7 +4800,7 @@ CUST04798,Balanced spender,Your spending is close to people your age in every ar
 CUST04799,Balanced spender (and a saver),Your spending is close to people your age in every area.,,74
 CUST04800,On-the-go and Experience seeker,You spend more than most people your age on taxis and entertainment.,"taxi,entertainment",68
 CUST04801,Experience seeker,You spend more than most people your age on entertainment.,entertainment,52
-CUST04802,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",65
+CUST04802,Foodie and Driver,You spend more than most people your age on restaurants & cafés and parking.,"restaurants,parking",65
 CUST04803,Balanced spender,Your spending is close to people your age in every area.,,42
 CUST04804,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,63
 CUST04805,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",55
@@ -4876,7 +4876,7 @@ CUST04874,Home & gadget investor and Shopper,You spend more than most people you
 CUST04875,Traveller and Big-ticket buyer,You spend more than most people your age on travel and big one-off purchases.,"travel,big_purchase",55
 CUST04876,Home & gadget investor and Experience seeker,You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",67
 CUST04877,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",60
-CUST04878,Driver and Foodie,You spend more than most people your age on parking and restaurants & cafés.,"parking,restaurants",58
+CUST04878,Driver and Takeaway lover,You spend more than most people your age on parking and fast food & takeaway.,"parking,fast_food",58
 CUST04879,Balanced spender,Your spending is close to people your age in every area.,,56
 CUST04880,Balanced spender (and a saver),Your spending is close to people your age in every area.,,30
 CUST04881,On-the-go,You spend more than most people your age on other transport and taxis.,"transport_other,taxi",69
@@ -4999,8 +4999,8 @@ CUST04997,Balanced spender (and a saver),Your spending is close to people your a
 CUST04998,Balanced spender,Your spending is close to people your age in every area.,,56
 CUST04999,Takeaway lover and Experience seeker,You spend more than most people your age on fast food & takeaway and entertainment.,"fast_food,entertainment",67
 CUST05000,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,58
-CUST05001,On-the-go and Foodie,You spend more than most people your age on taxis and restaurants & cafés.,"taxi,restaurants",85
-CUST05002,Home & gadget investor and Foodie,You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",67
+CUST05001,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",85
+CUST05002,Experience seeker and Foodie,You spend more than most people your age on entertainment and restaurants & cafés.,"entertainment,restaurants",67
 CUST05003,Balanced spender (and a saver),Your spending is close to people your age in every area.,,41
 CUST05004,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",35
 CUST05005,Balanced spender,Your spending is close to people your age in every area.,,9
@@ -5011,9 +5011,9 @@ CUST05009,Balanced spender (and a saver),Your spending is close to people your a
 CUST05010,Social butterfly,You spend more than most people your age on bars.,bars,29
 CUST05011,Experience seeker and Shopper (and a saver),You spend more than most people your age on entertainment and shopping & personal care.,"entertainment,lifestyle",96
 CUST05012,Shopper and Traveller (and a saver),You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",46
-CUST05013,On-the-go and Traveller,You spend more than most people your age on taxis and travel.,"taxi,travel",66
-CUST05014,Social butterfly and Big-ticket buyer,You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",63
-CUST05015,Home & gadget investor and On-the-go,You spend more than most people your age on home & tech and taxis.,"home_tech,taxi",57
+CUST05013,Traveller and Foodie,You spend more than most people your age on travel and restaurants & cafés.,"travel,restaurants",66
+CUST05014,Big-ticket buyer and Social butterfly,You spend more than most people your age on big one-off purchases and bars.,"big_purchase,bars",63
+CUST05015,Experience seeker and On-the-go,You spend more than most people your age on entertainment and taxis.,"entertainment,taxi",57
 CUST05016,Balanced spender (and a saver),Your spending is close to people your age in every area.,,30
 CUST05017,Shopper,You spend more than most people your age on shopping & personal care.,lifestyle,65
 CUST05018,Balanced spender,Your spending is close to people your age in every area.,,40
@@ -5025,7 +5025,7 @@ CUST05023,Traveller and Home & gadget investor,You spend more than most people y
 CUST05024,Big-ticket buyer (and a saver),You spend more than most people your age on big one-off purchases.,big_purchase,74
 CUST05025,Balanced spender (and a saver),Your spending is close to people your age in every area.,,19
 CUST05026,Shopper and Traveller,You spend more than most people your age on shopping & personal care and travel.,"lifestyle,travel",42
-CUST05027,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and other transport.,"big_purchase,transport_other",73
+CUST05027,Foodie and Big-ticket buyer,You spend more than most people your age on restaurants & cafés and big one-off purchases.,"restaurants,big_purchase",73
 CUST05028,Balanced spender,Your spending is close to people your age in every area.,,64
 CUST05029,Balanced spender (and a saver),Your spending is close to people your age in every area.,,9
 CUST05030,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",50
@@ -5037,36 +5037,36 @@ CUST05035,Balanced spender (and a saver),Your spending is close to people your a
 CUST05036,Balanced spender,Your spending is close to people your age in every area.,,13
 CUST05037,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",49
 CUST05038,Big-ticket buyer,You spend more than most people your age on big one-off purchases.,big_purchase,50
-CUST05039,Social butterfly and Shopper,You spend more than most people your age on bars and shopping & personal care.,"bars,lifestyle",53
+CUST05039,Shopper and Social butterfly,You spend more than most people your age on shopping & personal care and bars.,"lifestyle,bars",53
 CUST05040,Balanced spender,Your spending is close to people your age in every area.,,8
 CUST05041,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",57
 CUST05042,Balanced spender,Your spending is close to people your age in every area.,,10
 CUST05043,Balanced spender (and a saver),Your spending is close to people your age in every area.,,16
 CUST05044,Traveller and Shopper (and a saver),You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",97
-CUST05045,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",87
+CUST05045,Home & gadget investor and Driver,You spend more than most people your age on home & tech and parking.,"home_tech,parking",87
 CUST05046,Takeaway lover and Social butterfly,You spend more than most people your age on fast food & takeaway and bars.,"fast_food,bars",60
 CUST05047,Traveller,You spend more than most people your age on travel.,travel,23
 CUST05048,Big-ticket buyer and Takeaway lover,You spend more than most people your age on big one-off purchases and fast food & takeaway.,"big_purchase,fast_food",40
 CUST05049,Balanced spender,Your spending is close to people your age in every area.,,9
 CUST05050,Big-ticket buyer and Traveller,You spend more than most people your age on big one-off purchases and travel.,"big_purchase,travel",47
 CUST05051,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",42
-CUST05052,Home & gadget investor and Experience seeker (and a saver),You spend more than most people your age on home & tech and entertainment.,"home_tech,entertainment",77
+CUST05052,Shopper and Home & gadget investor (and a saver),You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",77
 CUST05053,Social butterfly and Takeaway lover (and a saver),You spend more than most people your age on bars and fast food & takeaway.,"bars,fast_food",18
 CUST05054,Home & gadget investor and Traveller (and a saver),You spend more than most people your age on home & tech and travel.,"home_tech,travel",26
-CUST05055,Shopper and Home & gadget investor,You spend more than most people your age on shopping & personal care and home & tech.,"lifestyle,home_tech",47
+CUST05055,Shopper and Experience seeker,You spend more than most people your age on shopping & personal care and entertainment.,"lifestyle,entertainment",47
 CUST05056,Big-ticket buyer and Traveller (and a saver),You spend more than most people your age on big one-off purchases and travel.,"big_purchase,travel",61
 CUST05057,Social butterfly and Big-ticket buyer (and a saver),You spend more than most people your age on bars and big one-off purchases.,"bars,big_purchase",59
 CUST05058,Balanced spender,Your spending is close to people your age in every area.,,10
-CUST05059,On-the-go and Home & gadget investor (and a saver),You spend more than most people your age on other transport and home & tech.,"transport_other,home_tech",96
+CUST05059,On-the-go and Experience seeker (and a saver),You spend more than most people your age on other transport and entertainment.,"transport_other,entertainment",96
 CUST05060,Balanced spender,Your spending is close to people your age in every area.,,7
 CUST05061,Home & gadget investor,You spend more than most people your age on home & tech.,home_tech,22
 CUST05062,Social butterfly and Traveller,You spend more than most people your age on bars and travel.,"bars,travel",59
-CUST05063,Traveller and Big-ticket buyer,You spend more than most people your age on travel and big one-off purchases.,"travel,big_purchase",47
+CUST05063,Traveller and Home & gadget investor,You spend more than most people your age on travel and home & tech.,"travel,home_tech",47
 CUST05064,Home & gadget investor and Traveller,You spend more than most people your age on home & tech and travel.,"home_tech,travel",35
 CUST05065,Driver and Shopper,You spend more than most people your age on parking and shopping & personal care.,"parking,lifestyle",75
 CUST05066,Social butterfly and On-the-go,You spend more than most people your age on bars and other transport.,"bars,transport_other",29
 CUST05067,Traveller and On-the-go,You spend more than most people your age on travel and taxis.,"travel,taxi",68
-CUST05068,Traveller and Driver (and a saver),You spend more than most people your age on travel and parking.,"travel,parking",76
+CUST05068,Traveller and Shopper (and a saver),You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",76
 CUST05069,Social butterfly and On-the-go (and a saver),You spend more than most people your age on bars and other transport.,"bars,transport_other",47
 CUST05070,Balanced spender (and a saver),Your spending is close to people your age in every area.,,31
 CUST05071,Balanced spender (and a saver),Your spending is close to people your age in every area.,,10
@@ -5086,16 +5086,16 @@ CUST05084,Experience seeker and Traveller,You spend more than most people your a
 CUST05085,Balanced spender,Your spending is close to people your age in every area.,,5
 CUST05086,Balanced spender (and a saver),Your spending is close to people your age in every area.,,83
 CUST05087,On-the-go and Takeaway lover (and a saver),You spend more than most people your age on other transport and fast food & takeaway.,"transport_other,fast_food",58
-CUST05088,Driver and Big-ticket buyer,You spend more than most people your age on parking and big one-off purchases.,"parking,big_purchase",68
+CUST05088,On-the-go and Traveller,You spend more than most people your age on taxis and travel.,"taxi,travel",68
 CUST05089,Big-ticket buyer and Traveller,You spend more than most people your age on big one-off purchases and travel.,"big_purchase,travel",40
 CUST05090,Driver and Social butterfly,You spend more than most people your age on parking and bars.,"parking,bars",53
 CUST05091,Balanced spender (and a saver),Your spending is close to people your age in every area.,,29
-CUST05092,Big-ticket buyer and On-the-go,You spend more than most people your age on big one-off purchases and other transport.,"big_purchase,transport_other",65
+CUST05092,Big-ticket buyer and Driver,You spend more than most people your age on big one-off purchases and parking.,"big_purchase,parking",65
 CUST05093,Balanced spender (and a saver),Your spending is close to people your age in every area.,,93
 CUST05094,Takeaway lover and Traveller,You spend more than most people your age on fast food & takeaway and travel.,"fast_food,travel",42
 CUST05095,Shopper and Big-ticket buyer,You spend more than most people your age on shopping & personal care and big one-off purchases.,"lifestyle,big_purchase",63
 CUST05096,On-the-go and Driver,You spend more than most people your age on taxis and parking.,"taxi,parking",57
 CUST05097,Experience seeker and Big-ticket buyer (and a saver),You spend more than most people your age on entertainment and big one-off purchases.,"entertainment,big_purchase",59
-CUST05098,Home & gadget investor and Foodie,You spend more than most people your age on home & tech and restaurants & cafés.,"home_tech,restaurants",67
+CUST05098,Big-ticket buyer and Home & gadget investor,You spend more than most people your age on big one-off purchases and home & tech.,"big_purchase,home_tech",67
 CUST05099,Balanced spender,Your spending is close to people your age in every area.,,65
 CUST05100,Traveller and Shopper (and a saver),You spend more than most people your age on travel and shopping & personal care.,"travel,lifestyle",35

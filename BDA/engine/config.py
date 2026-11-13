@@ -65,6 +65,7 @@ TREND_MIN_EUR = 20           # ... and at least €20 / month
 TREND_RECENT_MONTHS = 6      # "recent" window compared with the earlier baseline
 PEER_MIN_RATIO = 1.5         # mention peer gap only if >= 1.5x the peer median
 PEER_MIN_EUR = 20            # ... and >= €20 / month above it
+OVERSPEND_MIN_EUR = 50       # warn when spending exceeds income by more than this per month
 SAFE_QUANTILE = 0.10         # safe-to-spend is the 10th percentile of simulated outcomes
 SAFE_CUSHION_EUR = 100       # always keep this much on the account
 N_SIM = 2000                 # Monte Carlo draws for safe-to-spend

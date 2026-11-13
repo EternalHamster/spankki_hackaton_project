@@ -47,12 +47,16 @@ def customer_insights(s, cl, anomalies):
     # 1. safe to spend (always)
     pay = fmt_date(s["next_payday"])
     sw = nice(s["safe_to_spend_week"])
+    usual_week = nice(s["extras_12m"] * 7 / C_DPM)        # what they actually spent on extras per week
     if sw > 0:
         tight = s["safe_binding"] == "cash_until_payday"
+        note = (f" That's less than the {eur(usual_week)} a week you usually spend on extras."
+                if usual_week > 1.15 * sw else "")
         add("safe_to_spend", 1, 0,
             f"You can safely spend about €{sw} a week on extras until payday on {pay}."
-            + (" Money is a bit tight until then." if tight else ""),
-            f"Keep this week's extras under €{sw}.", safe_week=sw, next_payday=str(pd.Timestamp(s['next_payday']).date()))
+            + (" Money is a bit tight until then." if tight else "") + note,
+            f"Keep this week's extras under €{sw}.", safe_week=sw, usual_week=usual_week,
+            next_payday=str(pd.Timestamp(s['next_payday']).date()))
     else:
         add("safe_to_spend", 1, 0,
             f"Money is tight until payday on {pay}: after rent, bills and essentials there is nothing spare.",
@@ -75,13 +79,12 @@ def customer_insights(s, cl, anomalies):
         if r["line"] == "big_purchase":
             why = f"You make a big one-off purchase about {max(1, round(r['lam'] * 12))} times a year."
         elif freq_ratio >= 1.3 and size_ratio < 1.3:
-            why = f"You pay for {lab} about {r['lam']:.0f} times a month; most people your age do it {r['peer_lam_median']:.0f} times."
+            why = (f"You pay for {lab} about {how_often(r['lam'])}; "
+                   f"most people your age about {how_often(r['peer_lam_median'])}.")
         elif size_ratio >= 1.3 and freq_ratio < 1.3:
             why = f"You go about as often as others, but spend about {eur(r['size_eur'])} each time versus {eur(r['peer_size_median'])}."
         else:
             why = "You go more often and spend more each time than most people your age."
-        if r["lam"] < 1 and r["line"] != "big_purchase":
-            why = why.replace(f"about {r['lam']:.0f} times a month", "regularly")
         add("peer_gap", 3 + i, r["gap"],
             f"You spend about {eur(r['expected_month'])} a month on {lab}. People your age in {s['area']} typically spend {eur(r['peer_median'])}. {why}",
             f"Matching them would save about {eur(r['gap'])} a month ({eur(12 * r['gap'])} a year).",
@@ -128,17 +131,39 @@ def customer_insights(s, cl, anomalies):
         "Everyday spending is the part you control most. That's where small changes add up.",
         fixed=nice(b1), surprises=nice(b2), everyday=nice(b3), fixed_pct=round(100 * b1 / tot), everyday_pct=round(100 * b3 / tot))
 
-    # 7. savings habit
+    # 7. balance and savings habit: ACTUAL last 12 months, income vs ALL spending (a fact, not an estimate)
     sr = s["savings_rate"] if pd.notna(s["savings_rate"]) else 0
-    free = s["safe_week_budget"] * C_DPM / 7
-    if sr >= 0.10:
+    left = s["net_12m"]
+    if left < -C.OVERSPEND_MIN_EUR:
+        out_m = s["spend_12m"] + s["savings_12m"]
+        cut = 100 * -left / max(s["extras_12m"], 1)        # extras = discretionary lines incl. big purchases, once
+        pct = nice(cut) if cut >= 10 else round(cut)
+        if cut <= 50:
+            action = f"Trimming your extras by {pct} % would bring you back to balance."
+        elif cut < 100:
+            action = (f"Balancing with extras alone would mean cutting them by {pct} %. "
+                      "Check your bigger costs and recent big purchases too.")
+        else:
+            action = "Even with no extras you'd spend more than comes in. Your fixed bills and essentials need a look."
+        add("overspending", 2, -left,
+            f"Over the last 12 months you spent about {eur(-left)} a month more than came in: "
+            f"{eur(s['income_12m'])} in, {eur(out_m)} out.",
+            action, overspend=nice(-left), income=nice(s["income_12m"]), out=nice(out_m), cut_pct=round(cut))
+    elif sr >= 0.10:
         add("savings", 9, 0, f"You put aside about {eur(s['savings_month'])} a month ({round(100 * sr)} % of your income). That's a great habit.",
             "Keep your automatic savings going.", saving=nice(s["savings_month"]))
-    elif free > 50:
-        x = nice(min(0.5 * free, 0.1 * s["income_month"]))
-        add("savings", 9, x, f"After your needs you have about {eur(free)} a month left.",
-            f"Saving just €{x} a month on payday adds up to {eur(12 * x)} a year.", suggested=x)
+    elif left > 50:
+        x = min(0.5 * left, 0.1 * s["income_month"])
+        add("savings", 9, x, f"On average about {eur(left)} a month is left over after all your spending.",
+            f"Moving {eur(x)} of it to savings on payday adds up to {eur(12 * x)} a year.", suggested=nice(x))
     return out
+
+
+def how_often(per_month):
+    """'5 times a month' for frequent things, '9 times a year' for rarer ones."""
+    if per_month >= 2:
+        return f"{round(per_month)} times a month"
+    return f"{max(1, round(12 * per_month))} times a year"
 
 
 C_DPM = 30.44

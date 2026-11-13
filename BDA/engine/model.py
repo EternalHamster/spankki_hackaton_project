@@ -357,6 +357,29 @@ def run(db_path=C.DB_PATH, verbose=True):
                                           on="customer_id")
     summary["as_of"] = as_of
 
+    # Actual cash flow over the last 12 months (facts, not shrunk estimates). Used for statements about
+    # what the customer DID, e.g. "you spend more than comes in". Shrunk estimates are for predictions.
+    in_disc = "(" + ",".join(f"'{l}'" for l in C.DISCRETIONARY) + ")"
+    actual = con.sql(f"""
+        select customer_id,
+               coalesce(sum(tx_amount_eur) filter (where line = 'income'), 0) / 12            as income_12m,
+               coalesce(sum(spend) filter (where line not in ('income', 'savings_transfer')), 0) / 12 as spend_12m,
+               coalesce(sum(spend) filter (where line = 'savings_transfer'), 0) / 12          as savings_12m,
+               coalesce(sum(spend) filter (where line in {in_disc}), 0) / 12                  as extras_12m
+        from transactions where month >= '{months[-12]:%Y-%m-%d}' group by 1""").df()
+    summary = summary.merge(actual, on="customer_id", how="left")
+    summary["net_12m"] = summary["income_12m"] - summary["spend_12m"] - summary["savings_12m"]
+
+    # Safe-to-spend must also hold under the LAST 12 MONTHS' needs: the 24-month estimates lag behind
+    # customers whose bills/essentials went up recently. Take the most conservative of the three.
+    needs_12m = summary["spend_12m"] - summary["extras_12m"]
+    summary["safe_week_budget_12m"] = (summary["income_12m"] - needs_12m - summary["savings_12m"]) * 7 / DPM
+    limits = summary[["safe_week_cash", "safe_week_budget", "safe_week_budget_12m"]]
+    summary["safe_to_spend_week"] = np.floor(limits.min(axis=1).clip(lower=0) / 5) * 5
+    summary["safe_binding"] = limits.idxmin(axis=1).map({"safe_week_cash": "cash_until_payday",
+                                                         "safe_week_budget": "monthly_budget",
+                                                         "safe_week_budget_12m": "recent_budget"})
+
     for name, df in [("model_hyper", hyper), ("customer_line", customer_line), ("customer_summary", summary)]:
         con.register("tmp_df", df)
         con.sql(f"create or replace table {name} as select * from tmp_df")

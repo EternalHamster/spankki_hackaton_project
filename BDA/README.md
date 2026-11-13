@@ -81,8 +81,11 @@ The **hyperparameters** (a, b, M, t², cv²) are estimated once from all 5,100 c
 **Derived outputs:**
 - **Peer comparison:** the customer vs the median of their peer group. The frequency/size split says *why* ("you go more often" or "you spend more each time").
 - **Trend:** the last 6 months vs the 18 before, each shrunk toward the customer's *own* long-run level. It's shown only if P(change) > 95 %, the change is > 20 % and it's > €20/month.
-- **Safe-to-spend per week:** Monte Carlo (2,000 draws) of balance − bills due before payday − essentials − surprises. Takes the 10th percentile minus a €100 cushion, spread over the weeks to payday, and caps it at the monthly budget (income − needs − surprises − current saving).
+- **Safe-to-spend per week:** Monte Carlo (2,000 draws) of balance − bills due before payday − essentials − surprises. Takes the 10th percentile minus a €100 cushion, spread over the weeks to payday, and caps it at the monthly budget (income − needs − surprises − current saving). It is also capped at the last 12 months' actual budget, so it is never above what kept the customer balanced recently.
 - **Surprise fund:** the 90th percentile of one year of shocks (at least one typical shock).
+- **Overspending:** the customer's *actual* last 12 months (income − all spending − savings), not model estimates.
+  Shrunk estimates are for predictions; statements about what someone *did* use their real numbers.
+  Checked: warnings match actual cash flow for all 5,100 customers. The earlier model-based version had 360 false alarms.
 - **Spender type:** the discretionary lines where the customer is in the top 25 % of their peers.
 
 ## Does it work? (`python -m engine.validate`)
