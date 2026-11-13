@@ -57,3 +57,59 @@ The last event is not always the decision: 136 of the 200 histories end with a c
 collateral_status reads approved even for applications that were rejected.
 78 customers had extra collateral requested but never got a second valuation. 8 approved customers had no extra collateral request at all.
 The final table matches the history exactly: same decision, reason, loan, equity and last price, and its collateral equals the primary valuation on the loan_decision row.
+4. tx_junction_transactions.csv: bank account transactions (3,626,755 rows, 343 MB, stored in Git LFS)
+Columns: customer_id, bank_account_id, tx_date, tx_timestamp, category, tx_amount_eur, balance_after_eur, transaction_type, merchant_id, mcc_code
+
+Size and performance: a single streaming pass in plain Python (csv module) takes about 2.7 minutes and very little memory. Don't load it into Excel. With pandas, read customer_id, bank_account_id, merchant_id and mcc_code as strings.
+
+Coverage:
+All 5,100 customers appear, each with exactly one account (ACC000001 = CUST00001, etc.). All 200 mortgage customers have transactions.
+Dates run 1 Oct 2024 – 30 Sep 2026 (24 months), with an even ~150k transactions per month. The mortgage history (Jan–Sep 2026) falls inside this window, so behaviour before and after the mortgage application is visible.
+148–1,543 transactions per account (median 700).
+Timestamps use the same SAS format as the negotiation history (03OCT24:09:04:04), and tx_date always matches the timestamp's date. Activity runs 05:00–23:59, peaks around 16–18h and is highest on Fridays and Saturdays. Nothing happens between 00:00 and 05:00.
+
+Data quality (better than expected):
+No duplicate rows, no zero amounts, no unparseable timestamps.
+Rows are sorted by account, then by time.
+The balance chain is perfect: previous balance_after + tx_amount = balance_after on every row. You can therefore reconstruct the full daily balance history of any account.
+Amounts have 1–2 decimals. The only empty fields are merchant_id and mcc_code (786,668 rows, all the same rows).
+
+Categories and transaction types (category maps 1:1 to a type):
+Type	Category	Rows	Sign	Amount range (EUR)
+purchase	Groceries, Restaurants, Transportation, Entertainment, Health, Home & Tech, Lifestyle, Travel	3,000,711	always negative	−30,935 to −0.03 (mean −72)
+utilities_payment	Utilities	342,728	negative	−1,098 to −2.58
+salary	Salary	121,725	positive	356 to 22,583 (mean 3,362)
+housing_payment	Housing	112,903	negative	−2,578 to −7.53 (mean −1,088)
+investment_deposit	Invest Deposit	35,668	negative	−3,439 to −20
+other_income	Other Income	6,299	positive	34 to 22,011
+salary_sweep	Salary Sweep	6,189	negative	−9,200 to −314
+investment_withdrawal	Invest Withdraw	532	positive	252 to 4,801
+Outflows are only purchases, utilities, housing, investment deposits and salary sweeps. Inflows are only salary, other income and investment withdrawals. There are no transfers, refunds or card reversals.
+
+Merchants (there are no free-text merchant descriptions; only IDs and MCC codes):
+515 merchants, IDs like MRC-GRO-0035. The prefix encodes the category: GRO Groceries (80 merchants), RES Restaurants (90), TRN Transportation (65), LIF Lifestyle (65), HMT Home & Tech (60), HEA Health (55), ENT Entertainment (55), TRV Travel (45).
+Each merchant always has exactly one category and one MCC code.
+36 distinct MCC codes (standard card merchant category codes). Examples: 5411 grocery, 5812/5814 restaurants/fast food, 5542/5541 fuel, 4111 public transport, 4121 taxi, 7523 parking, 5912 pharmacy, 8011 doctors, 4511 airlines, 7011 hotels.
+Very skewed popularity: MRC-GRO-0032 alone has 90,280 transactions, while the least used merchant has 92.
+Edge case: 160,624 purchases have no merchant or MCC (mostly Transportation with 75k, then Restaurants, Health and Groceries). Non-purchase types never have a merchant.
+
+Salary and income:
+Every customer gets exactly one salary per month (a few months are missing, 121,725 of 122,400 possible). Most are paid on the 15th (96k); the rest at month end (26th–31st). Salary is stable per customer (median coefficient of variation 7.7%).
+salary_sweep moves a large part of the salary out right after payday (on the 15th–17th or at month end), apparently into savings.
+Key finding for the mortgage data: each mortgage customer's average monthly inflow (Jan 2025 – Aug 2026) is almost exactly equal to their required_monthly_income_eur (median ratio 1.00 for both approved and rejected; range 0.59–1.12). The loan amounts seem to have been sized to the customer's actual income, so income alone does not separate approved from rejected. Even the "insufficient_income" rejections have ratios of 0.98–1.05.
+
+Balances:
+Opening balances range from −1.41 to €19.8k (median €2.9k). Closing balances range from −€1.2k to €408k (median €6.2k). A few accounts accumulate very large balances (max €408k, CUST05034).
+Overdrafts are common: 3,526 of 5,100 accounts go below zero at some point (lowest −€1,985). Most recover quickly (median 11 days negative over two years), but some stay negative for up to 216 days.
+
+Spending behaviour:
+Purchases take a median of 52% of a customer's inflow (10th–90th percentile 28%–69%). A few customers spend almost all their income.
+Outliers: 104 single purchases of €5,000 or more (up to −€30,935, mostly Home & Tech and Travel). Some customers repeat them (CUST00448 has several).
+Housing payments do not change after a mortgage decision. Only 78 of the 200 mortgage customers have housing payments both before and after their decision month, and for them the after/before ratio is 0.95–1.05. Approved mortgages do not show up as new loan payments in the account.
+
+Edge cases:
+Category and transaction_type are redundant; either one is enough.
+Treat a missing merchant as "unknown merchant", not as bad data. Category is still filled.
+Negative balances are normal (overdraft) and are not errors.
+September 2026 is a complete month here, unlike the mortgage history which ends on 10 Sep.
+Joining: tx customer_id → link file customer_id → mortgage_customer_id → negotiation history.
