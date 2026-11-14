@@ -6,7 +6,7 @@ import subprocess
 import sys
 import unittest
 from unittest.mock import patch
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -41,14 +41,85 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(actual["as_of"], "2026-09-30")
             weekly = actual["weekly_spending"]
             safe = self.tool("safe_to_spend", {}, cid)
-            self.assertEqual(set(weekly), {"eur_week", "usual_extras_eur_week"})
-            for key, amount in weekly.items():
+            self.assertEqual((weekly["week_start"], weekly["week_end"], weekly["observed_through"]),
+                             ("2026-09-28", "2026-10-04", "2026-09-30"))
+            self.assertEqual(weekly["days_remaining_in_week"], 4)
+            for key in ("eur_week", "usual_extras_eur_week", "spent_eur_week", "weekly_budget_eur",
+                        "remaining_eur_week", "over_budget_eur_week", "daily_remaining_eur"):
+                amount = weekly[key]
                 self.assertIsInstance(amount, (int, float))
                 self.assertGreaterEqual(amount, 0)
                 self.assertEqual(amount, safe[key])
+            for key in weekly:
+                self.assertEqual(weekly[key], safe[key])
             for other in worker.DEMO_CUSTOMERS:
                 if other != cid:
                     self.assertNotIn(other, json.dumps(actual))
+
+    def test_weekly_spending_reconciles_actual_classified_records_for_each_customer(self):
+        for cid in worker.DEMO_CUSTOMERS:
+            weekly = self.runtime.weekly_spending(cid)
+            rows = self.runtime.query("""select cast(tx_date as varchar) payment_date, line,
+                cast(tx_amount_eur as decimal(18,2)) amount_eur from transactions
+                where customer_id = ? order by tx_date""", [cid])
+            expected = sum((-Decimal(row["amount_eur"]) for row in rows if
+                            "2026-09-28" <= row["payment_date"] <= "2026-09-30" and
+                            row["line"] in self.runtime.cfg.DISCRETIONARY and Decimal(row["amount_eur"]) < 0), Decimal(0))
+            budget = Decimal(str(weekly["weekly_budget_eur"]))
+            self.assertEqual(Decimal(str(weekly["spent_eur_week"])), expected)
+            self.assertEqual(Decimal(str(weekly["remaining_eur_week"])), max(Decimal(0), budget - expected))
+            self.assertEqual(Decimal(str(weekly["over_budget_eur_week"])), max(Decimal(0), expected - budget))
+            self.assertLessEqual(Decimal(str(weekly["daily_remaining_eur"])) * 4,
+                                 Decimal(str(weekly["remaining_eur_week"])))
+            self.assertIn("not an account balance", weekly["planning_note"])
+
+    def test_weekly_spending_dates_filters_zero_budget_and_daily_rounding(self):
+        # Small independent SQL fixture covers boundary and refund cases even when
+        # the real demonstration customers have no payment on a particular day.
+        runtime = object.__new__(worker.CustomerRuntime)
+        runtime.connection = worker.duckdb.connect(":memory:")
+        runtime.cfg = self.runtime.cfg
+        runtime.connection.execute("""create table transactions(customer_id varchar, tx_date date,
+            line varchar, spend decimal(18,2), tx_amount_eur decimal(18,2))""")
+        rows = [("CUST00207", day, line, amount, -amount) for day, line, amount in [
+            ("2026-09-27", "restaurants", 7), ("2026-09-28", "restaurants", 1.01),
+            ("2026-09-29", "taxi", 2.02), ("2026-09-29", "home_tech", 3.03),
+            ("2026-09-30", "big_purchase", 4.04), ("2026-09-30", "entertainment", 5.05),
+            ("2026-10-01", "lifestyle", 6), ("2026-09-29", "restaurants", -20),
+            ("2026-09-29", "groceries", 99), ("2026-09-29", "shock", 50),
+            ("2026-09-29", "savings_transfer", 1000), ("2026-09-29", "income", -2000),
+            ("2026-12-31", "restaurants", .10), ("2027-01-01", "parking", .20),
+            ("2027-01-04", "restaurants", 9),
+        ]]
+        rows.extend([("CUST00127", "2026-09-29", "restaurants", 100, -100),
+                     ("CUST00207", "2026-09-29", "restaurants", 100, 100)])
+        runtime.connection.executemany("insert into transactions values (?, ?, ?, ?, ?)", rows)
+        detail = {"eur_week": 100, "usual_extras_eur_week": 90}
+        try:
+            runtime.as_of = "2026-09-30"
+            weekly = runtime.weekly_spending("CUST00207", detail)
+            self.assertEqual(weekly["spent_eur_week"], 15.15)
+            self.assertEqual(weekly["remaining_eur_week"], 84.85)
+            self.assertEqual(weekly["daily_remaining_eur"], 21.21)
+            self.assertEqual(weekly["over_budget_eur_week"], 0)
+            self.assertEqual(runtime.weekly_spending("CUST00127", detail)["spent_eur_week"], 100)
+            runtime.as_of = "2026-09-28"
+            zero = runtime.weekly_spending("CUST00207", {**detail, "eur_week": 0})
+            self.assertEqual(zero["spent_eur_week"], 1.01)
+            self.assertEqual(zero["remaining_eur_week"], 0)
+            self.assertEqual(zero["daily_remaining_eur"], 0)
+            self.assertEqual(zero["over_budget_eur_week"], 1.01)
+            self.assertEqual(zero["days_remaining_in_week"], 6)
+            runtime.as_of = "2027-01-03"
+            sunday = runtime.weekly_spending("CUST00207", detail)
+            self.assertEqual((sunday["week_start"], sunday["week_end"]), ("2026-12-28", "2027-01-03"))
+            self.assertEqual(sunday["spent_eur_week"], .30)
+            self.assertEqual(sunday["days_remaining_in_week"], 0)
+            self.assertIsNone(sunday["daily_remaining_eur"])
+            with self.assertRaises(worker.RequestError):
+                runtime.weekly_spending("CUST99999", detail)
+        finally:
+            runtime.close()
 
     def test_context_queries_only_selected_rows_and_contains_no_ids(self):
         for cid in worker.DEMO_CUSTOMERS:
@@ -74,11 +145,142 @@ class RuntimeTests(unittest.TestCase):
                 args = {"start_date": month + "-01", "end_date": end}
                 result = self.tool("get_spending", args, profile["customer_id"])
                 rows = [r for r in profile["transactions"] if r["date"].startswith(month)]
-                expected = sum((-Decimal(str(r["amount"])) for r in rows if r["category"] in worker.SPENDING_CATEGORIES and r["amount"] < 0), Decimal(0))
+                payments = [r for r in rows if r["category"] in worker.SPENDING_CATEGORIES and r["amount"] < 0]
+                expected = sum((-Decimal(str(r["amount"])) for r in payments), Decimal(0))
                 self.assertEqual(Decimal(result["total_eur"]), expected, (profile["customer_id"], month))
+                self.assertEqual(result["payments"], len(payments))
+                for scope, scoped in (("all", payments), ("discretionary", [row for row in payments if row["category"] in worker.PURCHASE_CATEGORIES])):
+                    stats = result["patterns"][scope]
+                    amounts = sorted(-Decimal(str(row["amount"])) for row in scoped)
+                    total = sum(amounts, Decimal(0))
+                    self.assertEqual(stats["payments"], len(scoped))
+                    self.assertEqual(stats["active_days"], len({row["date"] for row in scoped}))
+                    self.assertEqual(Decimal(stats["total_eur"]), total)
+                    self.assertEqual(Decimal(stats["top_three_payments_eur"]), sum(amounts[-3:], Decimal(0)))
+                    self.assertEqual(Decimal(stats["biggest_payment_eur"]), max(amounts, default=Decimal(0)))
+                    self.assertEqual(stats["average_payment_eur"], str((total / len(amounts)).quantize(Decimal(".01"), rounding=ROUND_HALF_UP)) if amounts else None)
+                    median = (amounts[(len(amounts) - 1) // 2] + amounts[len(amounts) // 2]) / 2 if amounts else None
+                    self.assertEqual(stats["median_payment_eur"], str(median.quantize(Decimal(".01"), rounding=ROUND_HALF_UP)) if amounts else None)
+                    for buckets in ("categories", "weekdays", "month_parts", "dayparts"):
+                        self.assertEqual(sum(row["payments"] for row in stats[buckets]), len(scoped))
+                        self.assertEqual(sum((Decimal(row["total_eur"]) for row in stats[buckets]), Decimal(0)), total)
+                    self.assertEqual(sum(row["calendar_days"] for row in stats["weekdays"]),
+                                     (worker.date.fromisoformat(end) - worker.date.fromisoformat(month + "-01")).days)
+                    self.assertEqual(sum(row["calendar_days"] for row in stats["month_parts"]),
+                                     sum(row["calendar_days"] for row in stats["weekdays"]))
+                self.assertEqual({row["category"] for row in result["categories"]}, {row["category"] for row in payments})
+                for category in result["categories"]:
+                    amounts = [-Decimal(str(row["amount"])) for row in payments if row["category"] == category["category"]]
+                    self.assertEqual(set(category), {"category", "payments", "total_eur", "biggest_payment_eur"})
+                    self.assertEqual(category["payments"], len(amounts))
+                    self.assertEqual(Decimal(category["total_eur"]), sum(amounts, Decimal(0)))
+                    self.assertEqual(Decimal(category["biggest_payment_eur"]), max(amounts))
                 cash = self.tool("get_cash_flow", args, profile["customer_id"])
                 self.assertEqual(Decimal(cash["spending_eur"]), expected)
                 self.assertEqual(Decimal(cash["net_account_flow_eur"]), sum((Decimal(str(r["amount"])) for r in rows), Decimal(0)))
+
+    def spending_pattern_fixture(self):
+        runtime = object.__new__(worker.CustomerRuntime)
+        runtime.connection = worker.duckdb.connect(":memory:")
+        self.addCleanup(runtime.close)
+        runtime.cfg, runtime.groups = self.runtime.cfg, self.runtime.groups
+        runtime.version, runtime.as_of = "test-patterns", "2024-12-31"
+        runtime.coverage = {"first": "2024-01-01", "last": "2024-12-31"}
+        runtime._tool_cache, runtime._observed_transactions = worker.OrderedDict(), {}
+        runtime.connection.execute("""create table transactions(customer_id varchar, tx_date date,
+            ts timestamp, category varchar, line varchar, tx_amount_eur decimal(18,2), merchant_id varchar)""")
+        rows = [("CUST00207", day, day + " " + clock, category, line, amount, "PRIVATE_MERCHANT")
+                for day, clock, category, line, amount in [
+            ("2024-02-08", "23:59:59", "Restaurants", "restaurants", "-99.00"),
+            ("2024-02-09", "00:00:00", "Restaurants", "restaurants", "-0.01"),
+            ("2024-02-09", "05:59:59", "Restaurants", "restaurants", "-0.02"),
+            ("2024-02-10", "06:00:00", "Restaurants", "restaurants", "-0.10"),
+            ("2024-02-10", "11:59:59", "Lifestyle", "lifestyle", "-0.10"),
+            ("2024-02-11", "12:00:00", "Entertainment", "entertainment", "-0.20"),
+            ("2024-02-20", "17:59:59", "Travel", "travel", "-0.20"),
+            ("2024-02-21", "18:00:00", "Groceries", "groceries", "-1.00"),
+            ("2024-02-22", "23:59:59", "Housing", "housing", "-1.00"),
+            ("2024-02-23", "00:00:01", "Restaurants", "restaurants", "-0.20"),
+            ("2024-02-24", "00:00:00", "Restaurants", "restaurants", "-1000.00"),
+            ("2024-02-10", "13:00:00", "Restaurants", "restaurants", "0.50"),
+            ("2024-02-10", "13:00:00", "Restaurants", "restaurants", "0.00"),
+            ("2024-02-10", "13:00:00", "Salary", "income", "200.00"),
+            ("2024-02-10", "13:00:00", "Invest Deposit", "savings_transfer", "-300.00"),
+            ("2024-02-10", "13:00:00", "Salary Sweep", "savings_transfer", "-400.00"),
+            ("2024-02-10", "13:00:00", "Unknown", "shock", "-500.00"),
+            ("2024-02-29", "23:59:59", "Travel", "travel", "-0.31"),
+            ("2024-03-01", "00:00:00", "Groceries", "groceries", "-0.42"),
+        ]]
+        rows.append(("CUST00127", "2024-02-10", "2024-02-10 13:00:00", "Restaurants", "restaurants", "-600.00", "OTHER_MERCHANT"))
+        runtime.connection.executemany("insert into transactions values (?, ?, ?, ?, ?, ?, ?)", rows)
+        return runtime
+
+    def test_spending_patterns_exact_scoped_counts_and_clock_boundaries(self):
+        runtime = self.spending_pattern_fixture()
+        period = {"start_date": "2024-02-09", "end_date": "2024-02-24"}
+        result = runtime.execute("CUST00207", "get_spending", period)
+        all_spend, optional = result["patterns"]["all"], result["patterns"]["discretionary"]
+        self.assertEqual((all_spend["payments"], all_spend["active_days"], all_spend["timed_payments"]), (9, 7, 8))
+        self.assertEqual((all_spend["total_eur"], all_spend["average_payment_eur"], all_spend["median_payment_eur"],
+                          all_spend["biggest_payment_eur"], all_spend["top_three_payments_eur"]), ("2.83", "0.31", "0.20", "1.00", "2.20"))
+        self.assertEqual((optional["payments"], optional["active_days"], optional["timed_payments"]), (7, 5, 6))
+        self.assertEqual((optional["total_eur"], optional["average_payment_eur"], optional["median_payment_eur"],
+                          optional["biggest_payment_eur"], optional["top_three_payments_eur"]), ("0.83", "0.12", "0.10", "0.20", "0.60"))
+        self.assertEqual([(r["part"], r["payments"], r["total_eur"]) for r in all_spend["dayparts"]],
+                         [("night", 3, "0.23"), ("morning", 2, "0.20"), ("afternoon", 2, "0.40"), ("evening", 2, "2.00")])
+        self.assertEqual([(r["part"], r["calendar_days"], r["payments"]) for r in all_spend["month_parts"]],
+                         [("early", 2, 4), ("middle", 10, 2), ("late", 3, 3)])
+        self.assertEqual([(r["day"], r["calendar_days"], r["payments"]) for r in all_spend["weekdays"]],
+                         [(1, 2, 0), (2, 2, 1), (3, 2, 1), (4, 2, 1), (5, 3, 3), (6, 2, 2), (7, 2, 1)])
+        self.assertEqual(len(all_spend["categories"]), 10)
+        self.assertEqual(len(optional["categories"]), 4)
+        self.assertEqual(next(r for r in all_spend["categories"] if r["category"] == "Health")["total_eur"], "0.00")
+        self.assertEqual(result["total_eur"], all_spend["total_eur"])
+        self.assertEqual(result["payments"], all_spend["payments"])
+        self.assertNotRegex(json.dumps(result["patterns"]), r"CUST\d+|MERCHANT|merchant_id")
+        self.assertIn("not visits", result["patterns"]["scope_note"])
+        self.assertIn("timezone is unspecified", result["patterns"]["scope_note"])
+        other = runtime.execute("CUST00127", "get_spending", period)["patterns"]["all"]
+        self.assertEqual((other["payments"], other["total_eur"]), (1, "600.00"))
+        for filter_, total, optional_total in (({"category": "restaurants"}, "0.33", "0.33"),
+                                               ({"line": "food"}, "1.33", "0.33"),
+                                               ({"category": "Groceries"}, "1.00", "0.00")):
+            filtered = runtime.execute("CUST00207", "get_spending", {**period, **filter_})
+            self.assertEqual(filtered["patterns"]["all"]["total_eur"], total)
+            self.assertEqual(filtered["patterns"]["all"]["payments"], filtered["payments"])
+            self.assertEqual(filtered["patterns"]["discretionary"]["total_eur"], optional_total)
+
+    def test_spending_patterns_round_half_up_empty_sparse_and_leap_calendar(self):
+        runtime = self.spending_pattern_fixture()
+        tiny = runtime.execute("CUST00207", "get_spending", {"start_date": "2024-02-09", "end_date": "2024-02-10"})["patterns"]["all"]
+        self.assertEqual((tiny["total_eur"], tiny["average_payment_eur"], tiny["median_payment_eur"], tiny["top_three_payments_eur"]),
+                         ("0.03", "0.02", "0.02", "0.03"))
+        self.assertEqual(tiny["timed_payments"], 1)
+        leap = runtime.execute("CUST00207", "get_spending", {"start_date": "2024-02-28", "end_date": "2024-03-02"})["patterns"]
+        self.assertEqual(leap["all"]["total_eur"], "0.73")
+        self.assertEqual(leap["all"]["average_payment_eur"], "0.37")
+        self.assertEqual(leap["all"]["median_payment_eur"], "0.37")
+        self.assertEqual([(r["part"], r["calendar_days"]) for r in leap["all"]["month_parts"]], [("early", 1), ("middle", 0), ("late", 2)])
+        self.assertEqual([r["calendar_days"] for r in leap["all"]["weekdays"]], [0, 0, 1, 1, 1, 0, 0])
+        self.assertEqual(leap["discretionary"]["payments"], 1)
+        for key in ("total_eur", "average_payment_eur", "median_payment_eur", "biggest_payment_eur", "top_three_payments_eur"):
+            self.assertEqual(leap["discretionary"][key], "0.31")
+        midnight = runtime.execute("CUST00207", "get_spending", {"start_date": "2024-03-01", "end_date": "2024-03-02"})["patterns"]["all"]
+        self.assertEqual((midnight["payments"], midnight["timed_payments"]), (1, 0))
+        for args in ({"start_date": "2024-02-12", "end_date": "2024-02-13"},
+                     {"start_date": "2024-02-09", "end_date": "2024-02-24", "category": "Health"}):
+            result = runtime.execute("CUST00207", "get_spending", args)
+            for scope in ("all", "discretionary"):
+                empty = result["patterns"][scope]
+                self.assertEqual((empty["payments"], empty["active_days"], empty["timed_payments"]), (0, 0, 0))
+                self.assertIsNone(empty["average_payment_eur"])
+                self.assertIsNone(empty["median_payment_eur"])
+                for key in ("total_eur", "biggest_payment_eur", "top_three_payments_eur"):
+                    self.assertEqual(empty[key], "0.00")
+                for key in ("categories", "weekdays", "month_parts", "dayparts"):
+                    self.assertTrue(all(r["payments"] == 0 and r["total_eur"] == "0.00" for r in empty[key]))
+        with self.assertRaises(worker.RequestError):
+            runtime.execute("CUST00207", "get_spending", {"start_date": "2024-01-01", "end_date": "2028-01-01"})
 
     def test_every_tool_rejects_customer_overrides_and_unknown_arguments(self):
         for tool in worker.TOOLS:
@@ -138,9 +340,14 @@ class RuntimeTests(unittest.TestCase):
                 [cid, period["start_date"], period["end_date"]])
             rows = [row for row in rows if row["category"] in worker.SPENDING_CATEGORIES]
             for line in worker.LINE_PROPERTY["enum"]:
-                expected = sum((Decimal(row["amount"]) for row in rows if row["line"] in self.runtime.resolve_line(line)), Decimal(0))
+                scoped = [row for row in rows if row["line"] in self.runtime.resolve_line(line)]
+                expected = sum((Decimal(row["amount"]) for row in scoped), Decimal(0))
                 actual = self.tool("get_spending", {**period, "line": line}, cid)
                 self.assertEqual(Decimal(actual["total_eur"]), expected, (cid, line))
+                self.assertEqual(sum(row["payments"] for row in actual["categories"]), len(scoped))
+                for category in actual["categories"]:
+                    amounts = [Decimal(row["amount"]) for row in scoped if row["category"] == category["category"]]
+                    self.assertEqual(Decimal(category["biggest_payment_eur"]), max(amounts), (cid, line, category["category"]))
                 self.assertTrue(self.tool("what_if", {"line": line, "cut_percent": 20}, cid)["model_estimate"])
                 self.assertGreaterEqual(self.tool("compare_to_peers", {"line": line}, cid)["group_size"], 10)
             for category in worker.SPENDING_CATEGORIES:

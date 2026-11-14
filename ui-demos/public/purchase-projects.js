@@ -37,7 +37,7 @@ export function validProjectProposal(value) {
 
 function validProject(value) {
   return objectWith(value, PROJECT_KEYS) && validProjectProposal(pickProposal(value)) && money(value.saved_eur) &&
-    cents(value.saved_eur) <= cents(value.price_eur) && isoTime(value.created_at) &&
+    isoTime(value.created_at) &&
     (value.memory_revision === '' || revision(value.memory_revision));
 }
 
@@ -49,7 +49,7 @@ export function validProjectContext(value) {
 export function projectProgress(project) {
   if (!validProject(project)) throw new TypeError('Invalid purchase project');
   const target = cents(project.price_eur), saved = cents(project.saved_eur), monthly = cents(project.monthly_eur);
-  const remaining = target - saved;
+  const remaining = Math.max(0, target - saved);
   return { remaining_eur: remaining / 100, percent: remaining === 0 ? 100 : Math.min(99.99, Math.round(saved / target * 10000) / 100),
     months_remaining: remaining === 0 ? 0 : monthly > 0 ? Math.ceil(remaining / monthly) : null };
 }
@@ -143,7 +143,7 @@ export function createPurchaseProjects(options = {}) {
         if (JSON.stringify(pickProposal(existing)) === JSON.stringify(candidate) && existing.memory_revision === memoryRevision) {
           return { changed: false };
         }
-        const updated = { ...candidate, saved_eur: Math.min(cents(existing.saved_eur), cents(candidate.price_eur)) / 100,
+        const updated = { ...candidate, saved_eur: existing.saved_eur,
           created_at: existing.created_at, memory_revision: memoryRevision };
         return { changed: true, projects: projects.map(project => project === existing ? updated : project) };
       }
@@ -173,5 +173,19 @@ export function createPurchaseProjects(options = {}) {
     }, mutationOptions);
   }
 
-  return { read, confirm, setSaved, remove };
+  // A demo deposit, never a bank transfer or a time-based balance forecast.
+  async function simulateMonthlyDeposit(customerId, id, expectedRevision, mutationOptions) {
+    if (!uuid(id)) return { ...read(customerId), saved: false, reason: 'invalid' };
+    return write(customerId, expectedRevision, projects => {
+      const item = projects.find(project => project.id.toLowerCase() === id.toLowerCase());
+      if (!item) return { error: 'not_found' };
+      const remaining = Math.max(0, cents(item.price_eur) - cents(item.saved_eur));
+      if (!remaining) return { changed: false };
+      if (item.monthly_eur <= 0) return { error: 'invalid' };
+      item.saved_eur = (cents(item.saved_eur) + Math.min(remaining, cents(item.monthly_eur))) / 100;
+      return { changed: true, projects };
+    }, mutationOptions);
+  }
+
+  return { read, confirm, setSaved, simulateMonthlyDeposit, remove };
 }

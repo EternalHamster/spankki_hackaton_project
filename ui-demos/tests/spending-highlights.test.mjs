@@ -3,7 +3,24 @@ import assert from 'node:assert/strict';
 import { spendingHighlight, previousMonth } from '../spending-highlights.mjs';
 import { createCoach } from '../coach.mjs';
 
-const rows = values => Object.entries(values).map(([category, total_eur]) => ({ category, total_eur }));
+const rows = values => Object.entries(values).map(([category, total_eur]) => ({ category, total_eur,
+  payments: Number(total_eur) > 0 ? 1 : 0, biggest_payment_eur: total_eur }));
+
+test('payment evidence compares actual counts and rounded means without inventing a previous month', () => {
+  const current = [{ category: 'Restaurants', total_eur: '10.01', payments: 2, biggest_payment_eur: '7.00' }];
+  const previous = [{ category: 'Restaurants', total_eur: '120.00', payments: 3, biggest_payment_eur: '60.00' }];
+  assert.deepEqual(spendingHighlight('2026-09', current, previous).payments, {
+    current: { payments: 2, average_payment_eur: '5.01', biggest_payment_eur: '7.00' },
+    previous_month: '2026-08', previous: { payments: 3, average_payment_eur: '40.00', biggest_payment_eur: '60.00' },
+  });
+  assert.equal(spendingHighlight('2026-09', current).payments.previous, undefined);
+  assert.deepEqual(spendingHighlight('2026-09', [], previous).payments.current,
+    { payments: 0, average_payment_eur: null, biggest_payment_eur: '0.00' });
+  assert.equal(spendingHighlight('2026-09', [{ category: 'Restaurants', total_eur: '10.01' }]).payments, undefined);
+  for (const change of [{ payments: 1.5 }, { payments: 0 }, { biggest_payment_eur: '11.00' }, { biggest_payment_eur: '4.00' }]) {
+    assert.throws(() => spendingHighlight('2026-09', [{ ...current[0], ...change }]));
+  }
+});
 
 test('a material variable expense change wins over large stable rent', () => {
   const result = spendingHighlight('2026-09', rows({ Housing: '1500.00', Restaurants: '340.19', Entertainment: '120.00' }),
@@ -63,15 +80,20 @@ test('summary preparation sends the current customer’s covered comparison to t
       const content = JSON.parse(options.body).messages[0].content;
       facts = JSON.parse(content.split('\n\nWrite prepared')[0].replace('EXACT TOPIC FACTS:\n', '')).months['2026-09'];
       return Response.json({ stop_reason: 'end_turn', content: [{ type: 'text', text: JSON.stringify({ months: {
-        '2026-09': { spending: ['Ravintoloihin kului 340,19 €.', 'Katso, mistä summa koostui.'],
+        '2026-09': { spending: ['Ravintoloihin kului 340,19 €.', 'Summa muodostui yhdestä maksusta.'],
           saving: ['Tuloista jäi menojen jälkeen 659,81 €.', 'Varaa ensin rahat laskuihin.'] },
       } }) }] });
     } });
     await coach.summaryBatch('selected-customer', { months: ['2026-09'] });
     assert.ok(calls.every(call => call.customer === 'selected-customer'));
     assert.equal(facts.spending_highlight.category, 'Restaurants');
+    assert.equal(facts.spending_highlight.payments.current.payments, 1);
+    assert.equal(facts.spending_highlight.payments.current.average_payment_eur, '340.19');
+    assert.equal(facts.spending_highlight.payments.previous?.biggest_payment_eur,
+      coverageFrom === '2026-08-01' ? '75.10' : undefined);
     assert.equal(facts.spending_highlight.reason, coverageFrom === '2026-08-01' ? 'category_change' : 'category_focus');
-    assert.equal(calls.length, coverageFrom === '2026-08-01' ? 3 : 2);
-    if (calls.length === 3) assert.deepEqual(calls.at(-1).args, { start_date: '2026-08-01', end_date: '2026-09-01' });
+    const monthCalls = calls.filter(call => call.name !== 'safe_to_spend');
+    assert.equal(monthCalls.length, coverageFrom === '2026-08-01' ? 3 : 2);
+    if (monthCalls.length === 3) assert.deepEqual(monthCalls.at(-1).args, { start_date: '2026-08-01', end_date: '2026-09-01' });
   }
 });

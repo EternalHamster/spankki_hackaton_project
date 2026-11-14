@@ -9,7 +9,7 @@ from money_coach import smoke
 
 
 def response_body():
-    return {"id": "msg_test", "type": "message", "role": "assistant", "model": "claude-haiku-5-5",
+    return {"id": "msg_test", "type": "message", "role": "assistant", "model": "claude-sonnet-5-5",
             "stop_reason": "end_turn", "stop_sequence": None,
             "usage": {"input_tokens": 8, "output_tokens": 2},
             "content": [{"type": "text", "text": "Hi!"}]}
@@ -32,7 +32,7 @@ def test_direct_api_key_and_endpoint(monkeypatch):
         return httpx2.Response(200, json=response_body())
 
     with create_client(http_client=httpx2.Client(transport=httpx2.MockTransport(handle))) as client:
-        client.messages.create(model="claude-haiku-5-5", max_tokens=32,
+        client.messages.create(model="claude-sonnet-5-5", max_tokens=32,
                                messages=[{"role": "user", "content": "hi"}])
     assert len(captured) == 1
     assert str(captured[0].url) == "https://api.anthropic.com/v1/messages"
@@ -58,7 +58,7 @@ def test_smoke_uses_one_small_request_and_redacts_errors(monkeypatch, capsys, st
     body = json.loads(requests[0].content)
     assert body["messages"] == [{"role": "user", "content": "hi"}]
     assert body["max_tokens"] == 32
-    assert body["thinking"] == {"type": "disabled"}
+    assert body["thinking"] == {"type": "between_tools"}
     assert "tools" not in body and "system" not in body
     output = capsys.readouterr()
     assert "test-secret" not in output.out + output.err

@@ -1,3 +1,6 @@
+import { locale } from './language.js';
+import { getLanguage } from './language.js';
+import { translate } from './translations.js';
 import { formatCoachText, formatInline } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { affordTemplate } from './exploration.js';
@@ -13,7 +16,7 @@ const SUGGESTIONS = [
   { text: 'Miten aloitan budjetoinnin?' },
   { text: 'Anna kolme säästövinkkiä arkeen.' },
 ];
-const GAP = /\[(?:tuote|hinta|kuukaudet)\]/;
+const GAP = /\[(?:tuote|hinta|kuukaudet|item|price|months)\]/;
 
 const ready = draft => Boolean(draft.trim()) && !GAP.test(draft);
 
@@ -21,7 +24,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
   const memory = createCustomerMemory();
   const projects = createPurchaseProjects();
   const fresh = () => ({ messages: [], draft: '', pending: false, rewriting: null, error: '', memoryPending: false, memoryNotice: '', memoryWarning: false,
-    projectProposal: null, projectRevision: '', projectMemoryRevision: '', projectSaving: false, projectError: '',
+    projectProposal: null, projectBaseline: [], projectRevision: '', projectMemoryRevision: '', projectSaving: false, projectError: '',
     insight: null, exploration: null, explorationBullets: null, controller: null, selection: getSelection() });
   let session = fresh();
   let displayedMemory = null;
@@ -33,17 +36,35 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (!target) return;
     const proposal = session.projectProposal;
     if (!proposal) { target.innerHTML = ''; return; }
-    const euros = value => new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value);
-    const previous = projects.read(session.selection.customer_id).projects.find(project => project.id === proposal.id);
+    const euros = value => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value);
+    // Use the same commitments as the calculation, even if another tab changes storage.
+    const previous = session.projectBaseline.find(project => project.id === proposal.id);
+    const otherMonthlyCents = session.projectBaseline
+      .filter(project => project.id !== proposal.id && project.saved_eur < project.price_eur)
+      .reduce((sum, project) => sum + Math.round(project.monthly_eur * 100), 0);
+    const goalMonthlyCents = proposal.projected_months === 0 ? 0 : Math.round(proposal.monthly_eur * 100);
+    const savingsNote = goalMonthlyCents === 0
+      ? 'Tavoitetilisi demosaldo kattaa tämän tavoitteen. Siihen ei tarvita lisää kuukausisäästöä.'
+      : previous ? 'Tämän tavoitteen uusi kuukausisumma korvaa aiemman. Muiden tavoitteiden säästöt jatkuvat ennallaan.'
+      : otherMonthlyCents > 0 ? 'Muille tavoitteillesi on jo suunniteltu kuukausisäästö. Jos haluat myös tämän tavoitteen, säästä siihen lisäksi alla oleva summa.'
+      : 'Jos haluat toteuttaa tämän tavoitteen, laita sitä varten alla oleva summa säästöön joka kuukausi.';
     const busy = session.pending || session.projectSaving;
     target.innerHTML = `<section class="chat-project-proposal" aria-labelledby="project-proposal-title">
-      <span class="project-proposal-label">Tehdään tästä tavoite?</span><h3 id="project-proposal-title">${escape(proposal.title)}</h3>
-      <dl class="project-proposal-figures"><div><dt>Tavoitesumma</dt><dd>${euros(proposal.price_eur)}</dd></div><div><dt>Säästövauhti</dt><dd>${euros(proposal.monthly_eur)} / kk</dd></div><div><dt>Aikaa tällä vauhdilla</dt><dd>${proposal.projected_months} kk</dd></div></dl>
+      <span class="project-proposal-label">${previous ? 'Päivitetäänkö tavoitettasi?' : 'Avataanko tavoitteellesi Tavoitetili?'}</span><h3 id="project-proposal-title">${escape(proposal.title)}</h3>
+      <dl class="project-proposal-figures"><div><dt>Tavoitesumma</dt><dd>${euros(proposal.price_eur)}</dd></div><div><dt>Aikaa tällä vauhdilla</dt><dd>${proposal.projected_months} kk</dd></div></dl>
+      <div class="project-proposal-savings">
+        <h4>Kuukausisäästösi</h4><p>${savingsNote}</p>
+        <dl>
+          ${otherMonthlyCents > 0 ? `<div><dt>Muille tavoitteille jo suunniteltu</dt><dd>${euros(otherMonthlyCents / 100)} / kk</dd></div>` : ''}
+          <div><dt>${previous ? 'Tälle tavoitteelle jatkossa' : otherMonthlyCents > 0 ? 'Lisäksi tähän tavoitteeseen' : 'Tähän tavoitteeseen'}</dt><dd>${!previous && otherMonthlyCents > 0 && goalMonthlyCents > 0 ? '+ ' : ''}${euros(goalMonthlyCents / 100)} / kk</dd></div>
+          ${otherMonthlyCents > 0 ? `<div class="project-proposal-total"><dt>Tavoitteisiin yhteensä</dt><dd>${euros((otherMonthlyCents + goalMonthlyCents) / 100)} / kk</dd></div>` : ''}
+        </dl>
+      </div>
       ${proposal.projected_months !== proposal.requested_months ? `<p class="project-proposal-note">Toivomasi aikataulu: ${proposal.requested_months} kk.</p>` : ''}
-      ${previous ? `<p class="project-proposal-note">Päivitetään nykyinen tavoite. Kirjatut säästöt säilyvät: ${euros(Math.min(previous.saved_eur, proposal.price_eur))}.</p>` : ''}
+      ${previous ? `<p class="project-proposal-note">Tavoitetilisi demosaldo säilyy: ${euros(previous.saved_eur)}.</p>` : '<p class="project-proposal-note">Avaan sinulle S-Pankki Tavoitetilin tätä tavoitetta varten. Näet tilin saldon ja edistymisesi tavoitekortissa.</p>'}
       ${proposal.conditions.length ? `<ul class="project-proposal-conditions">${proposal.conditions.map(note => `<li>${escape(note)}</li>`).join('')}</ul>` : ''}
-      <p class="project-proposal-note">Arvio perustuu ${new Date(proposal.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' })} tietoihin. Tavoite tallentuu tähän selaimeen. Kirjaat itse säästämäsi rahat.</p>
-      <div class="project-proposal-actions"><button type="button" class="primary-button" data-project-confirm ${busy ? 'disabled' : ''}>${session.projectSaving ? 'Tallennetaan…' : previous ? 'Päivitä tavoite' : 'Aloita tavoite'}</button><button type="button" data-project-dismiss ${busy ? 'disabled' : ''}>Jatka pohdintaa</button></div>
+      <p class="project-proposal-note">Arvio perustuu ${new Date(proposal.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' })} tietoihin. Demo: simuloitu tili tallentuu tähän selaimeen, eikä oikeaa pankkitiliä avata.</p>
+      <div class="project-proposal-actions"><button type="button" class="primary-button" data-project-confirm ${busy ? 'disabled' : ''}>${session.projectSaving ? 'Tallennetaan…' : previous ? 'Päivitä tavoite' : 'Avaa Tavoitetili'}</button><button type="button" data-project-dismiss ${busy ? 'disabled' : ''}>Jatka pohdintaa</button></div>
       ${session.projectError ? `<p class="project-proposal-error" role="alert">${escape(session.projectError)}</p>` : ''}
     </section>`;
   }
@@ -70,7 +91,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       list.dataset.state = signature;
       list.innerHTML = state.facts.length
         ? `<ul>${state.facts.map(fact => `<li><span>${escape(fact.text)}</span><button type="button" data-memory-forget="${escape(fact.key)}" aria-label="Unohda: ${escape(fact.text)}" ${busy ? 'disabled' : ''}>Unohda</button></li>`).join('')}</ul>`
-        : `<p class="chat-memory-empty">${state.available ? 'Ei vielä muistettuja asioita. Voit kertoa esimerkiksi, mistä menoista et halua tinkiä.' : 'Selaimen muisti ei ole käytettävissä. Voit silti jatkaa keskustelua.'}</p>`;
+        : `<p class="chat-memory-empty">${state.available ? 'Ei vielä muistettuja asioita. Kerro esimerkiksi ostotavoistasi, tavoitteistasi tai menoista, joista et halua tinkiä.' : 'Selaimen muisti ei ole käytettävissä. Voit silti jatkaa keskustelua.'}</p>`;
     }
     const clear = panel.querySelector('[data-memory-clear]');
     clear.hidden = !state.facts.length;
@@ -95,13 +116,13 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const scrollTop = log.scrollTop;
     const busy = session.pending || session.memoryPending || session.projectSaving;
     log.innerHTML = session.messages.map((m, i) => {
-      // Prepared summaries start in plain language. Each answer keeps its own depth.
+      // Each answer keeps its own depth, including a summary opened from the main screen.
       const index = levelIndex(m.level ?? 'simple');
       const actions = m.role === 'assistant' ? `<div class="chat-depth-actions" role="group" aria-label="Muokkaa tätä vastausta">
         <button type="button" data-depth="simpler" data-answer-index="${i}" ${busy || index <= 0 ? 'disabled' : ''}>Selitä yksinkertaisemmin</button>
         <button type="button" data-depth="deeper" data-answer-index="${i}" ${busy || index >= LEVELS.length - 1 ? 'disabled' : ''}>Kerro tarkemmin</button>
         ${session.rewriting === i ? '<span class="chat-rewrite-status" role="status">Muokataan vastausta…</span>' : ''}</div>` : '';
-      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${actions}</div>`;
+      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${m.accountReceipt ? `<button type="button" class="chat-account-link" data-project-view="${escape(m.accountReceipt)}">Näytä Tavoitetili ${icon('arrow')}</button>` : ''}${actions}</div>`;
     }).join('');
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending && session.rewriting === null ? 'Valmentaja vastaa…' : '';
@@ -131,7 +152,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const memoryBefore = memory.read(current.selection.customer_id);
     const projectsBefore = projects.read(current.selection.customer_id);
     let expectedMemoryRevision = memoryBefore.revision;
-    const body = { messages: [...history, { role: 'user', content }], level: depth,
+    const body = { messages: [...history, { role: 'user', content }], level: depth, language: getLanguage(),
       ...(memoryBefore.available ? { memory: memoryBefore.facts } : {}),
       ...(projectsBefore.available ? { projects: projectsBefore.projects } : {}),
       ...(current.projectProposal ? { pending_project: current.projectProposal } : {}) };
@@ -154,7 +175,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
         reset(); onSelectionStale(); return;
       }
       if (!response.ok) throw new Error(result.error || 'Vastausta ei saatu. Yritä uudelleen.');
-      if (typeof result.answer !== 'string' || !result.answer.trim()) throw new Error('Vastausta ei saatu. Yritä uudelleen.');
+      if (typeof result.answer !== 'string' || !result.answer.trim() || (result.language ?? 'fi') !== body.language) throw new Error('Vastausta ei saatu. Yritä uudelleen.');
       current.messages.push({ role: 'assistant', content: result.answer, level: depth });
       if (result.memory_updates !== undefined && !(Array.isArray(result.memory_updates) && result.memory_updates.length === 0)) {
         const saved = await memory.apply(current.selection.customer_id, result.memory_updates, memoryBefore.revision,
@@ -166,6 +187,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       if (validProjectProposal(result.project_proposal)) {
         current.projectProposal = result.project_proposal;
+        current.projectBaseline = projectsBefore.projects;
         current.projectRevision = projectsBefore.revision;
         current.projectMemoryRevision = expectedMemoryRevision;
       }
@@ -202,7 +224,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const remembered = memory.read(current.selection.customer_id);
     // Retain the original detail so repeated changes do not progressively lose information.
     const original = message.originalContent ?? message.content;
-    const body = { messages: history, level: depth, rewrite: { answer: original },
+    const body = { messages: history, level: depth, language: getLanguage(), rewrite: { answer: original },
       ...(remembered.available ? { memory: remembered.facts } : {}) };
     if (current.insight) body.insight = { insight_id: current.insight.card.id };
     // Count the full UTF-8 request, including the source answer. Keep its question intact.
@@ -223,7 +245,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
         reset(); onSelectionStale(); return;
       }
       if (!response.ok) throw new Error(result.error || 'Vastausta ei voitu muokata. Yritä uudelleen.');
-      if (typeof result.answer !== 'string' || !result.answer.trim()) throw new Error('Vastausta ei voitu muokata. Yritä uudelleen.');
+      if (typeof result.answer !== 'string' || !result.answer.trim() || (result.language ?? 'fi') !== body.language) throw new Error('Vastausta ei voitu muokata. Yritä uudelleen.');
       message.originalContent = original;
       message.content = result.answer;
       message.level = depth;
@@ -251,11 +273,11 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (question) { reset(); session.draft = question; }
     const selected = session.insight;
     const period = selected ? insightPeriod(selected.card.period, selected.asOf) : null;
-    const date = customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' }) : '';
+    const date = customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' }) : '';
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${escape(customer.label || 'Demoasiakas')}${date ? ' · aineisto ' + escape(date) : ''}</span></div></div>
       <details id="chat-memory" class="chat-memory"><summary><span>Valmentajan muisti</span><small id="chat-memory-count"></small>${icon('chevron')}</summary>
-        <p class="chat-memory-description">Valmentaja voi muistaa kertomiasi toiveita ja tavoitteita. Ne tallentuvat tähän selaimeen valitulle demoasiakkaalle ja auttavat myös uusissa keskusteluissa. Voit poistaa muistettuja asioita milloin tahansa.</p>
+        <p class="chat-memory-description">Valmentaja poimii vastauksistasi hyödyllisiä muistiinpanoja: kertomiasi ostotapoja, toiveita, tavoitteita ja arjen rajoitteita. Ne tallentuvat tähän selaimeen valitulle demoasiakkaalle ja auttavat myös uusissa keskusteluissa. Voit tarkistaa ja poistaa muistetut asiat milloin tahansa.</p>
         <div id="chat-memory-facts"></div><button type="button" class="chat-memory-clear" data-memory-clear hidden>Tyhjennä muisti</button>
       </details>
       ${selected ? `<div class="chat-insight"><span>${escape(period.label)} · ${escape(period.detail)}</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div><p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.</p></div>`}
@@ -284,6 +306,8 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       current.projectSaving = true; current.projectError = ''; update();
       try {
+        const proposal = current.projectProposal;
+        const alreadyOpen = projects.read(current.selection.customer_id).projects.some(project => project.id === proposal.id);
         const result = await projects.confirm(current.selection.customer_id, current.projectProposal, current.projectRevision,
           { signal: current.controller?.signal, memoryRevision: current.projectMemoryRevision });
         if (current !== session || current.selection?.selection_id !== getSelection()?.selection_id) return;
@@ -293,12 +317,18 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
             : 'Tavoitetta ei voitu tallentaa tähän selaimeen. Yritä uudelleen.';
           return;
         }
+        const opened = result.projects.find(project => project.id === proposal.id);
+        const balance = new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR' }).format(opened.saved_eur);
+        const english = getLanguage() === 'en';
+        current.messages.push({ role: 'user', content: english
+          ? alreadyOpen ? `Update my goal “${opened.title}”.` : `Open a demo S-Pankki Goal Account for my goal “${opened.title}”.`
+          : alreadyOpen ? `Päivitä tavoite ”${opened.title}”.` : `Avaa S-Pankki Tavoitetili tavoitteelleni ”${opened.title}” demossa.` },
+          { role: 'assistant', level: getAnswerLevel(), accountReceipt: opened.id,
+            content: english
+              ? `${alreadyOpen ? 'I updated your goal. Your S-Pankki Goal Account remains open.' : `I opened an S-Pankki Goal Account for your goal “${opened.title}”.`}\n\nYour account now holds **${balance}**. See your balance and progress on the goal card.\n\nDemo: the account and balance are simulated.`
+              : `${alreadyOpen ? 'Päivitin tavoitteesi. S-Pankki Tavoitetilisi säilyy käytössä.' : `Avasin sinulle S-Pankki Tavoitetilin tavoitettasi ”${opened.title}” varten.`}\n\nTililläsi on nyt **${balance}**. Näet saldon ja etenemisesi tavoitekortissa.\n\nDemo: tili ja saldo ovat simuloituja.` });
         current.projectProposal = null;
         onProjectsChanged({ reveal: host.isConnected });
-        if (host.isConnected) {
-          detail.close();
-          document.querySelector('#afford-projects')?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-        }
       } finally {
         if (current === session) { current.projectSaving = false; update(); }
       }
@@ -342,10 +372,22 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     });
     detail.querySelectorAll('[data-chat-question]').forEach(button => button.addEventListener('click', () => {
       if (session.pending) return;
-      input.value = session.draft = button.dataset.chatQuestion;
+      input.value = session.draft = translate(button.dataset.chatQuestion, getLanguage());
       update(); input.focus(); selectGap();
     }));
     detail.querySelector('#chat-messages').addEventListener('click', event => {
+      const account = event.target.closest('[data-project-view]');
+      if (account?.dataset.projectView && session.selection?.selection_id === getSelection()?.selection_id) {
+        onProjectsChanged({ reveal: true });
+        detail.close();
+        const card = document.querySelector(`[data-project-id="${account.dataset.projectView}"]`);
+        if (card) {
+          card.querySelector('.project-details').open = true;
+          card.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+          card.querySelector('.project-details summary')?.focus({ preventScroll: true });
+        }
+        return;
+      }
       const button = event.target.closest('[data-depth]');
       if (!button || button.disabled) return;
       void rewriteAnswer(Number(button.dataset.answerIndex), button.dataset.depth);
@@ -355,12 +397,13 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (autoSend && question) void send();
   }
   showChat.reset = reset;
-  showChat.openExploration = ({ question, displayQuestion, answer, bullets, selectionId }) => {
+  showChat.openExploration = ({ question, displayQuestion, answer, bullets, selectionId, level }) => {
     if (selectionId !== getSelection()?.selection_id) { onSelectionStale(); return; }
     reset();
     session.exploration = displayQuestion;
     session.explorationBullets = Array.isArray(bullets) && bullets.length >= 2 && bullets.length <= 3 && bullets.every(bullet=>typeof bullet === 'string') ? bullets : null;
-    session.messages = [{ role: 'user', content: question }, { role: 'assistant', content: answer }];
+    const depth = levelIndex(level) >= 0 ? level : 'simple';
+    session.messages = [{ role: 'user', content: question }, { role: 'assistant', content: answer, level: depth }];
     showChat();
     detail.querySelector('#chat-question').focus();
   };
@@ -368,7 +411,8 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (customerId !== getSelection()?.customer_id) { onSelectionStale(); return; }
     reset();
     session.insight = { customerId, card, asOf };
-    session.draft = `Auta minua toteuttamaan tämä askel: ${card.action} Anna lyhyt käytännön suunnitelma havaintoon ”${card.title}”.`;
+    session.draft = getLanguage() === 'en' ? `Help me take this step: ${card.action} Give me a brief practical plan for “${card.title}”.`
+      : `Auta minua toteuttamaan tämä askel: ${card.action} Anna lyhyt käytännön suunnitelma havaintoon ”${card.title}”.`;
     showChat();
     void send();
   };

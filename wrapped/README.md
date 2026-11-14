@@ -27,21 +27,22 @@ works for any of the 5,100 customers.
 
 ## The cards
 
-Each person gets 9–12 cards in story order (intro and tip always; the rest only when they say something):
+Each person gets 9–13 cards in story order (intro and tip always; the rest only when they say something):
 
 | Card | Example |
 |---|---|
 | Intro | "Lokakuu 2025 – syyskuu 2026 · 256 korttiostosta" |
 | Year in numbers | Income, spending, saving, and what was left |
+| You and your peer group | Annual spending, purchase count and average purchase side by side with the same age-and-area group's averages |
 | Top 5 | Purchase categories with bars |
-| Favourite | "Ravintolat: 100 kertaa, keskimäärin 47 €" (never groceries or health) |
+| Favourite | "Ravintolat: 100 kertaa, keskimäärin 47 €", plus the group's average annual spending in that category (never groceries or health) |
 | Regular place | Most visited merchant, by type and number (names are not in the data) |
 | Your time | Busiest weekday and time of day, busiest hour |
-| Small stuff adds up | Purchases under €10, count and total |
+| Small stuff adds up | Purchases under €10, count and total, compared with the group's annual total |
 | Biggest purchase | The year's largest single purchase |
 | Biggest month | Most and least expensive months |
 | Days in the green | Days with a positive balance, longest streak, recoveries |
-| Saver | Amount saved and in how many months |
+| Saver | Amount saved and in how many months, with the group's average net transfers into savings |
 | What changed | Up to 4 drastic changes since the previous year, biggest first. Income, spending or saving must move by 20 % and €300, a purchase category by 50 % and €500, the number of purchases by 20 %; days in the green are listed only when up by 10 points. No card when nothing changed that much |
 | Spending personality | BDA's spender type, translated, with the peer group |
 | Next year's goal | BDA's safe-to-save, or how much less spending balances the budget, or a surprise fund |
@@ -56,6 +57,14 @@ all by 23 Oct), so the previous year can be a few days short of a full year.
 Tone rules: never shame. Overdrafts are shown as progress ("palasit plussalle joka kerta", "you got back
 into the green every time"), essential spending is never a "favourite", and every story ends with one
 concrete, positive goal. Tests check these rules for all 5,100 customers.
+
+Peer comparisons are calculated locally by `peers.py` from each recap year's recorded facts. The peer group
+is the existing BDA age-band-and-area group. The customer is excluded, and averages require at least ten
+other group members. Annual amounts and purchase counts use the per-person mean, including zero spending
+in a category; average purchase size uses all peers' purchase euros divided by their purchase count.
+The card labels the group and its size. Only formatted aggregates are exported, never other customers'
+records or identities. Current and previous years use separate totals; neither uses smoothed monthly
+model estimates as a yearly comparison. Group averages are descriptive, not spending targets.
 
 ## UI
 

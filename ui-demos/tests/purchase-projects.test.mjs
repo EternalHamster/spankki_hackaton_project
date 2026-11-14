@@ -138,7 +138,8 @@ test('confirmed replanning updates the existing project and preserves recorded s
   assert.equal(repeated.projects[0].saved_eur, 456.78);
   const smaller = await store.confirm(customer, proposal(1, { price_eur: 300 }), repeated.revision);
   assert.equal(smaller.saved, true);
-  assert.equal(smaller.projects[0].saved_eur, 300, 'a cheaper target caps only the amount allocated to that target');
+  assert.equal(smaller.projects[0].saved_eur, 456.78, 'a cheaper target must not erase any demo account balance');
+  assert.deepEqual(projectProgress(smaller.projects[0]), { remaining_eur: 0, percent: 100, months_remaining: 0 });
   assert.equal(smaller.projects[0].created_at, original.created_at);
   assert.equal((await store.confirm(customer, revisedProposal, state.revision)).reason, 'conflict');
 });
@@ -168,7 +169,7 @@ test('proposal and saved-context validation reject extra identity fields and mal
     { tips: [{ ...tip, category: 'Housing' }] }, { tips: [{ ...tip, amount_eur: -1 }] }, { tips: [{ ...tip, amount_eur: 0.001 }] },
     { tips: [{ ...tip, extra: true }] }, { tips: Array(4).fill(tip) }, { tips: Array(1) },
   ]) assert.equal(validProjectProposal(proposal(1, changes)), false, JSON.stringify(changes));
-  for (const changes of [{ saved_eur: -1 }, { saved_eur: 1500.01 }, { saved_eur: 1.234 }, { saved_eur: '20' },
+  for (const changes of [{ saved_eur: -1 }, { saved_eur: 1000000.01 }, { saved_eur: 1.234 }, { saved_eur: '20' },
     { created_at: '2026-02-30T12:00:00.000Z' }, { created_at: 'now' }, { memory_revision: undefined },
     { memory_revision: '../invalid' }, { memory_revision: null }, { extra: true }]) {
     assert.equal(validProjectContext([project(changes)]), false, JSON.stringify(changes));
@@ -177,6 +178,40 @@ test('proposal and saved-context validation reject extra identity fields and mal
   assert.equal(validProjectContext([proposal()]), false);
   assert.equal(validProjectContext(Array(1)), false);
   assert.equal(validProjectProposal(proposal(1, { price_eur: 0.29 })), true, 'normal cent amounts tolerate binary floating-point representation');
+});
+
+test('demo monthly deposits update only the selected account, persist, and stop at the goal', async () => {
+  const storage = storageFixture(), store = create({ storage });
+  let current = await store.confirm(customer, proposal(1, { price_eur: 600, monthly_eur: 250 }), '');
+  const originalRevision = current.revision;
+  await store.confirm(other, proposal(2), '');
+  current = await store.simulateMonthlyDeposit(customer, id(1), current.revision);
+  assert.equal(current.saved, true);
+  assert.equal(current.projects[0].saved_eur, 250);
+  assert.equal(create({ storage }).read(customer).projects[0].saved_eur, 250);
+  assert.equal(store.read(other).projects[0].saved_eur, 0);
+  assert.equal((await store.simulateMonthlyDeposit(customer, id(1), originalRevision)).reason, 'conflict');
+  current = await store.simulateMonthlyDeposit(customer, id(1), current.revision);
+  assert.equal(current.projects[0].saved_eur, 500);
+  current = await store.simulateMonthlyDeposit(customer, id(1), current.revision);
+  assert.equal(current.projects[0].saved_eur, 600, 'last simulated deposit is capped at the remaining target');
+  assert.deepEqual(projectProgress(current.projects[0]), { remaining_eur: 0, percent: 100, months_remaining: 0 });
+  const complete = await store.simulateMonthlyDeposit(customer, id(1), current.revision);
+  assert.equal(complete.revision, current.revision);
+  assert.equal((await store.simulateMonthlyDeposit(customer, id(2), current.revision)).reason, 'not_found');
+  assert.equal((await store.simulateMonthlyDeposit(customer, 'invalid-id', current.revision)).reason, 'invalid');
+});
+
+test('demo deposits use exact cents and cannot advance a project with no agreed saving pace', async () => {
+  const store = create({ storage: storageFixture() });
+  let current = await store.confirm(customer, proposal(1, { price_eur: 0.3, monthly_eur: 0.1 }), '');
+  for (let step = 1; step <= 3; step++) {
+    current = await store.simulateMonthlyDeposit(customer, id(1), current.revision);
+    assert.equal(current.projects[0].saved_eur, step / 10);
+  }
+  current = await store.confirm(customer, proposal(2, { monthly_eur: 0 }), current.revision);
+  assert.equal((await store.simulateMonthlyDeposit(customer, id(2), current.revision)).reason, 'invalid');
+  assert.equal(store.read(customer).projects[1].saved_eur, 0);
 });
 
 test('progress and extra-saving projections use cents and handle zero pace and completion', () => {
@@ -254,7 +289,7 @@ test('queued operations snapshot the proposal rather than retaining a mutable ca
 test('blocked, corrupted and lockless storage never reports a successful save or overwrites data', async () => {
   const storage = storageFixture();
   for (const raw of ['{bad', JSON.stringify({ version: 2, revision: 'test', projects: [] }),
-    JSON.stringify({ version: 1, revision: 'test', projects: [{ ...project(), saved_eur: 9999 }] })]) {
+    JSON.stringify({ version: 1, revision: 'test', projects: [{ ...project(), saved_eur: 1000000.01 }] })]) {
     storage.values.set(prefix + customer, raw);
     const store = create({ storage });
     assert.equal(store.read(customer).available, false);

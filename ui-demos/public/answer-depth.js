@@ -1,4 +1,5 @@
-// One browser-wide preference for new answers. Individual rewrites do not change it.
+// One browser-wide preference for observations, summaries and new chat answers.
+// Individual answer rewrites do not change it.
 export const LEVELS = [
   { id: 'simple', label: 'Selkeä', description: 'Lyhyesti ja arkikielellä, ilman lukujen pyörittelyä.' },
   { id: 'standard', label: 'Perus', description: 'Tärkeimmät luvut, yksi vertailu ja syy lyhyesti.' },

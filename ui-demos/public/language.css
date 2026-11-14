@@ -1,0 +1,13 @@
+.bottom-nav{grid-template-columns:repeat(6,minmax(0,1fr))}
+.bottom-nav .nav-item{min-width:0;min-height:52px;padding-left:2px;padding-right:2px}
+.bottom-nav .nav-item>span{font-size:10px;overflow-wrap:normal;text-align:center}
+.language-flag{width:28px;height:19px;border:1px solid #d3ddd7;border-radius:2px;flex-shrink:0}
+.language-nav{gap:7px}
+.language-dialog{width:min(92vw,380px);border:1px solid #cbded2;border-radius:18px;padding:18px;color:#174e38;background:#f3f9f5;margin:auto;box-shadow:0 16px 60px #183d3433}
+.language-dialog::backdrop{background:#102a1e66}
+.language-dialog .dialog-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.language-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.language-options>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:110px;border:2px solid #d9e5dd;border-radius:12px;background:white;font:inherit;font-weight:600;color:#315943;cursor:pointer}
+.language-options>button[aria-pressed=true]{border-color:#00834b;background:#e4f3e9}
+.language-options>button:focus-visible{outline:3px solid #174e38;outline-offset:3px}
+.language-options .language-flag{width:54px;height:34px}

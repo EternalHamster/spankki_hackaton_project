@@ -19,7 +19,7 @@ set "PYTHON_EXE=C:\Users\nikik\Documents\hackathon_project\.venv\Scripts\python.
 ```
 
 The test reads `ANTHROPIC_API_KEY` or asks for it with a hidden prompt; the prompted key is not saved.
-It sends one `hi` to Haiku with no tools or financial records and at most 32 output tokens, then prints
+It sends one `hi` to the default Sonnet model with no tools or financial records and at most 32 output tokens, then prints
 text and usage. It performs a real billable API request using the key's Anthropic workspace credits.
 Tests under `tests/` use mocked HTTP and never make paid requests.
 
@@ -108,9 +108,8 @@ The coach's "today" is the last transaction date in the snapshot (2026-09-30 for
 relative questions such as "last month" resolve to months that have data. Set `COACH_AS_OF=YYYY-MM-DD`
 to override it. If the snapshot cannot be read at startup, the real Europe/Helsinki date is used.
 
-Every model round is sent with reasoning effort `low` (`CLAUDE_EFFORT`, default `low`). Claude Haiku 5.5
-thinks by default, and thinking counts toward the 900-token output limit per round; low effort keeps chat
-answers inside it and makes them faster and cheaper. Raise it only together with the token limit.
+Every model round is sent with reasoning effort `low` (`CLAUDE_EFFORT`, default `low`)
+and a 900-token output limit per round. Review the token limit when raising reasoning effort.
 
 Tools return exact decimal strings. Date ranges use an exclusive end and are limited to 366 days.
 Full calendar months use precomputed category summaries; partial months query canonical transactions.
@@ -148,10 +147,7 @@ These reset on restart and multiply across instances; they are not an account-wi
 Before a public demo, use a shared gateway/rate limiter, cap cloud instances and configure provider
 billing controls. Prompts, financial results and secrets are not logged by application code.
 
-Default `CLAUDE_MODEL=claude-haiku-5-5` is configurable. As checked on 2026-11-14,
-[Anthropic lists Haiku 5.5](https://platform.claude.com/docs/en/models/haiku-5-5/overview) as its
-lowest-cost current model: $0.10 input / $0.50 output per million tokens for prompts up to 100,000
-tokens, with a higher price above that threshold. This uses the
+Default `CLAUDE_MODEL=claude-sonnet-5-5` is configurable. This uses the
 [Anthropic Python SDK](https://platform.claude.com/docs/en/cli-sdks-libraries/sdks/python) and
 [custom tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools),
 not the Claude Code Agent SDK. No paid API calls are needed for tests or importing.

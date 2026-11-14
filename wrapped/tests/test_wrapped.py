@@ -37,7 +37,7 @@ class TestWrapped(unittest.TestCase):
     def test_every_customer_gets_a_full_story(self):
         for cid in self.src['facts']:
             cards = build_cards(cid, self.src)
-            self.assertTrue(9 <= len(cards) <= 12, cid)
+            self.assertTrue(9 <= len(cards) <= 13, cid)
             self.assertEqual((cards[0]['id'], cards[-1]['id']), ('intro', 'outro'))
             for c in cards:
                 text = ' '.join(str(c[k]) for k in ('kicker', 'title', 'body') if c[k])
@@ -70,7 +70,7 @@ class TestWrapped(unittest.TestCase):
             self.assertAlmostEqual(p['spend'], prev_monthly[cid], delta=0.05)
             self.assertTrue(340 <= p['green_days'] + p['negative_days'] <= 365, cid)
             cards = build_cards(cid, src, year='previous')
-            self.assertTrue(6 <= len(cards) <= 12, cid)
+            self.assertTrue(6 <= len(cards) <= 13, cid)
             self.assertEqual((cards[0]['id'], cards[-1]['id']), ('intro', 'outro'))
             self.assertEqual(cards[0]['title'], 'Lokakuu 2024 – syyskuu 2025')
             ids = [c['id'] for c in cards]
@@ -99,6 +99,26 @@ class TestWrapped(unittest.TestCase):
         self.assertEqual(slot_phrase(4, 'ilta'), 'perjantai-iltaisin')
         self.assertEqual(slot_phrase(5, 'aamu'), 'lauantaiaamuisin')
         self.assertEqual(slot_phrase(2, 'iltapäivä'), 'keskiviikkoiltapäivisin')
+
+    def test_peer_comparisons_use_each_year_and_keep_individual_records_private(self):
+        from wrapped.cards import eur, num
+        for year, key in [('current', 'facts'), ('previous', 'previous')]:
+            for cid in ['CUST00207', 'CUST00127', 'CUST00103']:
+                row = self.src[key][cid]
+                others = [other for peer_id, other in self.src[key].items()
+                          if peer_id != cid and other['peer_group'] == row['peer_group']]
+                cards = build_cards(cid, self.src, year)
+                comparison = next(card for card in cards if card['id'] == 'peers')
+                self.assertEqual(comparison['items'][0]['own'], eur(row['spend']))
+                self.assertEqual(comparison['items'][0]['peer'], eur(sum(other['spend'] for other in others) / len(others)))
+                self.assertEqual(comparison['items'][1]['peer'], num(sum(other['n_purchases'] for other in others) / len(others)))
+                self.assertIn(f'{num(len(others))} muuta asiakasta', comparison['note'])
+                self.assertNotRegex(str(comparison), r'CUST\d+')
+                if year == 'previous':
+                    self.assertIsNone(comparison['ask'])
+                for card in cards:
+                    if card['id'] in ('favourite', 'small', 'saving'):
+                        self.assertTrue(card['note'], f'{cid}: missing peer context on {card["id"]}')
 
     def test_personas(self):
         pekka = {c['id']: c for c in build_cards('CUST04971', self.src)}

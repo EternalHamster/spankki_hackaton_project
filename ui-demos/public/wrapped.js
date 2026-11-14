@@ -1,3 +1,6 @@
+import { locale } from './language.js';
+import { getLanguage } from './language.js';
+import { translate } from './translations.js';
 // "Rahavuotesi": a Spotify Wrapped-style story of the customer's last 12 months, plus the same story
 // for the year before it. The latest story has a "Mikä muuttui" card with the drastic changes between the two;
 // its button is the only way to open the older story.
@@ -9,7 +12,7 @@ const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&a
 const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
 export function formatCount(value) {
-  return new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(locale(), { maximumFractionDigits: 0 }).format(value);
 }
 
 function shapes(theme) {
@@ -21,7 +24,8 @@ export function renderSlide(card, index, total) {
     `<p class="wr-count wr-anim"><span data-count="${Number(card.count)}">${formatCount(card.count)}</span><small>${escape(card.suffix)}</small></p>`;
   const items = card.layout === 'list' ? `<ol class="wr-list">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-rank">${i + 1}</span><span class="wr-label">${escape(item.label)}<i class="wr-bar" style="--w:${Math.max(6, Math.round(100 * item.share / card.items[0].share))}%"></i></span><b>${escape(item.value)}</b></li>`).join('')}</ol>`
     : card.layout === 'changes' ? `<ul class="wr-deltas">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-label">${escape(item.label)}<small>${escape(item.detail)}</small></span><b>${escape(item.value)}</b></li>`).join('')}</ul>`
-    : card.layout === 'split' ? `<dl class="wr-split">${card.items.map((item, i) => `<div class="wr-anim" style="--d:${i}"><dt>${escape(item.label)}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl>` : '';
+    : card.layout === 'split' ? `<dl class="wr-split">${card.items.map((item, i) => `<div class="wr-anim" style="--d:${i}"><dt>${escape(item.label)}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl>`
+    : card.layout === 'comparison' ? `<table class="wr-comparison-table wr-anim"><thead><tr><th scope="col">Vuoden luvut</th><th scope="col">Sinä</th><th scope="col">Ryhmän keskiarvo</th></tr></thead><tbody>${card.items.map(item => `<tr><th scope="row">${escape(item.label)}</th><td>${escape(item.own)}</td><td>${escape(item.peer)}</td></tr>`).join('')}</tbody></table>` : '';
   const ask = card.ask && card.layout !== 'outro' ? `<button type="button" class="wr-ask wr-anim" data-wr-ask="${escape(card.ask)}">Kysy valmentajalta tästä<span aria-hidden="true">→</span></button>` : '';
   const outro = card.layout === 'outro' ? `<div class="wr-actions wr-anim">${card.ask ? `<button type="button" class="wr-primary" data-wr-ask="${escape(card.ask)}">Kysy valmentajalta</button>` : ''}<button type="button" class="wr-secondary" data-wr="restart">Katso alusta</button></div>` : '';
   return `<section class="wr-slide wr-${escape(card.layout)} theme-${escape(card.theme)}" role="group" aria-roledescription="dia" aria-label="${index + 1} / ${total}: ${escape(card.kicker)}" data-index="${index}">
@@ -84,7 +88,7 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
     });
     dialog.addEventListener('click', event => {
       const ask = event.target.closest('[data-wr-ask]');
-      if (ask) { const question = ask.dataset.wrAsk; close(); onAsk?.(question); return; }
+      if (ask) { const question = translate(ask.dataset.wrAsk, getLanguage()); close(); onAsk?.(question); return; }
       const control = event.target.closest('[data-wr]')?.dataset.wr;
       if (control === 'close') close();
       else if (control === 'pause') togglePause();

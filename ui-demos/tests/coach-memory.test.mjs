@@ -52,6 +52,34 @@ test('changed preferences replace the existing key and explicit forgetting remov
   assert.deepEqual([preference], [{ key: 'restaurant_spending', text: 'En halua vähentää ravintolakäyntejä.' }]);
 });
 
+test('a short follow-up answer can update a durable preference and be reused in a new conversation', async () => {
+  const { coach, requests } = fixture((_body, count) => count === 1
+    ? call('remember_customer_fact', { ...preference, evidence: 'Ei' }) : reply('Etsitään säästöä muista menoista.'));
+  const result = await coach.chat('A', { messages: [
+    { role: 'user', content: 'Miten voisin säästää?' },
+    { role: 'assistant', content: 'Oletko valmis vähentämään ravintolakäyntejä?' },
+    { role: 'user', content: 'Ei' },
+  ] });
+  assert.deepEqual(result.memory_updates, [{ action: 'remember', ...preference }]);
+  assert.equal(JSON.parse(requests[1].messages.at(-1).content[0].content).status, 'pending_save');
+  const next = fixture();
+  await next.coach.chat('A', { memory: result.memory_updates.map(({ key, text }) => ({ key, text })),
+    messages: [{ role: 'user', content: 'Miten voisin säästää lomaan?' }] });
+  const notes = next.requests[0].system.find(block => block.text.includes('Remembered personal facts'));
+  assert.ok(notes.text.includes(JSON.stringify([preference])));
+  assert.equal(next.requests[0].messages.length, 1);
+});
+
+test('short memory evidence must quote the whole latest answer, not a fragment of another statement', () => {
+  for (const [latest, evidence] of [['Ei vielä. Kysyn vain vaihtoehtoja.', 'Ei'], ['I prefer cooking.', 'I'], ['Ei', ' '], ['Ei', 'Yes']]) {
+    const draft = createMemoryDraft([], latest);
+    assert.equal(draft.execute('remember_customer_fact', { ...preference, evidence }).error, 'invalid_arguments');
+    assert.deepEqual(draft.updates(), []);
+  }
+  const draft = createMemoryDraft([], 'Ei');
+  assert.equal(draft.execute('remember_customer_fact', { ...preference, evidence: 'Ei' }).status, 'pending_save');
+});
+
 test('memory tools reject invented evidence, old conversation evidence and identity overrides', async () => {
   const current = 'Miten voisin säästää enemmän?';
   for (const input of [

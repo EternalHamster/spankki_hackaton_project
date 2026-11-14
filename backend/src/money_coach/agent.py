@@ -27,8 +27,8 @@ class CoachAgent:
                  as_of: date | None = None, effort: str = "low"):
         self.client, self.model = client, model
         self.max_rounds, self.max_tokens, self.max_tool_calls = max_rounds, max_tokens, max_tool_calls
-        # Haiku 5.5 thinks by default and thinking counts toward max_tokens; low effort keeps short chat
-        # answers inside the per-round limit and makes them faster and cheaper.
+        # Keep reasoning effort low to leave room for short chat answers within the
+        # per-round output budget.
         self.effort = effort
         # Historical snapshots end before the real date; relative dates ("last month") must use the data's end.
         self.as_of = as_of

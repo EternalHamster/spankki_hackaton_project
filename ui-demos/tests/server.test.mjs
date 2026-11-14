@@ -23,9 +23,9 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
     ['/', 'text/html'], ['/app.js', 'text/javascript'], ['/model.js', 'text/javascript'], ['/exploration.js', 'text/javascript'],
     ['/styles.css', 'text/css'], ['/adapters/project-finance.js', 'text/javascript'],
     ['/coach-text.js', 'text/javascript'], ['/insights.js', 'text/javascript'], ['/disclosure.js', 'text/javascript'],
-    ['/customer-memory.js', 'text/javascript'], ['/answer-depth.js', 'text/javascript'],
+    ['/customer-memory.js', 'text/javascript'], ['/answer-depth.js', 'text/javascript'], ['/summary-depth.js', 'text/javascript'], ['/weekly-plan.js', 'text/javascript'],
     ['/purchase-projects.js', 'text/javascript'], ['/project-ui.js', 'text/javascript'],
-    ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'],
+    ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'], ['/month-picker.js', 'text/javascript'],
     ['/finance-analytics/index.js', 'text/javascript'], ['/finance-analytics/model.js', 'text/javascript'],
     ['/finance-analytics/styles.css', 'text/css'], ['/finance-analytics/example.js', 'text/javascript'],
     ['/finance-analytics/example.html', 'text/html'],
@@ -92,4 +92,30 @@ test('static service rejects mutations instead of pretending to accept chat requ
   const response = await fetch(base + '/v1/chat', { method: 'POST', body: '{}' });
   assert.equal(response.status, 405);
   assert.equal(response.headers.get('allow'), 'GET, HEAD');
+});
+
+test('AI summary routes forward validated depth without accepting customer overrides', async () => {
+  const selected = await openSession(base);
+  for (const level of ['simple', 'standard', 'detailed']) {
+    for (const route of [`/api/insights?level=${level}&retry=1`, `/api/summaries?topic=spending&month=2026-09&level=${level}`]) {
+      const response = await selected.get(route);
+      assert.equal(response.status, 200, route);
+      const body = await response.json();
+      assert.equal(body.level, level);
+      assert.equal(body.customer_id, selected.customer_id);
+      assert.equal(body.selection_id, selected.selection_id);
+    }
+  }
+  assert.equal((await (await selected.get('/api/insights')).json()).level, 'standard');
+  for (const query of ['level=', 'level=unknown', 'level=__proto__', 'level=simple&level=detailed', 'customer_id=CUST00127&level=simple']) {
+    for (const route of [`/api/insights?${query}`, `/api/summaries?topic=week&${query}`]) {
+      assert.equal((await selected.get(route)).status, 400, route);
+    }
+  }
+  for (const query of ['retry=0', 'retry=1&retry=1']) assert.equal((await selected.get('/api/insights?' + query)).status, 400);
+  for (const route of ['/demo-data.json?level=simple', '/wrapped-data.json?level=simple']) {
+    assert.equal((await selected.get(route)).status, 400, route);
+  }
+  assert.equal((await fetch(base + '/api/insights?level=simple')).status, 401);
+  assert.equal((await selected.get('/api/insights?level=simple', { 'X-Demo-Selection': 'stale' })).status, 409);
 });

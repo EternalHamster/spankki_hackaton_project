@@ -13,6 +13,8 @@
 !customers.mjs
 !data-source.mjs
 !spending-highlights.mjs
+!spending-patterns.mjs
+!saving-actions.mjs
 !.runtime/
 !.runtime/manifest.json
 !.runtime/BDA/
@@ -39,6 +41,7 @@
 !scripts/
 !scripts/check.mjs
 !scripts/check-prepared.mjs
+!scripts/prepare-coach.mjs
 !tests/
 !tests/**
 **/.env*

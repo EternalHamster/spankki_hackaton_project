@@ -4,7 +4,7 @@ import os
 from anthropic import Anthropic
 
 
-DEFAULT_MODEL = "claude-haiku-5-5"
+DEFAULT_MODEL = "claude-sonnet-5-5"
 
 
 def create_client(*, api_key: str | None = None, max_retries: int = 1, http_client=None):

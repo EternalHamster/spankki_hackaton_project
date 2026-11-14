@@ -1,9 +1,10 @@
+import { locale, getLanguage } from './language.js';
 import { createPurchaseProjects, projectProgress, projectHint } from './purchase-projects.js';
 import { createCustomerMemory } from './customer-memory.js';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const euro = value => new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR', maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(value);
-const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
+const euro = value => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(value);
+const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
 
 export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExpanded = () => true }) {
   const store = createPurchaseProjects();
@@ -17,10 +18,11 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
     const time = project.monthly_eur <= 0 ? 'Aika-arvio odottaa säästövauhtia'
       : impact.days_faster === 0 ? 'Alle päivä aiemmin'
       : `Noin ${impact.days_faster} ${impact.days_faster === 1 ? 'päivä' : 'päivää'} aiemmin`;
-    const condition = project.monthly_eur > 0
-      ? 'Arvio nykyisellä säästövauhdilla, kun siirrät säästyvän summan tavoitteeseen kuukausisäästön lisäksi.'
-      : 'Sovitaan ensin kuukausittainen säästövauhti, jotta ajansäästö voidaan arvioida. Varaa tämä säästö kuukausitavoitteen lisäksi.';
-    return `<li><div><strong>${esc(tip.label)}</strong><span>${time}</span></div><p>${esc(tip.text)}</p><small>${condition}</small></li>`;
+    const condition = project.monthly_eur <= 0
+      ? 'Sovitaan ensin kuukausittainen säästövauhti, jotta ajansäästö voidaan arvioida. Varaa tämä säästö kuukausitavoitteen lisäksi.' : '';
+    // Previously saved goals may still contain the old observation-date suffix.
+    const text = tip.text.replace(/\s*Havainto kuukaudelta \d{4}-\d{2}\.\s*$/u, '');
+    return `<li><div><strong>${esc(tip.label)}</strong><span>${time}</span></div><p>${esc(text)}</p>${condition ? `<small>${condition}</small>` : ''}</li>`;
   }
 
   function cardHTML(project, remembered) {
@@ -28,24 +30,31 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
     const needsReview = !remembered.available || project.memory_revision !== remembered.revision;
     const done = progress.remaining_eur === 0;
     const pace = project.monthly_eur > 0 ? `${euro(project.monthly_eur)} / kk` : 'Sovitaan yhdessä';
-    const timeline = done ? 'Hienoa, olet kirjannut koko tavoitesumman säästöön.'
+    const timeline = done ? 'Hienoa, Tavoitetililläsi on koko tavoitesumma.'
       : needsReview ? 'Suunnitelman säästövauhti odottaa tarkistusta.'
       : progress.months_remaining === null ? 'Sovitaan valmentajan kanssa sopiva säästövauhti.'
       : `Arviolta ${progress.months_remaining} kk jäljellä tavoitevauhdilla.`;
     return `<article class="purchase-project${done ? ' purchase-project-complete' : ''}${needsReview ? ' project-needs-review' : ''}" data-project-id="${esc(project.id)}" aria-labelledby="project-title-${esc(project.id)}">
       <div class="project-heading"><span>${done ? 'Tavoite saavutettu' : 'Oma tavoite'}</span>${icon(done ? 'check' : 'bag')}</div>
       <h4 id="project-title-${esc(project.id)}">${esc(project.title)}</h4>
+      <p class="project-balance-label">Tavoitetilin saldo <span class="project-demo-badge">Demo</span></p>
       <p class="project-amount"><strong>${euro(project.saved_eur)}</strong><span>/ ${euro(project.price_eur)}</span></p>
-      <label class="sr-only" for="project-progress-${esc(project.id)}">Tavoitteeseen kirjatut säästöt: ${esc(project.title)}</label>
-      <progress id="project-progress-${esc(project.id)}" class="project-progress" value="${project.saved_eur}" max="${project.price_eur}" aria-valuetext="${esc(`${euro(project.saved_eur)} säästössä, tavoite ${euro(project.price_eur)}.`)}"></progress>
+      <label class="sr-only" for="project-progress-${esc(project.id)}">Tavoitetilin demosaldo suhteessa tavoitteeseen: ${esc(project.title)}</label>
+      <progress id="project-progress-${esc(project.id)}" class="project-progress" value="${Math.min(project.saved_eur, project.price_eur)}" max="${project.price_eur}" aria-valuetext="${esc(`${euro(project.saved_eur)} Tavoitetilillä (demo), tavoite ${euro(project.price_eur)}.`)}"></progress>
       <p class="project-timeline">${timeline}</p>
       ${needsReview ? `<p class="project-review-notice">${remembered.available ? 'Toiveesi ovat muuttuneet.' : 'Muistitiedot eivät ole käytettävissä.'} Tarkista suunnitelma valmentajan kanssa.</p>` : ''}
       <dl class="project-plan-facts"><div><dt>${needsReview ? 'Aiempi kuukausivauhti' : 'Kuukausivauhti'}</dt><dd>${pace}</dd></div><div><dt>Toivottu aika</dt><dd>${project.requested_months} kk</dd></div></dl>
-      <details class="project-details"><summary>Vinkit ja säästöjen kirjaus ${icon('chevron')}</summary>
+      <details class="project-details"><summary>Tavoitetili ja vinkit ${icon('chevron')}</summary>
         ${!needsReview && project.conditions.length ? `<ul class="project-conditions">${project.conditions.map(condition => `<li>${esc(condition)}</li>`).join('')}</ul>` : ''}
-        ${!needsReview && !done && project.tips.length ? `<section class="project-tips" aria-label="Tavoitettasi tukevat arjen valinnat"><h5>Pieniä askelia lähemmäs</h5><ul>${project.tips.map(tip => tipHTML(project, tip)).join('')}</ul><p class="project-footnote">Esimerkit perustuvat ${esc(dateLabel(project.as_of))} aineistoon. Kirjaa vain säästö, jonka olet itse varannut tavoitteeseen.</p></section>` : ''}
-        <form class="project-savings-form" data-project-savings="${esc(project.id)}"><label for="project-saved-${esc(project.id)}">Kirjaa säästösi <small>Tähän tavoitteeseen varaamasi säästöt yhteensä (€)</small></label><div><input id="project-saved-${esc(project.id)}" name="saved" type="number" inputmode="decimal" min="0" max="${project.price_eur}" step="0.01" value="${project.saved_eur}" required><button type="submit">Päivitä säästöt</button></div><small>Voit myös korjata aiempaa kirjausta. Edistyminen perustuu omiin kirjauksiisi.</small></form>
-        <p class="project-footnote">Suunnitelman pohjana ${esc(dateLabel(project.as_of))} taloustiedot. Tavoite ja kirjaukset säilyvät tässä selaimessa.</p>
+        ${!needsReview && !done && project.tips.length ? `<section class="project-tips" aria-label="Tavoitettasi tukevat arjen valinnat"><h5>Pieniä askelia lähemmäs</h5><ul>${project.tips.map(tip => tipHTML(project, tip)).join('')}</ul></section>` : ''}
+        <section class="project-account" aria-labelledby="project-account-${esc(project.id)}">
+          <div class="project-account-heading"><h5 id="project-account-${esc(project.id)}">S-Pankki Tavoitetili</h5><span class="project-demo-badge">Demo</span></div>
+          <p>Valmentajasi avasi tämän tilin tavoitettasi varten.</p>
+          <dl class="project-account-balance"><dt>Tilillä nyt</dt><dd>${euro(project.saved_eur)}</dd></dl>
+          ${!done && !needsReview && project.monthly_eur > 0 ? `<button type="button" data-project-deposit="${esc(project.id)}">Simuloi kuukausisäästö ${icon('plus')}</button><small>Lisää tilille ${euro(Math.min(project.monthly_eur, progress.remaining_eur))} demorahaa.</small>` : ''}
+          <p class="project-footnote">Simuloitu tili ja saldo. Demo ei ole yhteydessä S-Pankkiin.</p>
+        </section>
+        <p class="project-footnote">Suunnitelman pohjana ${esc(dateLabel(project.as_of))} taloustiedot. Tavoite ja demosaldo säilyvät tässä selaimessa.</p>
         <div class="project-actions"><button type="button" data-project-chat="${esc(project.id)}">Jatka suunnittelua ${icon('arrow')}</button><button type="button" data-project-remove="${esc(project.id)}">Poista tavoite</button></div>
       </details>
     </article>`;
@@ -56,7 +65,7 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
     warning = !result.saved;
     notice = result.saved ? success
       : result.reason === 'conflict' ? 'Tavoite muuttui toisessa välilehdessä. Tarkista uudet tiedot ja yritä uudelleen.'
-      : result.reason === 'invalid' ? 'Tarkista säästösumma. Sen pitää olla nollan ja tavoitehinnan välillä.'
+      : result.reason === 'invalid' ? 'Kuukausisäästöä ei voitu lisätä. Tarkista suunnitelma valmentajan kanssa.'
       : 'Muutosta ei voitu tallentaa tähän selaimeen. Yritä uudelleen.';
   }
 
@@ -76,33 +85,29 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
     for (const card of target.querySelectorAll('[data-project-id]')) {
       if (opened.has(card.dataset.projectId)) card.querySelector('.project-details').open = true;
     }
-    target.onsubmit = async event => {
-      const form = event.target.closest('[data-project-savings]');
-      if (!form) return;
-      event.preventDefault();
-      if (!sameSelection(selected) || !form.reportValidity() || form.dataset.pending) return;
-      const id = form.dataset.projectSavings, saved = Number(new FormData(form).get('saved'));
-      form.dataset.pending = 'true';
-      form.querySelector('button').disabled = true;
-      const result = await store.setSaved(selected.customer_id, id, saved, state.revision);
-      if (!sameSelection(selected)) return;
-      resultNotice(result, 'Säästösumma päivitetty. Näet edistymisesi tavoitteen palkista.');
-      render();
-      const details = target.querySelector(`[data-project-id="${id}"] .project-details`);
-      if (details) {
-        details.open = true;
-        details.querySelector('input')?.focus({ preventScroll: true });
-      }
-    };
     target.onclick = async event => {
-      const button = event.target.closest('[data-project-chat], [data-project-remove]');
+      const button = event.target.closest('[data-project-chat], [data-project-remove], [data-project-deposit]');
       if (!button || !sameSelection(selected) || button.disabled) return;
-      const id = button.dataset.projectChat || button.dataset.projectRemove;
+      const id = button.dataset.projectChat || button.dataset.projectRemove || button.dataset.projectDeposit;
       const project = state.projects.find(item => item.id === id);
       if (!project) return;
+      if (button.hasAttribute('data-project-deposit')) {
+        const latestMemory = memory.read(selected.customer_id);
+        if (!latestMemory.available || project.memory_revision !== latestMemory.revision) { render(); return; }
+        button.disabled = true;
+        const result = await store.simulateMonthlyDeposit(selected.customer_id, id, state.revision);
+        if (!sameSelection(selected)) return;
+        resultNotice(result, 'Kuukausisäästö lisätty Tavoitetilille demossa. Saldo ja tavoitteen edistyminen on päivitetty.');
+        render();
+        const card = target.querySelector(`[data-project-id="${id}"]`);
+        (card?.querySelector('[data-project-deposit]') || card?.querySelector('.project-details summary'))?.focus({ preventScroll: true });
+        return;
+      }
       if (button.hasAttribute('data-project-chat')) {
         const needsReview = !remembered.available || project.memory_revision !== remembered.revision;
-        onAsk(`Jatketaan tavoitettani ”${project.title}”. Tavoite maksaa ${euro(project.price_eur)}, toiveaikani on ${project.requested_months} kuukautta ja olen itse kirjannut säästöön ${euro(project.saved_eur)}. ${needsReview ? 'Aiemman suunnitelman' : 'Suunnitelman'} kuukausivauhti on ${euro(project.monthly_eur)}. ${needsReview ? 'Tarkistetaan suunnitelma nykyisten toiveideni perusteella.' : 'Mikä olisi minulle sopiva seuraava askel?'}`);
+        onAsk(getLanguage() === 'en'
+          ? `Let's continue planning my goal “${project.title}”. You opened a demo S-Pankki Goal Account for it. Its demo balance is now ${euro(project.saved_eur)}. The goal costs ${euro(project.price_eur)} and my preferred timeframe is ${project.requested_months} months. The ${needsReview ? 'previous ' : ''}plan saves ${euro(project.monthly_eur)} a month. ${needsReview ? 'Let’s review the plan using my current preferences.' : 'What would be a suitable next step for me?'}`
+          : `Jatketaan tavoitettani ”${project.title}”. Avasit minulle tätä varten S-Pankki Tavoitetilin demossa. Tilin demosaldo on nyt ${euro(project.saved_eur)}. Tavoite maksaa ${euro(project.price_eur)} ja toiveaikani on ${project.requested_months} kuukautta. ${needsReview ? 'Aiemman suunnitelman' : 'Suunnitelman'} kuukausivauhti on ${euro(project.monthly_eur)}. ${needsReview ? 'Tarkistetaan suunnitelma nykyisten toiveideni perusteella.' : 'Mikä olisi minulle sopiva seuraava askel?'}`);
         return;
       }
       button.disabled = true;

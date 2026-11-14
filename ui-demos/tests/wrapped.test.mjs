@@ -5,13 +5,13 @@ import { renderSlide, formatCount } from '../public/wrapped.js';
 
 const wrapped = JSON.parse(fs.readFileSync(new URL('../server-data/wrapped-data.json', import.meta.url)));
 const demo = JSON.parse(fs.readFileSync(new URL('../server-data/demo-data.json', import.meta.url)));
-const layouts = new Set(['intro', 'hero', 'split', 'list', 'changes', 'outro']);
+const layouts = new Set(['intro', 'hero', 'split', 'list', 'changes', 'comparison', 'outro']);
 
 test('every demo customer has a recap that starts with the intro and ends with the tip', () => {
   for (const profile of demo.profiles) {
     const cards = wrapped.recaps[profile.customer_id];
     assert.ok(cards, `missing recap for ${profile.customer_id}`);
-    assert.ok(cards.length >= 8 && cards.length <= 12, `${profile.customer_id}: ${cards.length} cards`);
+    assert.ok(cards.length >= 8 && cards.length <= 13, `${profile.customer_id}: ${cards.length} cards`);
     assert.equal(cards[0].id, 'intro');
     assert.equal(cards.at(-1).id, 'outro');
   }
@@ -59,4 +59,22 @@ test('text is escaped and counts use Finnish number formatting', () => {
   const html = renderSlide({ id: 'x', layout: 'hero', theme: 'forest', kicker: '<script>', title: 'a"b', body: '', count: 1234, suffix: ' €', items: [], ask: 'Mitä <b>?', note: null }, 0, 1);
   assert.doesNotMatch(html, /<script>|<b>/);
   assert.match(formatCount(1234), /^1\s234$/);
+});
+
+test('peer slides display the subject beside group averages for both recap years', () => {
+  for (const recaps of [wrapped.recaps, wrapped.previous.recaps]) {
+    for (const profile of demo.profiles) {
+      const card = recaps[profile.customer_id].find(card => card.id === 'peers');
+      assert.equal(card.layout, 'comparison');
+      assert.equal(card.items.length, 3);
+      assert.match(card.note, /muuta asiakasta/);
+      const html = renderSlide(card, 2, recaps[profile.customer_id].length);
+      assert.match(html, /scope="col">Sinä/);
+      assert.match(html, /Ryhmän keskiarvo/);
+      for (const item of card.items) assert.ok(html.includes(item.own) && html.includes(item.peer));
+      assert.doesNotMatch(html, /CUST\d+/);
+    }
+  }
+  const card = { layout: 'comparison', items: [{ label: '<script>', own: '<b>', peer: '<i>' }] };
+  assert.doesNotMatch(renderSlide(card, 0, 1), /<script>|<b>|<i>/);
 });

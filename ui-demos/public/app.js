@@ -1,3 +1,7 @@
+import { locale } from './language.js';
+import { getLanguage } from './language.js';
+import { translate } from './translations.js';
+import { languageButton, installLanguageUI } from './ui-language.js';
 import { createChatDialog } from './chat.js';
 import { createWrapped } from './wrapped.js';
 import { metrics, basketTotals, scenarioSavings, transactionKind } from './model.js';
@@ -8,7 +12,9 @@ import { explorationTopics, createExplorationSummaries } from './exploration.js'
 import { formatInline } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { setDisclosure } from './disclosure.js';
+import { renderMonthPicker, installMonthPickers } from './month-picker.js';
 import { createProjectUI } from './project-ui.js';
+import { weeklyPlan } from './weekly-plan.js';
 import { LEVELS, LEVEL_KEY, levelIndex, getAnswerLevel, setAnswerLevel } from './answer-depth.js';
 
 // Appearance follows the user's references; all money data is synthetic.
@@ -36,8 +42,8 @@ const paths={
 const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.receipt}</svg>`;
 const sMark=()=>'<svg class="s-mark" viewBox="0 0 35 48" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M29 3C13 3 9 12 9 25c0 9-2 14-7 14v6c12 0 14-9 14-20 0-10 3-15 13-15Z"/><path d="M29 16c-6 0-7 3-7 12 0 12-5 17-14 17"/></svg>';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const euro=(n,digits=2)=>new Intl.NumberFormat('fi-FI',{style:'currency',currency:'EUR',minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n===0?0:n);
-const monthName=value=>new Date(value+'-15T12:00:00Z').toLocaleDateString('fi-FI',{month:'long',year:'numeric',timeZone:'UTC'});
+const euro=(n,digits=2)=>new Intl.NumberFormat(locale(),{style:'currency',currency:'EUR',minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n===0?0:n);
+const monthName=value=>new Date(value+'-15T12:00:00Z').toLocaleDateString(locale(),{month:'long',year:'numeric',timeZone:'UTC'});
 const capitalize=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const names={Housing:'Asuminen',Utilities:'Laskut ja palvelut',Groceries:'Ruokaostokset',Health:'Terveys','Home & Tech':'Koti ja tekniikka',Transportation:'Liikkuminen',Restaurants:'Ravintolat',Lifestyle:'Ostokset',Entertainment:'Vapaa-aika',Travel:'Matkailu',Salary:'Palkka','Other Income':'Muut tulot','Invest Deposit':'Siirto sijoituksiin','Invest Withdraw':'Nosto sijoituksista','Salary Sweep':'Palkkasiirto'};
 const categoryIcon=c=>({Housing:'home',Utilities:'bolt',Groceries:'bag',Transportation:'train',Restaurants:'coffee',Health:'shield',Salary:'plus'}[c]||'receipt');
@@ -47,6 +53,8 @@ const selectedMonths = { spending: null, saving: null, transactions: null };
 let transactionFilter = 'all';
 const months=[];
 let insightsPromise = null, activeInsights = null, insightController = null;
+let summaryLevel = getAnswerLevel(), summaryEpoch = 0, summaryRefreshTimer = null;
+const topicRequests = new WeakMap();
 let customerSession = null, customerController = null, customerEpoch = 0, synchronizingSession = false;
 const explorationSummaries = createExplorationSummaries();
 let activeTopic = null, activeTopicResult = null;
@@ -56,13 +64,15 @@ class StaleSelectionError extends Error {}
 const selectionHeaders = selected => ({ 'X-Demo-Selection': selected.selection_id });
 const customerLabel = () => customerSession?.customers.find(customer => customer.id === customerSession.customer_id)?.label || 'Demoasiakas';
 const topicMonth = topic => selectedMonths[topic] || customerSession?.as_of?.slice(0, 7) || data?.summary.to.slice(0, 7);
-const dateLabel = date => new Date(date + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
+const dateLabel = date => new Date(date + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
 function monthPicker(scope) {
-  return `<label class="section-month-picker" for="month-${scope}"><span>${icon('calendar')}Kuukausi</span><select id="month-${scope}" data-month-scope="${scope}">${months.map(month=>`<option value="${month}" ${month===selectedMonths[scope]?'selected':''}>${capitalize(monthName(month))}</option>`).join('')}</select></label>`;
+  return renderMonthPicker({ scope, selected: selectedMonths[scope], available: months, calendarIcon: icon('calendar'), chevronIcon: icon('chevron') });
 }
 
 async function loadCustomer(customerId) {
   const epoch = ++customerEpoch;
+  clearTimeout(summaryRefreshTimer); summaryRefreshTimer = null;
+  summaryEpoch++; summaryLevel = getAnswerLevel();
   customerController?.abort(); insightController?.abort();
   explorationSummaries.reset(); activeTopic = null; activeTopicResult = null;
   for (const scope of Object.keys(selectedMonths)) selectedMonths[scope] = null;
@@ -88,7 +98,7 @@ async function loadCustomer(customerId) {
     const headers = selectionHeaders(selected);
     // Financial charts and the model's insight generation load independently.
     insightController = new AbortController();
-    insightsPromise = pollInsights(selected, AbortSignal.any([signal, insightController.signal]));
+    insightsPromise = pollInsights(selected, AbortSignal.any([signal, insightController.signal]), summaryLevel);
     // The chart may still be loading when generation fails; its card view will show the error.
     void insightsPromise.catch(() => {});
     const recap = wrapped.load({ headers, signal, customerId: selected.customer_id, selectionId: selected.selection_id }).then(result => {
@@ -109,7 +119,7 @@ async function loadCustomer(customerId) {
     for (const scope of Object.keys(selectedMonths)) selectedMonths[scope] = latestMonth;
     months.length = 0;
     for (let month = latestMonth; month >= data.summary.from.slice(0, 7); month = moveMonth(month, -1)) months.push(month);
-    void Promise.resolve(explorationSummaries.warm?.(selected, latestMonth)).catch(error => {
+    void Promise.resolve(explorationSummaries.warm?.(selected, latestMonth, summaryLevel)).catch(error => {
       if (epoch === customerEpoch && error.staleSelection) void loadCustomer();
     });
     render(); openFromLink();
@@ -145,7 +155,7 @@ function render(){
     <div id="recap-teaser">${recapTeaser()}</div>
     <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small id="transactions-period">${capitalize(monthName(selectedMonths.transactions))}</small></span>${icon('chevron')}</button><button class="utility-row" data-action="settings">${icon('person')}<span><strong>Valmentajan asetukset</strong><small id="answer-depth-summary">Vastausten taso: ${LEVELS[levelIndex(getAnswerLevel())].label}</small></span>${icon('chevron')}</button></div>
     <p class="demo-note">Synteettinen demoaineisto · tiedot ${esc(dateLabel(customerSession.as_of))} asti<br>Ei yhteyttä oikeaan pankkitiliin.</p></main>
-    <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-action="settings" aria-label="Minä – asetukset">${icon('person')}<span>Minä</span></button></nav></div>`;
+    <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-action="settings" aria-label="Minä – asetukset">${icon('person')}<span>Minä</span></button>${languageButton()}</nav></div>`;
   void loadInsights();
   renderProjects();
   if (activeTopic) openTopic(activeTopic, false);
@@ -155,27 +165,26 @@ function recapTeaser() {
 }
 function weeklyAllowance() {
   const allowance = data.weekly_spending;
-  if (!allowance || ![allowance.eur_week, allowance.usual_extras_eur_week].every(value =>
-    typeof value === 'number' && Number.isFinite(value) && value >= 0)) {
+  if (!allowance || ![allowance.spent_eur_week, allowance.weekly_budget_eur, allowance.remaining_eur_week,
+      allowance.over_budget_eur_week].every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0) ||
+      ![allowance.week_start, allowance.week_end, allowance.observed_through].every(value =>
+        typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)))) {
     return '<p class="topic-caption">Käyttövaran palkki ei ole saatavilla.</p>';
   }
-  const available = allowance.eur_week, usual = allowance.usual_extras_eur_week;
-  // Compare the dated estimate with usual spending, not an invented amount already spent.
-  const maximum = usual || available || 1;
-  const amount = available > 0 ? `noin ${euro(available, 0)}` : euro(0, 0);
-  const comparison = usual > 0 ? `Tavallinen viikkokulutus noin ${euro(usual, 0)}.` : 'Tavallista viikkokulutusta ei ole arvioitu.';
-  const note = available === 0 ? 'Lisäostoihin ei jää käyttövaraa tässä arviossa.'
-    : usual === 0 ? 'Palkki näyttää arvioidun käyttövarasi.'
-    : available >= usual ? 'Käyttövara kattaa tavallisen viikkokulutuksesi.'
-    : 'Käyttövara on tavallista viikkokulutustasi pienempi.';
-  return `<section class="weekly-allowance${available === 0 ? ' weekly-allowance-empty' : ''}" aria-labelledby="weekly-allowance-title">
-    <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Käytettävissä lisäostoihin</span>${icon('wallet')}</div>
-    <p class="weekly-allowance-amount"><strong>${amount}</strong><span>/ viikko</span></p>
-    <p class="weekly-allowance-description">Ravintoloihin, ostoksiin ja muuhun mukavaan.</p>
-    <label class="weekly-allowance-label" for="weekly-allowance-progress">${usual > 0 ? 'Käyttövara suhteessa tavalliseen kulutukseen' : 'Arvioitu käyttövara'}</label>
-    <progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(available, maximum)}" max="${maximum}" aria-valuetext="${esc(`Käyttövara ${amount} viikossa. ${comparison}`)}" aria-describedby="weekly-allowance-note"></progress>
-    ${usual > 0 ? `<div class="weekly-allowance-scale"><span>Tavallinen viikkokulutus</span><strong>noin ${euro(usual, 0)}</strong></div>` : ''}
-    <p id="weekly-allowance-note" class="weekly-allowance-note">${note}</p>
+  const spent = allowance.spent_eur_week, budget = allowance.weekly_budget_eur;
+  const remaining = allowance.remaining_eur_week, over = allowance.over_budget_eur_week;
+  const maximum = budget || spent || 1;
+  const shortDate = value => new Date(value + 'T12:00:00Z').toLocaleDateString(locale(), { day: 'numeric', month: 'numeric', timeZone: 'UTC' });
+  const period = `${shortDate(allowance.week_start)}–${shortDate(allowance.week_end)}`;
+  const note = `${over > 0 ? `Viikkoraja ylittynyt ${euro(over)}. ` : budget === 0 ? 'Arviossa ei ole varaa lisäostoihin. ' : ''}Kirjaukset ${shortDate(allowance.week_start)}–${dateLabel(allowance.observed_through)}.`;
+  const accessible = `Lisäostoihin käytetty ${euro(spent)}. Viikkoraja, arvio ${euro(budget)}. Viikkorajasta jäljellä ${euro(remaining)}.${over > 0 ? ` Raja ylittynyt ${euro(over)}.` : ''}`;
+  return `<section class="weekly-allowance${remaining === 0 ? ' weekly-allowance-empty' : ''}" aria-labelledby="weekly-allowance-title">
+    <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Viikon lisäostot</span><small>${esc(period)}</small></div>
+    <dl class="weekly-allowance-figures"><div><dt>Käytetty</dt><dd id="weekly-spent">${euro(spent)}</dd></div><div><dt>Viikkorajasta jäljellä</dt><dd id="weekly-remaining">${euro(remaining)}</dd></div></dl>
+    <label class="sr-only" for="weekly-allowance-progress">Lisäostoihin käytetty suhteessa arvioituun viikkorajaan</label>
+    <div class="weekly-allowance-track"><progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(spent, maximum)}" max="${maximum}" aria-valuetext="${esc(accessible)}" aria-describedby="weekly-allowance-note weekly-demo-marker"></progress><span class="weekly-allowance-marker" aria-hidden="true"></span></div>
+    <div class="weekly-allowance-scale"><span id="weekly-demo-marker">Demomerkki 20 %</span><span>Viikkoraja (arvio) <strong>${euro(budget, 0)}</strong></span></div>
+    <p id="weekly-allowance-note" class="weekly-allowance-note">${esc(note)}</p>
   </section>`;
 }
 function openTopic(topicId, toggle = true) {
@@ -234,64 +243,74 @@ function changeTopicMonth(topic, month) {
   }
 }
 async function loadTopicSummary(target, topic) {
-  const epoch = customerEpoch, selected = customerSession, month = topicMonth(topic);
-  const label = topic === 'spending' ? 'AI-nosto menoistasi' : 'AI:n tuottama yhteenveto';
+  const epoch = customerEpoch, depthEpoch = summaryEpoch, level = summaryLevel;
+  const selected = customerSession, month = topicMonth(topic), request = {};
+  topicRequests.set(target, request);
+  const current = () => target.isConnected && epoch === customerEpoch && depthEpoch === summaryEpoch &&
+    activeTopic === topic && topicRequests.get(target) === request;
+  const label = topic === 'week' ? 'Loppuviikon suunnitelma' : topic === 'spending' ? 'AI-nosto menoistasi' : 'AI:n tuottama yhteenveto';
   target.setAttribute('aria-busy', 'true');
   target.innerHTML = `<span class="ai-label">${label}</span><p class="summary-pending" role="status"><span class="insights-pulse" aria-hidden="true"></span>Yhteenvetoa ladataan…</p>`;
   try {
-    const result = await explorationSummaries.load({topic, month, selection:selected});
-    if (!target.isConnected || epoch !== customerEpoch || activeTopic !== topic) return;
+    const result = topic === 'week' ? weeklyPlan(data.weekly_spending, selected, level)
+      : await explorationSummaries.load({topic, month, selection:selected, level});
+    if (!current()) return;
     if (result.selectionId !== selected.selection_id) throw Object.assign(new Error('Demoasiakas vaihtui.'), {staleSelection:true});
-    if (!Array.isArray(result.bullets) || result.bullets.length < 2 || result.bullets.length > 3 ||
+    if (result.level !== level || !Array.isArray(result.bullets) || result.bullets.length < 2 || result.bullets.length > 3 ||
         result.bullets.some(bullet=>typeof bullet !== 'string' || !bullet.trim())) throw new Error('Yhteenveto puuttuu.');
     activeTopicResult = result;
     target.innerHTML = `<span class="ai-label">${label}</span><ul class="summary-bullets">${result.bullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>`;
   } catch (error) {
-    if (!target.isConnected || epoch !== customerEpoch || activeTopic !== topic) return;
+    if (!current()) return;
     if (error.staleSelection) { void loadCustomer(); return; }
-    target.innerHTML = `<span class="ai-label">AI-yhteenveto ei ole saatavilla</span><p>Voit silti tutkia lukuja tai kysyä valmentajalta.</p><button class="text-button" data-topic-retry="${topic}">Yritä uudelleen</button>`;
+    target.innerHTML = `<span class="ai-label">${topic === 'week' ? 'Viikkosuunnitelma' : 'AI-yhteenveto'} ei ole saatavilla</span><p>Voit silti tutkia lukuja tai kysyä valmentajalta.</p><button class="text-button" data-topic-retry="${topic}">Yritä uudelleen</button>`;
   } finally {
-    if (target.isConnected) target.setAttribute('aria-busy', 'false');
+    if (current()) target.setAttribute('aria-busy', 'false');
   }
 }
 async function loadInsights(retry = false) {
   const target = document.querySelector('#key-insights');
   if (!target || !customerSession) return;
-  const epoch = customerEpoch, selected = customerSession;
+  const epoch = customerEpoch, depthEpoch = summaryEpoch, level = summaryLevel, selected = customerSession;
   if (retry) { insightController?.abort(); insightsPromise = null; activeInsights = null; }
   if (!insightsPromise) {
     insightController = new AbortController();
     const signal = AbortSignal.any([customerController.signal, insightController.signal]);
-    insightsPromise = pollInsights(selected, signal, retry);
+    insightsPromise = pollInsights(selected, signal, level, retry);
   }
   const pending = insightsPromise;
   if (!activeInsights) target.innerHTML = '<div class="insights-loading" role="status"><span class="insights-pulse" aria-hidden="true"></span><div><strong>Valmentaja muodostaa havaintojasi</strong><p>Voit tutkia talouttasi sillä aikaa. Havainnot ilmestyvät tähän, kun ne ovat valmiit.</p></div></div>';
   try {
     const result = await pending;
-    if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
+    if (!target.isConnected || epoch !== customerEpoch || depthEpoch !== summaryEpoch || pending !== insightsPromise) return;
     activeInsights = result;
-    const date = new Date(result.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
-    target.innerHTML = `<p class="insights-caption">Seuraavat askeleesi · tiedot ${esc(date)} asti</p>${result.insights.map(card => {
+    const date = new Date(result.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
+    target.innerHTML = `<p class="insights-caption">Tiedot ${esc(date)} asti</p>${result.insights.map(card => {
       const period = insightPeriod(card.period, result.as_of);
-      return `<button class="insight-card" data-insight="${esc(card.id)}" aria-label="${esc(period.label)}: ${esc(card.title)}. Suunnittele seuraava askel"><span class="insight-period"><span>${esc(period.label)}</span><small>${esc(period.detail)}</small></span><span class="insight-copy"><strong>${esc(card.title)}</strong><span class="insight-evidence">${formatInline(card.explanation)}</span></span><span class="insight-value">${esc(card.headline_number)}</span><span class="insight-action"><b>Kokeile tätä</b>${formatInline(card.action)}</span><span class="insight-cta">Suunnittele valmentajan kanssa ${icon('arrow')}</span></button>`;
-    }).join('')}<p class="insights-footnote">Viikkoarvio perustuu yllä olevaan tilanteeseen. Kuukausinosto koskee viimeisintä kuukautta ja vuosinosto viimeistä 12 kuukautta.</p>`;
+      return `<details class="insight-card"><summary class="insight-preview"><span class="insight-meta"><span class="insight-period">${esc(period.label)}</span><span class="insight-value">${esc(card.headline_number)}</span></span><strong class="insight-title">${esc(card.title)}</strong><span class="insight-toggle">Lisätiedot ${icon('chevron')}</span></summary><div class="insight-details"><p class="insight-date">${esc(period.detail)}</p><p>${formatInline(card.explanation)}</p><p>${formatInline(card.action)}</p><button class="insight-cta" data-insight="${esc(card.id)}" aria-label="Kysy valmentajalta: ${esc(card.title)}">Kysy valmentajalta ${icon('arrow')}</button></div></details>`;
+    }).join('')}`;
   } catch (error) {
-    if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
+    if (!target.isConnected || epoch !== customerEpoch || depthEpoch !== summaryEpoch || pending !== insightsPromise) return;
     if (error instanceof StaleSelectionError) { void loadCustomer(); return; }
     insightsPromise = null;
     activeInsights = null;
     target.innerHTML = '<div class="insights-error" role="alert"><p>Havaintoja ei voitu ladata.</p><button class="text-button" data-action="retry-insights">Yritä uudelleen</button></div>';
   }
 }
-async function pollInsights(selected, signal, retry = false) {
+async function pollInsights(selected, signal, level, retry = false) {
   const deadline = Date.now() + 120000;
   while (!signal.aborted && Date.now() < deadline) {
-    const response = await fetch('/api/insights' + (retry ? '?retry=1' : ''), { headers: selectionHeaders(selected), signal });
+    const query = new URLSearchParams({ level, language: getLanguage(), ...(retry ? { retry: '1' } : {}) });
+    const response = await fetch('/api/insights?' + query, {
+      headers: selectionHeaders(selected), signal: AbortSignal.any([signal, AbortSignal.timeout(90000)]),
+    });
     retry = false;
     if ([401, 409].includes(response.status)) throw new StaleSelectionError();
     if (!response.ok) throw new Error('Havaintoja ei voitu ladata.');
     const result = await response.json();
+    if (signal.aborted) throw new DOMException('Aborted', 'AbortError');
     if (result.customer_id !== selected.customer_id || result.selection_id !== selected.selection_id) throw new StaleSelectionError();
+    if ((result.language ?? 'fi') !== getLanguage() || result.level !== level) throw new Error('Havaintojen vastaustaso ei vastaa valintaa.');
     if (response.status === 202 || result.status === 'generating') {
       await new Promise((resolve, reject) => {
         const done = () => { signal.removeEventListener('abort', abort); resolve(); };
@@ -308,7 +327,7 @@ async function pollInsights(selected, signal, retry = false) {
   throw new Error('Havaintojen muodostaminen viipyy.');
 }
 function categoryRow(category,value){return `<button class="category-row" data-category="${category}"><span class="row-icon">${icon(categoryIcon(category))}</span><span class="category-copy"><strong>${names[category]}</strong><span class="category-track"><i style="width:${value/Math.max(1,m.spending)*100}%"></i></span></span><b>${euro(value)}</b>${icon('chevron','row-chevron')}</button>`;}
-function transactionsHTML(rows){return rows.length?rows.map(t=>`<div class="transaction-row"><span class="row-icon">${icon(categoryIcon(t.category))}</span><span><strong>${names[t.category]||esc(t.category)}</strong><small>${new Date(t.date+'T12:00:00Z').toLocaleDateString('fi-FI',{day:'numeric',month:'numeric',timeZone:'UTC'})}${t.merchant?' · '+esc(t.merchant):''}</small></span><b class="${t.amount>0?'positive':''}">${t.amount>0?'+':''}${euro(t.amount)}</b></div>`).join(''):'<p class="empty-state">Ei tapahtumia valitulla ajanjaksolla.</p>';}
+function transactionsHTML(rows){return rows.length?rows.map(t=>`<div class="transaction-row"><span class="row-icon">${icon(categoryIcon(t.category))}</span><span><strong>${names[t.category]||esc(t.category)}</strong><small>${new Date(t.date+'T12:00:00Z').toLocaleDateString(locale(),{day:'numeric',month:'numeric',timeZone:'UTC'})}${t.merchant?' · '+esc(t.merchant):''}</small></span><b class="${t.amount>0?'positive':''}">${t.amount>0?'+':''}${euro(t.amount)}</b></div>`).join(''):'<p class="empty-state">Ei tapahtumia valitulla ajanjaksolla.</p>';}
 function modal(title,body,kind=''){
   if(!detail.open)lastFocus=document.activeElement;detail.className=kind;
   detail.innerHTML=`<div class="dialog-heading"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close" aria-label="Sulje">${icon('close')}</button></div><div class="dialog-content">${body}</div>`;
@@ -328,15 +347,42 @@ function updateAnswerDepthSetting() {
     label.classList.toggle('selected', label.dataset.depthLabel === option.id);
   });
 }
+function refreshSummaryDepth() {
+  updateAnswerDepthSetting();
+  const level = getAnswerLevel();
+  if (level === summaryLevel) return;
+  summaryLevel = level; summaryEpoch++;
+  clearTimeout(summaryRefreshTimer); summaryRefreshTimer = null;
+  insightController?.abort(); insightsPromise = null; activeInsights = null;
+  explorationSummaries.reset(); activeTopicResult = null;
+  const observations = document.querySelector('#key-insights');
+  if (observations) observations.innerHTML = '<p class="insights-loading" role="status">Havaintoja päivitetään valitulle vastaustasolle…</p>';
+  document.querySelectorAll('.topic-summary').forEach(target => {
+    target.setAttribute('aria-busy', 'true');
+    target.innerHTML = '<p class="summary-pending" role="status">Yhteenvetoa päivitetään valitulle vastaustasolle…</p>';
+  });
+  if (!customerSession || !data) return;
+  const epoch = customerEpoch, depthEpoch = summaryEpoch, selected = customerSession;
+  // Clear stale text immediately, but avoid a generation for each step while dragging.
+  summaryRefreshTimer = setTimeout(() => {
+    summaryRefreshTimer = null;
+    if (epoch !== customerEpoch || depthEpoch !== summaryEpoch) return;
+    void loadInsights();
+    const target = activeTopic && document.querySelector(`#panel-${activeTopic} .topic-summary`);
+    if (target) void loadTopicSummary(target, activeTopic);
+    void Promise.allSettled(['spending', 'saving'].map(topic =>
+      explorationSummaries.load({ topic, month: topicMonth(topic), selection: selected, level })));
+  }, 200);
+}
 function showSettings() {
   const option = LEVELS[levelIndex(getAnswerLevel())];
   modal('Asetukset', `<section class="answer-depth-setting" aria-labelledby="answer-depth-title">
     <div class="answer-depth-heading"><label id="answer-depth-title" for="answer-depth-setting">Valmentajan vastausten taso</label><output id="answer-depth-current" for="answer-depth-setting">${option.label}</output></div>
-    <p>Valitse, kuinka tarkasti valmentaja vastaa uusiin kysymyksiisi.</p>
+    <p>Valitse, kuinka tarkasti valmentaja selittää havaintosi, yhteenvedot ja uudet vastaukset.</p>
     <input id="answer-depth-setting" type="range" min="0" max="2" step="1" value="${levelIndex(option.id)}" aria-valuetext="${option.label}" aria-describedby="answer-depth-description answer-depth-scope">
     <div class="answer-depth-labels" aria-hidden="true">${LEVELS.map(level => `<span data-depth-label="${level.id}" class="${option.id === level.id ? 'selected' : ''}">${level.label}</span>`).join('')}</div>
     <p id="answer-depth-description" class="answer-depth-description">${option.description}</p>
-    <p id="answer-depth-scope" class="answer-depth-scope">Tämä on oletus kaikissa keskusteluissa. Voit muokata yksittäistä vastausta sen omista painikkeista muuttamatta tätä asetusta.</p>
+    <p id="answer-depth-scope" class="answer-depth-scope">Havainnot ja yhteenvedot päivittyvät valitulle tasolle. Valinta on myös oletus uusille vastauksille kaikissa keskusteluissa. Voit muokata yksittäistä vastausta sen omista painikkeista muuttamatta tätä asetusta.</p>
     <p id="answer-depth-save-status" class="answer-depth-save-status" role="status">Valinta tallennetaan tähän selaimeen.</p>
   </section>`, 'settings-dialog');
 }
@@ -390,7 +436,7 @@ document.addEventListener('click', event=>{
   if (!button) return;
   if (button.dataset.affordExample) {
     const input = document.querySelector('#afford-idea');
-    if (input) { input.value = button.dataset.affordExample; input.focus(); }
+    if (input) { input.value = translate(button.dataset.affordExample, getLanguage()); input.focus(); }
   }
   if (button.dataset.topic) openTopic(button.dataset.topic);
   if (button.dataset.topicRetry) void loadTopicSummary(button.closest('.topic-summary'), button.dataset.topicRetry);
@@ -422,20 +468,21 @@ document.addEventListener('submit', event=>{
 });
 document.addEventListener('change',event=>{
   if(event.target.id==='customer-selector'){void loadCustomer(event.target.value);return;}
-  const scope = event.target.dataset.monthScope;
-  if (scope === 'transactions') {
-    showTransactions(transactionFilter, event.target.value);
-    document.querySelector('#month-transactions')?.focus({preventScroll:true});
-  } else if (scope) changeTopicMonth(scope, event.target.value);
 });
+installMonthPickers({ onSelect(scope, month) {
+  if (scope === 'transactions') {
+    showTransactions(transactionFilter, month);
+    document.querySelector('#month-transactions')?.focus({preventScroll:true});
+  } else changeTopicMonth(scope, month);
+} });
 document.addEventListener('input',event=>{
   if(event.target.id==='answer-depth-setting') {
     const option = LEVELS[Number(event.target.value)];
     if (!option) return;
     const result = setAnswerLevel(option.id);
-    updateAnswerDepthSetting();
+    refreshSummaryDepth();
     detail.querySelector('#answer-depth-save-status').textContent = result.persisted
-      ? 'Tallennettu. Valinta koskee uusia vastauksia.'
+      ? 'Tallennettu. Havainnot ja yhteenvedot päivittyvät valitulle tasolle.'
       : 'Valinta on käytössä tämän käynnin ajan. Selaimeen tallentaminen ei onnistunut.';
     return;
   }
@@ -443,11 +490,12 @@ document.addEventListener('input',event=>{
 });
 detail.addEventListener('click',event=>{if(event.target===detail){const r=detail.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)detail.close();}});
 detail.addEventListener('close',()=>{if(lastFocus?.isConnected)lastFocus.focus();else document.querySelector('.nav-item.active')?.focus();});
-window.addEventListener('focus', () => { void synchronizeSession(); });
+window.addEventListener('focus', () => { refreshSummaryDepth(); void synchronizeSession(); });
 window.addEventListener('storage', event => {
-  if (event.key === null || event.key === LEVEL_KEY) updateAnswerDepthSetting();
+  if (event.key === null || event.key === LEVEL_KEY) refreshSummaryDepth();
   if (customerSession && (event.key === null || event.key === `oma-talous-projects-v1:${customerSession.customer_id}` ||
       event.key === `oma-talous-memory-v1:${customerSession.customer_id}`)) renderProjects();
 });
-document.addEventListener('visibilitychange', () => { if (!document.hidden) void synchronizeSession(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { refreshSummaryDepth(); void synchronizeSession(); } });
+installLanguageUI(() => { void loadCustomer(); });
 void loadCustomer();

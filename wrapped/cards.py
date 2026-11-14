@@ -18,13 +18,14 @@ from datetime import date
 from pathlib import Path
 
 from coach_context.profile_card import nice, nice_down
+from wrapped.peers import build_peer_groups, peer_averages
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 FACTS = HERE / 'output' / 'facts.json'
 BDA_OUT = REPO / 'BDA' / 'output'
 
-MAX_CARDS = 12
+MAX_CARDS = 13
 MONTHS = ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu',
           'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu']
 WEEKDAYS = ['maanantai', 'tiistai', 'keskiviikko', 'torstai', 'perjantai', 'lauantai', 'sunnuntai']
@@ -94,6 +95,8 @@ def load_sources():
     facts = json.loads(FACTS.read_text(encoding='utf-8'))
     return {'period': facts['period'], 'facts': facts['customers'],
             'previous_period': facts['previous']['period'], 'previous': facts['previous']['customers'],
+            'peer_groups': build_peer_groups(facts['customers']),
+            'previous_peer_groups': build_peer_groups(facts['previous']['customers']),
             'summary': read('customer_summary.csv'), 'spender': read('spender_type.csv')}
 
 
@@ -167,6 +170,8 @@ def build_cards(customer_id, src, year='current'):
         return []
     s = src['summary'][customer_id]
     sp = src['spender'].get(customer_id, {})
+    peers = peer_averages(f, src.get('previous_peer_groups' if previous else 'peer_groups', {}))
+    group = f"{s['age_band']}-vuotiaat, {s['area']}"
     cards = []
 
     # 1. Intro
@@ -195,6 +200,22 @@ def build_cards(customer_id, src, year='current'):
     cards.append(card('year', 'split', 'Vuotesi luvuissa', 'Tulot, menot ja säästöt', year_body, items=items,
                       ask='Mihin rahani menivät viimeisen vuoden aikana?', priority=95))
 
+    if peers:
+        comparisons = [
+            {'label': 'Menot vuodessa', 'own': eur(f['spend']), 'peer': eur(peers['spend'])},
+            {'label': 'Korttiostoksia', 'own': num(f['n_purchases']), 'peer': num(peers['n_purchases'])},
+        ]
+        if f['n_purchases'] and peers['average_purchase_eur'] is not None:
+            comparisons.append({'label': 'Ostos keskimäärin',
+                                'own': eur(sum(value['eur'] for value in f['categories'].values()) / f['n_purchases']),
+                                'peer': eur(peers['average_purchase_eur'])})
+        peer_card = card('peers', 'comparison', 'Vertailu omaan ryhmään', 'Sinä ja verrokkiryhmäsi',
+                         'Sama ikäryhmä ja alue, sama rahavuosi. Ryhmän keskiarvo ei ole kulutustavoite.',
+                         items=comparisons, note=f'{group} · {num(peers["count"])} muuta asiakasta',
+                         ask=f'Vertaa rahavuoteni {period_title(src["period"]).lower()} menoja saman ikäryhmän ja alueen ryhmäkeskiarvoihin.',
+                         priority=94)
+        cards.append(peer_card)
+
     # 3. Top 5 purchase categories
     cats = f['categories']
     total = sum(c['eur'] for c in cats.values()) or 1
@@ -213,16 +234,17 @@ def build_cards(customer_id, src, year='current'):
         cards.append(card('favourite', 'hero', 'Vuoden suosikkisi', CATEGORY_FI[c],
                           f"Yhteensä {eur(v['eur'])} – keskimäärin {eur(v['eur'] / v['n'])} kerralla.",
                           count=v['n'], suffix=' kertaa',
-                          ask=f'Kerro {CATEGORY_ASK[c]} viime vuonna. Miten voisin säästää niissä?', priority=85))
+                          ask=f'Kerro {CATEGORY_ASK[c]} viime vuonna. Miten voisin säästää niissä?',
+                          note=(f'Samassa ikä- ja alueryhmässä tähän kului keskimäärin {eur(peers["categories"].get(c, 0))} vuodessa.' if peers else None),
+                          priority=85))
 
     # 5. Go-to place
     tm = f['top_merchant']
     if tm and tm['visits'] >= 10:
         place = f"{MCC_FI.get(tm['mcc'], 'Kauppa')} #{int(tm['id'][-4:])}"
-        peer = (f" – enemmän kuin {f['unique_merchants_peer_pct']} % ikäisistäsi"
-                if f['unique_merchants_peer_pct'] >= 75 else '')
+        peer = (f' Samassa ikä- ja alueryhmässä keskimäärin {num(peers["unique_merchants"])} paikassa.' if peers else '')
         cards.append(card('place', 'hero', 'Kanta-asiakas', place,
-                          f"Vuoden kantapaikkasi. Kaikkiaan asioit {f['unique_merchants']} eri paikassa{peer}.",
+                          f"Vuoden kantapaikkasi. Kaikkiaan asioit {f['unique_merchants']} eri paikassa.{peer}",
                           count=tm['visits'], suffix=' käyntiä', note='Kauppojen nimiä ei ole aineistossa.',
                           priority=60))
 
@@ -241,7 +263,9 @@ def build_cards(customer_id, src, year='current'):
         cards.append(card('small', 'hero', 'Pienistä puroista', f"{eur(f['small_eur'])} yhteensä",
                           'Alle 10 euron ostokset huomaa harvoin. Siksi ne kannattaa välillä laskea yhteen.',
                           count=f['small_n'], suffix=' pientä ostosta',
-                          ask='Paljonko pienet ostokset maksavat minulle vuodessa?', priority=70))
+                          ask='Paljonko pienet ostokset maksavat minulle vuodessa?',
+                          note=(f'Samassa ikä- ja alueryhmässä alle 10 euron ostoksiin kului keskimäärin {eur(peers["small_eur"])} vuodessa.' if peers else None),
+                          priority=70))
 
     # 8. Biggest single purchase
     b = f['biggest']
@@ -285,7 +309,9 @@ def build_cards(customer_id, src, year='current'):
         every = 'Joka ikinen kuukausi!' if f['saving_months'] >= 12 else \
             f"Säästit {f['saving_months']} kuukautena 12:sta."
         cards.append(card('saving', 'hero', 'Säästäjä', 'siirretty säästöön', every,
-                          count=f['saved'], suffix=' €', priority=82))
+                          count=f['saved'], suffix=' €',
+                          note=(f'Ryhmän nettosiirrot säästöön keskimäärin {eur(peers["saved"])} vuodessa. Nostoja on vähennetty siirroista.' if peers else None),
+                          priority=82))
 
     # 12. What changed drastically since the previous year
     # Only in the latest year's story, and only when something changed drastically.
@@ -309,9 +335,8 @@ def build_cards(customer_id, src, year='current'):
     parts = [ARCHETYPE_FI.get(p.strip(), p.strip()) for p in label.replace('(and a saver)', '').split(' and ')]
     title = ' ja '.join([parts[0]] + [p[0].lower() + p[1:] for p in parts[1:]])
     lines = [LINE_FI[l] for l in sp.get('top_lines', '').split(',') if l in LINE_FI]
-    group = f"{s['age_band']}-vuotiaat, {s['area']}"
-    body = (f"Käytät ikäisiäsi enemmän: {', '.join(lines)}." if lines
-            else 'Menosi ovat lähellä ikäistesi tasoa kaikilla alueilla.')
+    body = (f"Käytät saman ikä- ja alueryhmän tasoa enemmän: {', '.join(lines)}." if lines
+            else 'Menosi ovat lähellä saman ikä- ja alueryhmän tasoa kaikilla alueilla.')
     cards.append(card('personality', 'hero', 'Kuluttajatyyppisi', title + (' · säästäjä' if saver else ''),
                       body, note=f'Verrokkiryhmä: {group}', ask='Millainen kuluttaja olen?', priority=92))
 

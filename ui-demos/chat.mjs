@@ -1,6 +1,7 @@
 import { LEVELS, validAnswerRewrite } from './coach.mjs';
 import { validMemoryFacts } from './public/customer-memory.js';
 import { validProjectContext, validProjectProposal } from './public/purchase-projects.js';
+import { isLanguage } from './public/language.js';
 
 // Validates and bounds browser conversation before the customer-scoped coach runs.
 class ChatError extends Error {
@@ -22,7 +23,7 @@ async function readMessages(req) {
   try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw new ChatError(400, 'Kysymystä ei voitu lukea.'); }
   const messages = body?.messages;
-  if (!body || Object.keys(body).some(key => !['messages', 'insight', 'level', 'memory', 'projects', 'pending_project', 'rewrite'].includes(key)) || !Array.isArray(messages) ||
+  if (!body || Object.keys(body).some(key => !['messages', 'insight', 'level', 'language', 'memory', 'projects', 'pending_project', 'rewrite'].includes(key)) || !Array.isArray(messages) ||
       !messages.length || messages.length > 11 || messages.length % 2 !== 1 ||
       messages.some((m, i) => !m || Object.keys(m).length !== 2 ||
         m.role !== (i % 2 ? 'assistant' : 'user') || typeof m.content !== 'string' ||
@@ -31,6 +32,7 @@ async function readMessages(req) {
     throw new ChatError(400, 'Kysymys on liian pitkä tai keskustelu ei kelpaa. Aloita tarvittaessa uusi keskustelu.');
   }
   const insight = body.insight;
+  if (body.language !== undefined && !isLanguage(body.language)) throw new ChatError(400, 'Valitse kieli.');
   if (insight !== undefined && (!insight || Object.keys(insight).length !== 1 || typeof insight.insight_id !== 'string')) {
     throw new ChatError(400, 'Valitse havainto etusivulta.');
   }
@@ -43,7 +45,7 @@ async function readMessages(req) {
       (body.pending_project !== undefined && body.pending_project !== null && !validProjectProposal(body.pending_project))) {
     throw new ChatError(400, 'Tavoitteiden tiedot eivät kelpaa.');
   }
-  return { messages: messages.map(({ role, content }) => ({ role, content: content.trim() })), insight, level: body.level,
+  return { messages: messages.map(({ role, content }) => ({ role, content: content.trim() })), insight, level: body.level, language: body.language ?? 'fi',
     memory: body.memory || [], projects: body.projects || [], pendingProject: body.pending_project || null,
     rewrite: body.rewrite === undefined ? undefined : { answer: body.rewrite.answer.trim() } };
 }
@@ -62,12 +64,12 @@ export function createChatHandler({ answer, now = Date.now, requestsPerMinute = 
         res.setHeader('Allow', 'POST');
         throw new ChatError(405, 'Use POST for chat.');
       }
-      const { messages, insight, level, memory, projects, pendingProject, rewrite } = await readMessages(req);
+      const { messages, insight, level, language, memory, projects, pendingProject, rewrite } = await readMessages(req);
       const time = now();
       recent = recent.filter(t => time - t < 60000);
       if (active >= maxConcurrent || recent.length >= requestsPerMinute) throw new ChatError(429, 'Keskustelussa on ruuhkaa. Yritä hetken kuluttua uudelleen.');
       recent.push(time); active++; claimed = true;
-      const result = await answer(req.demoSession, messages, insight, level, memory, projects, pendingProject, rewrite);
+      const result = await answer(req.demoSession, messages, insight, level, memory, projects, pendingProject, rewrite, language);
       if (typeof result?.answer !== 'string' || !result.answer.trim()) throw new ChatError(502, 'Vastausta ei saatu. Yritä uudelleen.');
       send(200, { ...result, selection_id: req.demoSession.selection_id });
     } catch (error) {

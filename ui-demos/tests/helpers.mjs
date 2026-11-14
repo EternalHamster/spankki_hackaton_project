@@ -10,12 +10,12 @@ export const stubDataSource = () => ({
   toolDefinitions: async () => [], execute: async () => ({ error: 'not_available' }), close() {},
 });
 export const stubCoach = (overrides = {}) => ({
-  insights: async customer => ({ status: 'ready', as_of: '2026-09-30', insights: [1, 2, 3].map(n => ({
+  insights: async (customer, { level = 'standard' } = {}) => ({ status: 'ready', level, as_of: '2026-09-30', insights: [1, 2, 3].map(n => ({
     id: `${customer}-${n}`, period: ['weekly', 'monthly', 'yearly'][n - 1], title: `Havainto ${n}`, headline_number: '250 €', explanation: 'Testihavainto.', action: 'Tutustu menoihisi.',
   })) }),
-  summary: async (customer, { topic, month } = {}) => {
+  summary: async (customer, { topic, month, level = 'standard' } = {}) => {
     const bullets = ['Valitun asiakkaan historialliset luvut.', 'Tutustu menoihisi valmentajan kanssa.'];
-    return { bullets, answer: bullets.map(text => `• ${text}`).join('\n'), topic, ...(month ? { month } : {}), as_of: '2026-09-30', source: 'prepared' };
+    return { bullets, answer: bullets.map(text => `• ${text}`).join('\n'), topic, level, ...(month ? { month } : {}), as_of: '2026-09-30', source: 'prepared' };
   },
   chat: async () => ({ answer: 'Hei! Miten voin auttaa?' }), ...overrides,
 });

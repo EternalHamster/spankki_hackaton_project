@@ -33,7 +33,7 @@ def sdk_client(body, requests):
     def handle(request):
         requests.append(json.loads(request.content))
         return httpx2.Response(200, json={"id": "msg_test", "type": "message", "role": "assistant",
-            "model": "claude-haiku-5-5", "stop_sequence": None, "stop_reason": "end_turn",
+            "model": "claude-sonnet-5-5", "stop_sequence": None, "stop_reason": "end_turn",
             "usage": {"input_tokens": 900, "output_tokens": 300}, **body})
     return anthropic.Anthropic(api_key="test-key", max_retries=0,
         http_client=httpx2.Client(transport=httpx2.MockTransport(handle)))

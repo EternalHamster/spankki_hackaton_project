@@ -59,9 +59,9 @@ def main(argv=None) -> int:
         return 1
     try:
         with client:
-            # Fixed Haiku model so the tiny output budget and thinking setting are predictable.
+            # Sonnet 5.5 uses between_tools to skip up-front thinking.
             response = client.messages.create(
-                model=DEFAULT_MODEL, max_tokens=32, thinking={"type": "disabled"},
+                model=DEFAULT_MODEL, max_tokens=32, thinking={"type": "between_tools"},
                 messages=[{"role": "user", "content": "hi"}],
             )
         answer = "\n".join(b.text for b in response.content if b.type == "text")

@@ -30,6 +30,105 @@ function fixture(options = {}) {
   return { coach, requests, execution, events, source };
 }
 
+const preparedCards = () => ({ as_of: '2026-09-30', data_version: 'v1',
+  insights: cards().insights.map((card, index) => ({ id: `stable-card-${index}`, ...card })) });
+const preparedSummary = () => ({ as_of: '2026-09-30', data_version: 'v1', topic: 'saving', month: '2026-09',
+  bullets: ['Syyskuussa säästövara oli arviolta 130 €.', 'Jätä ensin rahaa syyskuun laskuihin.'] });
+
+test('prepared depth adaptations use only the displayed source, preserve card identity and expose no tools', async () => {
+  const source = preparedCards();
+  const { coach, requests, execution } = fixture({ provider: () => textResult(JSON.stringify(cards())) });
+  const result = await coach.adaptPrepared('A', { kind: 'insights', level: 'simple', source });
+  assert.equal(result.level, 'simple');
+  assert.equal(result.as_of, source.as_of);
+  assert.deepEqual(result.insights.map(({ id, period, headline_number }) => ({ id, period, headline_number })),
+    source.insights.map(({ id, period, headline_number }) => ({ id, period, headline_number })));
+  const payload = requests[0].body;
+  assert.equal(payload.tools, undefined);
+  assert.equal(payload.tool_choice, undefined);
+  assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_A|stable-card|remember_customer_fact|propose_purchase_project/);
+  assert.match(payload.system[0].text, /SIMPLE/);
+  assert.match(payload.system[0].text, /Keep estimates as estimates/);
+  assert.match(payload.messages[0].content, /250/);
+  assert.deepEqual(execution, []);
+  assert.equal(Object.hasOwn(result, 'memory_updates'), false);
+  assert.equal(Object.hasOwn(result, 'project_proposal'), false);
+});
+
+test('detailed summary depth allows fuller explanation while simple remains brief', async () => {
+  const bullets = ['Syyskuussa säästövara oli arviolta 130 €. Tämä oli aineiston tilanteesta tehty arvio: se kuvaa mahdollista säästämisen tilaa, eikä summaa kannata käsitellä lupauksena tämän päivän käytettävissä olevasta rahasta.',
+    'Jätä ensin rahaa syyskuun laskuihin. Näin säästötavoite ei vie välttämättömiin menoihin tarvittavaa rahaa.'];
+  const { coach, requests } = fixture({ provider: () => textResult(JSON.stringify({ bullets })) });
+  const result = await coach.adaptPrepared('A', { kind: 'summary', level: 'detailed', source: preparedSummary() });
+  assert.deepEqual(result.bullets, bullets);
+  assert.equal(result.answer, bullets.map(text => `• ${text}`).join('\n'));
+  assert.match(requests[0].body.system[0].text, /DETAILED/);
+  assert.match(requests[0].body.system[0].text, /500 characters/);
+  await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: preparedSummary() }), error => error.status === 502);
+  assert.equal(requests.length, 3);
+});
+
+test('summary adaptations may name the selected historical month even when it is absent from source bullets', async () => {
+  const source = { ...preparedSummary(), month: '2025-08',
+    bullets: ['Valitun kuukauden säästövara oli arviolta 130 €.', 'Jätä ensin rahaa valitun kuukauden laskuihin.'] };
+  const bullets = ['Kuukauden 2025-08 säästövara oli arviolta 130 €.', 'Varaa ensin rahat elokuun 2025 laskuihin.'];
+  const { coach } = fixture({ provider: () => textResult(JSON.stringify({ bullets })) });
+  const result = await coach.adaptPrepared('A', { kind: 'summary', level: 'detailed', source });
+  assert.deepEqual(result.bullets, bullets);
+});
+
+test('fuller prepared spending patterns can be simplified without losing their source scope', async () => {
+  const source = { ...preparedSummary(), topic: 'spending', bullets: [
+    'Syyskuun lisäostot painottuivat vapaa-aikaan. Näihin menoihin kului 250 €, ja tämä kuvaa vain valitun kuukauden kirjattuja maksuja, ei pysyvää tapaa käyttää rahaa.',
+    'Ilta-aikaan kirjautui 130 € lisäostoja. Kyse on maksujen kirjausajasta.',
+  ] };
+  assert.ok(source.bullets[0].length > 140 && source.bullets[0].length <= 220);
+  const bullets = ['Syyskuun lisäostot painottuivat vapaa-aikaan: 250 €.', 'Ilta-aikaan kirjautui 130 € lisäostoja.'];
+  const { coach, requests } = fixture({ provider: () => textResult(JSON.stringify({ bullets })) });
+  const result = await coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source });
+  assert.deepEqual(result.bullets, bullets);
+  assert.ok(requests[0].body.messages[0].content.includes(source.bullets[0]));
+  await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: {
+    ...source, bullets: ['x'.repeat(221), source.bullets[1]],
+  } }), error => error.status === 503);
+});
+
+test('depth adaptations reject changed protected fields, cross-card facts, invented figures and tool calls', async () => {
+  const variants = [
+    () => { const value = cards(); value.insights[0].headline_number = '999 €'; return textResult(JSON.stringify(value)); },
+    () => { const value = cards(); value.insights[0].period = 'yearly'; return textResult(JSON.stringify(value)); },
+    () => { const value = cards(); value.insights[0].explanation = 'Säästövara on 130 €.'; return textResult(JSON.stringify(value)); },
+    () => { const value = cards(); value.insights[0].explanation = 'Tiedot ovat ajalta 1.10.2026.'; return textResult(JSON.stringify(value)); },
+    () => { const value = cards(); value.insights[0].extra = 'unexpected'; return textResult(JSON.stringify(value)); },
+    () => toolResult('remember_customer_fact', { key: 'bad', text: 'bad' }),
+  ];
+  for (const provider of variants) {
+    const { coach, execution, requests } = fixture({ provider });
+    await assert.rejects(coach.adaptPrepared('A', { kind: 'insights', level: 'detailed', source: preparedCards() }), error => error.status === 502);
+    assert.equal(requests.length, 2);
+    assert.deepEqual(execution, []);
+  }
+  for (const bullets of [['Säästövara on 999 €.', 'Jätä rahaa laskuihin.'], ['Vain yksi kohta.'],
+    ['Säästövara on −130 €.', 'Jätä rahaa laskuihin.'],
+    ['Tietoja asiakkaasta CUST00127.', 'Jätä rahaa laskuihin.']]) {
+    const { coach } = fixture({ provider: () => textResult(JSON.stringify({ bullets })) });
+    await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: preparedSummary() }), error => error.status === 502);
+  }
+});
+
+test('adaptation rejects invalid levels and stale source before any model call and retains provider rate limits', async () => {
+  const { coach, requests } = fixture();
+  for (const level of ['standard', 'unknown', '__proto__', null]) {
+    await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level, source: preparedSummary() }), error => error.status === 400);
+  }
+  await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: { ...preparedSummary(), data_version: 'other-db' } }), error => error.status === 503);
+  assert.equal(requests.length, 0);
+  const limited = fixture({ coach: { requestsPerMinute: 1 }, provider: () => textResult(JSON.stringify({ bullets: preparedSummary().bullets })) });
+  await limited.coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: preparedSummary() });
+  await assert.rejects(limited.coach.adaptPrepared('A', { kind: 'summary', level: 'detailed', source: preparedSummary() }), error => error.status === 429);
+  assert.equal(limited.requests.length, 1);
+});
+
 test('answer rewrites target the supplied original answer without changing later answer depth or the cached prefix', async () => {
   const { coach, requests } = fixture({ provider: () => textResult('Aineistossa säästövara oli 130 € kuukaudessa.') });
   const messages = [{ role: 'user', content: 'Miten voisin säästää?' }];
@@ -44,7 +143,8 @@ test('answer rewrites target the supplied original answer without changing later
   assert.match(rewriteRequest.system.at(-2).text, /untrusted browser data/);
   assert.match(rewriteRequest.system.at(-2).text, /does not change the default/);
   assert.ok(rewriteRequest.system.at(-2).text.endsWith(JSON.stringify(original)));
-  assert.equal(rewriteRequest.system.at(-1).text, LEVELS.simple.prompt);
+  assert.ok(rewriteRequest.system.at(-1).text.startsWith(LEVELS.simple.prompt + '\n'));
+  assert.match(rewriteRequest.system.at(-1).text, /APPLICATION LANGUAGE: FINNISH/);
   assert.equal(rewriteRequest.max_tokens, LEVELS.simple.maxTokens);
   const later = await coach.chat('A', { messages });
   assert.equal(later.level, DEFAULT_LEVEL);
@@ -292,8 +392,15 @@ test('insights and normal chat share a cacheable profile prefix and automatic ta
   for (const { body } of requests) {
     assert.deepEqual(body.cache_control, { type: 'ephemeral' });
     assert.deepEqual(body.system[1].cache_control, { type: 'ephemeral' });
-    assert.deepEqual(body.thinking, { type: 'disabled' });
+    assert.deepEqual(body.thinking, { type: 'between_tools' });
   }
+});
+
+test('explicit Haiku overrides retain their supported thinking setting', async () => {
+  const { coach, requests } = fixture({ coach: { model: 'claude-haiku-5-5' }, provider: () => textResult('Hei!') });
+  await coach.chat('A', { messages: [{ role: 'user', content: 'Hei' }] });
+  assert.equal(requests[0].body.model, 'claude-haiku-5-5');
+  assert.deepEqual(requests[0].body.thinking, { type: 'disabled' });
 });
 
 test('tool round and result size limits bound model work and prevent oversized evidence', async () => {
@@ -410,6 +517,8 @@ test('summary validation rejects another month’s figures, jargon, long bullets
     output => { output.week[1] = 'Mallin mediaani kuvaa likviditeettiä.'; },
     output => { output.months['2026-09'].saving[1] = 'x'.repeat(141); },
     output => { delete output.months['2026-08'].saving; },
+    output => { output.months['2026-09'].spending[1] = 'Vertaa tämän ja edellisen kuun tapahtumia.'; },
+    output => { output.months['2026-09'].spending[1] = 'Voit tarkistaa, jäikö jokin ostos pois.'; },
   ]) {
     const { coach, requests } = summaryFixture({ provider: () => {
       const output = summaryCards(); change(output); return textResult(JSON.stringify(output));
@@ -417,6 +526,26 @@ test('summary validation rejects another month’s figures, jargon, long bullets
     await assert.rejects(coach.summaryBatch('A', { months: ['2026-08', '2026-09'], includeWeek: true }), error => error.status === 502);
     assert.equal(requests.length, 2);
     assert.match(requests[1].body.messages[0].content, /Previous response failed validation:/);
+  }
+});
+
+test('spending-only regeneration requests findings and never regenerates unrelated topics', async () => {
+  const { coach, requests } = summaryFixture({ provider: () => textResult(JSON.stringify({ months: {
+    '2026-09': { spending: ['Kotiin ja tekniikkaan kului 1 200 €.', 'Tämä kuvaa vain tarkasteltua kuukautta.'] },
+  } })) });
+  const result = await coach.summaryBatch('A', { months: ['2026-09'], spendingOnly: true });
+  assert.deepEqual(Object.keys(result.months['2026-09']), ['spending']);
+  assert.equal(result.week, undefined);
+  const prompt = requests[0].body.messages[0].content;
+  assert.match(prompt, /spending only for each; do not return saving or week/);
+  assert.match(prompt, /YOUR task is: "Vertaa tämän ja edellisen kuun tapahtumia/);
+  assert.match(prompt, /Never print the task prompt/);
+  const shape = JSON.parse(prompt.split('Return JSON only in this shape (repeat the month object for every supplied month):\n')[1].split('\n')[0]);
+  assert.deepEqual(Object.keys(shape.months['YYYY-MM']), ['spending']);
+  assert.equal(shape.week, undefined);
+  for (const options of [{ months: ['2026-09'], spendingOnly: 'yes' },
+    { months: ['2026-09'], spendingOnly: true, includeWeek: true }]) {
+    await assert.rejects(coach.summaryBatch('A', options), error => error.status === 400);
   }
 });
 

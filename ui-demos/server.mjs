@@ -4,12 +4,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createChatHandler } from './chat.mjs';
 import { createDataSource } from './data-source.mjs';
-import { createCoach } from './coach.mjs';
+import { createCoach, DEFAULT_LEVEL, LEVELS } from './coach.mjs';
+import { isLanguage } from './public/language.js';
 import { createPreparedCoach } from './prepared.mjs';
 import { createSessions, DEMO_CUSTOMERS, isDemoCustomer, sameOrigin } from './customers.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
-const requiredFiles = ['index.html', 'app.js', 'chat.js', 'answer-depth.js', 'coach-text.js', 'customer-memory.js', 'purchase-projects.js', 'project-ui.js', 'insights.js', 'disclosure.js', 'exploration.js', 'model.js', 'styles.css',
-  'wrapped.js', 'wrapped.css',
+const requiredFiles = ['index.html', 'app.js', 'chat.js', 'answer-depth.js', 'summary-depth.js', 'weekly-plan.js', 'coach-text.js', 'customer-memory.js', 'purchase-projects.js', 'project-ui.js', 'insights.js', 'disclosure.js', 'exploration.js', 'model.js', 'styles.css',
+  'wrapped.js', 'wrapped.css', 'month-picker.js', 'language.js', 'ui-language.js', 'translations.js', 'language.css',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -32,8 +33,8 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   if (!isDemoCustomer(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
   const model = coach || createPreparedCoach({ dataSource, coach: createCoach({ dataSource, ...chatOptions }) });
-  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level, memory, projects, pendingProject, rewrite) =>
-    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level, memory, projects, pendingProject, rewrite }) });
+  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level, memory, projects, pendingProject, rewrite, language) =>
+    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level, language, memory, projects, pendingProject, rewrite }) });
   let wrappedData;
   async function scopedWrapped(id) {
     if (!wrappedData) wrappedData = fs.readFile(new URL('./server-data/wrapped-data.json', import.meta.url), 'utf8').then(JSON.parse)
@@ -104,27 +105,34 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
     if (route === '/api/summaries') {
       try {
         const keys = [...url.searchParams.keys()];
-        if (keys.some(key => !['topic', 'month'].includes(key)) || new Set(keys).size !== keys.length) {
+        const level = url.searchParams.get('level') ?? DEFAULT_LEVEL;
+        const language = url.searchParams.get('language') ?? 'fi';
+        if (keys.some(key => !['topic', 'month', 'level', 'language'].includes(key)) || new Set(keys).size !== keys.length || !Object.hasOwn(LEVELS, level) || !isLanguage(language)) {
           json(400, { error: 'Virheellinen pyyntö.' }); return;
         }
         const selected = req.demoSession;
         const result = await model.summary(selected.customer_id, { topic: url.searchParams.get('topic'),
-          month: url.searchParams.has('month') ? url.searchParams.get('month') : undefined });
+          month: url.searchParams.has('month') ? url.searchParams.get('month') : undefined, level, language });
         json(200, { ...result, customer_id: selected.customer_id, selection_id: selected.selection_id });
       } catch (error) { json(error.status || 503, { error: error.status ? error.message : 'Vastaus ei latautunut. Yritä uudelleen.' }); }
       return;
     }
     if (route === '/api/insights' || route === '/demo-data.json' || route === '/wrapped-data.json') {
       try {
-        const allowedRetry = route === '/api/insights' && url.search === '?retry=1';
-        if (url.search && !allowedRetry) {
+        const keys = [...url.searchParams.keys()];
+        const level = url.searchParams.get('level') ?? DEFAULT_LEVEL;
+        const language = url.searchParams.get('language') ?? 'fi';
+        const allowedRetry = route === '/api/insights' && url.searchParams.get('retry') === '1';
+        if (route === '/api/insights' ? keys.some(key => !['level', 'retry', 'language'].includes(key)) ||
+            new Set(keys).size !== keys.length || !Object.hasOwn(LEVELS, level) || !isLanguage(language) ||
+            (url.searchParams.has('retry') && !allowedRetry) : Boolean(url.search)) {
           json(400, { error: 'Asiakasta ei voi vaihtaa pyynnössä.' }); return;
         }
         const selected = req.demoSession;
         const result = route === '/demo-data.json' ? await dataSource.bootstrap(selected.customer_id) :
           route === '/wrapped-data.json' ? await scopedWrapped(selected.customer_id) :
           // Prepared content is checked against the database and prompt version before serving.
-          await model.insights(selected.customer_id, { retry: allowedRetry });
+          await model.insights(selected.customer_id, { retry: allowedRetry, level, language });
         json(result.status === 'generating' ? 202 : 200, { ...result, customer_id: selected.customer_id,
           selection_id: selected.selection_id, ...(result.status === 'generating' ? { retry_after_ms: 1000 } : {}) });
       } catch (error) { json(error.status || 503, { error: error.status ? error.message : 'Tiedot eivät latautuneet. Yritä uudelleen.' }); }

@@ -1,396 +1,446 @@
 {
   "schema_version": 1,
   "content_version": "duckdb-coach-v8",
-  "model": "claude-haiku-5-5",
+  "spending_version": "spending-patterns-v2",
+  "saving_version": "saving-actions-v1",
+  "model": "claude-sonnet-5-5",
   "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
   "coverage_from": "2024-10-01",
   "as_of": "2026-09-30",
-  "generated_at": "2026-11-14T14:25:54.726Z",
+  "generated_at": "2026-11-14T17:37:25.898Z",
   "customers": {
     "CUST00207": {
       "months": {
         "2026-04": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 427,66 €: 427,66 € enemmän kuin edelliskuussa.",
-              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+              "Tässä kuussa lisäostoja oli 11 maksua, ja yksi suuri ostos ostoksiin ja itsestä huolehtimiseen oli 427,66 €. Se oli 63 % lisäostoista.",
+              "Lisäostot painottuivat kuun loppuun: päivää kohti niitä oli eniten viimeisellä kolmanneksella, noin 50,87 € päivässä.",
+              "Ostokset ja itsestä huolehtiminen nousivat 427,66 € edelliseen kuuhun verrattuna. Maaliskuussa maksuja ei ollut, nyt niitä oli yksi."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 427,66 €: 427,66 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+            "answer": "• Tässä kuussa lisäostoja oli 11 maksua, ja yksi suuri ostos ostoksiin ja itsestä huolehtimiseen oli 427,66 €. Se oli 63 % lisäostoista.\n• Lisäostot painottuivat kuun loppuun: päivää kohti niitä oli eniten viimeisellä kolmanneksella, noin 50,87 € päivässä.\n• Ostokset ja itsestä huolehtiminen nousivat 427,66 € edelliseen kuuhun verrattuna. Maaliskuussa maksuja ei ollut, nyt niitä oli yksi."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 615,65 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 85,53 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Kuukaudesta jäi 615,65 € ennen säästösiirtoja, mutta se ei ole tilin saldo.",
+              "Pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Tässä kuussa sellainen ostos oli keskimäärin 427,66 €.",
+              "Halutessasi voit siirtää erilliselle varalle vain sen summan, joka jää, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 615,65 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 85,53 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Kuukaudesta jäi 615,65 € ennen säästösiirtoja, mutta se ei ole tilin saldo.\n• Pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Tässä kuussa sellainen ostos oli keskimäärin 427,66 €.\n• Halutessasi voit siirtää erilliselle varalle vain sen summan, joka jää, kun välttämättömät maksut on hoidettu."
           }
         },
         "2026-05": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 1 056,39 €: 780,05 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi painottuivat ravintoloihin: 10 maksua, yhteensä 243,93 €. Tyypillinen lisäostos oli 22,01 €.",
+              "Lisäostoja oli eniten kuun alussa, noin 30,49 € päivässä. Viikonpäivistä eniten oli lauantaina, noin 46,50 € päivässä.",
+              "Ruokaostokset nousivat 780,05 € edelliseen kuuhun verrattuna. Maksuja oli 15, kun huhtikuussa niitä oli 4, ja keskiostos oli 70,43 €."
             ],
-            "answer": "• Ruokaostoksiin kului 1 056,39 €: 780,05 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi painottuivat ravintoloihin: 10 maksua, yhteensä 243,93 €. Tyypillinen lisäostos oli 22,01 €.\n• Lisäostoja oli eniten kuun alussa, noin 30,49 € päivässä. Viikonpäivistä eniten oli lauantaina, noin 46,50 € päivässä.\n• Ruokaostokset nousivat 780,05 € edelliseen kuuhun verrattuna. Maksuja oli 15, kun huhtikuussa niitä oli 4, ja keskiostos oli 70,43 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 229,78 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 48,79 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Toukokuussa meni 229,78 € enemmän kuin tuloja tuli.",
+              "Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii. Ravintolamaksu oli keskimäärin 24,39 €.",
+              "Katso seuraava lisäostos ennen ostamista kuukauden budjettia vasten, jos se tuntuu hyvältä."
             ],
-            "answer": "• Menot ylittivät tulot 229,78 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 48,79 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Toukokuussa meni 229,78 € enemmän kuin tuloja tuli.\n• Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii. Ravintolamaksu oli keskimäärin 24,39 €.\n• Katso seuraava lisäostos ennen ostamista kuukauden budjettia vasten, jos se tuntuu hyvältä."
           }
         },
         "2026-06": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 416,56 €: 639,83 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoista 809,29 € eli 60 % meni ravintoloihin, 10 maksulla. Ravintolamaksu oli keskimäärin 80,93 €.",
+              "Lisäostoja oli eniten kuun lopussa, noin 78,60 € päivässä. Viikonpäivistä eniten oli lauantaina, noin 118,59 € päivässä.",
+              "Ruokaostokset laskivat 639,83 € toukokuusta. Maksuja oli 6, kun toukokuussa niitä oli 15, ja keskiostos oli 69,43 €."
             ],
-            "answer": "• Ruokaostoksiin kului 416,56 €: 639,83 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoista 809,29 € eli 60 % meni ravintoloihin, 10 maksulla. Ravintolamaksu oli keskimäärin 80,93 €.\n• Lisäostoja oli eniten kuun lopussa, noin 78,60 € päivässä. Viikonpäivistä eniten oli lauantaina, noin 118,59 € päivässä.\n• Ruokaostokset laskivat 639,83 € toukokuusta. Maksuja oli 6, kun toukokuussa niitä oli 15, ja keskiostos oli 69,43 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 847,36 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 161,86 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Kesäkuussa meni 847,36 € enemmän kuin tuloja tuli.",
+              "Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii. Ravintolamaksu oli keskimäärin 80,93 €.",
+              "Voit katsoa seuraavan lisäostoksen kuukauden budjettia vasten ennen kuin maksat."
             ],
-            "answer": "• Menot ylittivät tulot 847,36 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 161,86 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Kesäkuussa meni 847,36 € enemmän kuin tuloja tuli.\n• Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii. Ravintolamaksu oli keskimäärin 80,93 €.\n• Voit katsoa seuraavan lisäostoksen kuukauden budjettia vasten ennen kuin maksat."
           }
         },
         "2026-07": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 273,94 €: 535,35 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 16 maksua, ja ravintolat olivat niistä isoin ryhmä: 10 maksua, yhteensä 273,94 €. Tyypillinen lisäostos oli 25,15 €.",
+              "Lisäostoja oli päivää kohti eniten kuun lopussa, noin 23,04 € päivässä. Viikonpäivistä eniten oli keskiviikkona, noin 41,48 € päivässä.",
+              "Ravintolamenot laskivat 535,35 € kesäkuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 27,39 € eikä 80,93 €."
             ],
-            "answer": "• Ravintoloihin kului 273,94 €: 535,35 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 16 maksua, ja ravintolat olivat niistä isoin ryhmä: 10 maksua, yhteensä 273,94 €. Tyypillinen lisäostos oli 25,15 €.\n• Lisäostoja oli päivää kohti eniten kuun lopussa, noin 23,04 € päivässä. Viikonpäivistä eniten oli keskiviikkona, noin 41,48 € päivässä.\n• Ravintolamenot laskivat 535,35 € kesäkuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 27,39 € eikä 80,93 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 452,94 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,79 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Heinäkuusta jäi 452,94 € ennen säästösiirtoja, mutta se ei ole tilin saldo.",
+              "Tarkista, onko laskuja varten rahaa erillään, ja aloita tai täydennä erillistä varaa. Ravintolamaksu oli keskimäärin 27,39 €.",
+              "Halutessasi siirrä varalle vain se summa, joka jää, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 452,94 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,79 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Heinäkuusta jäi 452,94 € ennen säästösiirtoja, mutta se ei ole tilin saldo.\n• Tarkista, onko laskuja varten rahaa erillään, ja aloita tai täydennä erillistä varaa. Ravintolamaksu oli keskimäärin 27,39 €.\n• Halutessasi siirrä varalle vain se summa, joka jää, kun välttämättömät maksut on hoidettu."
           }
         },
         "2026-08": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 997,13 €: 723,19 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoistasi 997,13 € eli 83 % meni ravintoloihin, 10 maksulla. Lisäostot olivat levinneet moneen maksuun.",
+              "Lisäostoja oli eniten kuun lopussa, noin 56,77 € päivässä. Päivän aikana eniten oli illalla, 703,23 €.",
+              "Ravintolamenot nousivat 723,19 € heinäkuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 99,71 € eikä 27,39 €."
             ],
-            "answer": "• Ravintoloihin kului 997,13 €: 723,19 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoistasi 997,13 € eli 83 % meni ravintoloihin, 10 maksulla. Lisäostot olivat levinneet moneen maksuun.\n• Lisäostoja oli eniten kuun lopussa, noin 56,77 € päivässä. Päivän aikana eniten oli illalla, 703,23 €.\n• Ravintolamenot nousivat 723,19 € heinäkuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 99,71 € eikä 27,39 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 395,30 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 199,43 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Elokuussa meni 395,30 € enemmän kuin tuloja tuli.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Sellainen maksu oli keskimäärin 40,03 €.",
+              "Voit katsoa seuraavan lisäostoksen kuukauden budjettia vasten ennen kuin maksat."
             ],
-            "answer": "• Menot ylittivät tulot 395,30 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 199,43 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Elokuussa meni 395,30 € enemmän kuin tuloja tuli.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Sellainen maksu oli keskimäärin 40,03 €.\n• Voit katsoa seuraavan lisäostoksen kuukauden budjettia vasten ennen kuin maksat."
           }
         },
         "2026-09": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 109,79 €: 887,34 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoista 256,77 € eli 70 % meni vapaa-aikaan, 5 maksulla. Tyypillinen lisäostos oli 12,15 €.",
+              "Lisäostot painottuivat iltaan: illalla maksettiin 320,60 € eli 87 % lisäostoista.",
+              "Ravintolamenot laskivat 887,34 € elokuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 10,98 € eikä 99,71 €."
             ],
-            "answer": "• Ravintoloihin kului 109,79 €: 887,34 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoista 256,77 € eli 70 % meni vapaa-aikaan, 5 maksulla. Tyypillinen lisäostos oli 12,15 €.\n• Lisäostot painottuivat iltaan: illalla maksettiin 320,60 € eli 87 % lisäostoista.\n• Ravintolamenot laskivat 887,34 € elokuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 10,98 € eikä 99,71 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 688,96 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 51,35 €."
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat. Syyskuusta jäi 688,96 € ennen säästösiirtoja, mutta se ei ole tilin saldo.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Sellainen maksu oli keskimäärin 51,35 €.",
+              "Varalle siirretyn 1 250 € arvion kattavuus on historiallinen. Halutessasi siirrä varalle vain se, mikä jää välttämättömien maksujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 688,96 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 51,35 €."
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat. Syyskuusta jäi 688,96 € ennen säästösiirtoja, mutta se ei ole tilin saldo.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Sellainen maksu oli keskimäärin 51,35 €.\n• Varalle siirretyn 1 250 € arvion kattavuus on historiallinen. Halutessasi siirrä varalle vain se, mikä jää välttämättömien maksujen jälkeen."
           }
         },
         "2025-10": {
           "spending": {
             "bullets": [
-              "Matkailuun kului 446,06 €: 446,06 € enemmän kuin edelliskuussa.",
-              "Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
+              "Tässä kuussa lisäostoja oli vain yksi maksu, joten selvää ostotyyliä ei voi sanoa. Kaikista maksuista suurin oli 640,07 €.",
+              "Aikaan liittyvää selvää kaavaa ei näy tässä kuussa kirjatuissa maksuissa.",
+              "Edelliseen kuuhun verrattuna matkailu nousi 446,06 €. Syyskuussa matkailussa ei ollut maksuja, nyt oli yksi 446,06 euron maksu."
             ],
-            "answer": "• Matkailuun kului 446,06 €: 446,06 € enemmän kuin edelliskuussa.\n• Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
+            "answer": "• Tässä kuussa lisäostoja oli vain yksi maksu, joten selvää ostotyyliä ei voi sanoa. Kaikista maksuista suurin oli 640,07 €.\n• Aikaan liittyvää selvää kaavaa ei näy tässä kuussa kirjatuissa maksuissa.\n• Edelliseen kuuhun verrattuna matkailu nousi 446,06 €. Syyskuussa matkailussa ei ollut maksuja, nyt oli yksi 446,06 euron maksu."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 827,47 €.",
-              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 89,21 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Rahaa jäi menojen jälkeen 827,47 €, eikä säästösiirtoja ollut.",
+              "Voit jättää yhden vapaaehtoisen matkailuostoksen tekemättä. Tämän kuun matkailumaksu oli keskimäärin 446,06 €.",
+              "Siirrä varalle vain se summa, jonka oikeasti jäi säästöön, kun pakolliset maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 827,47 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 89,21 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Rahaa jäi menojen jälkeen 827,47 €, eikä säästösiirtoja ollut.\n• Voit jättää yhden vapaaehtoisen matkailuostoksen tekemättä. Tämän kuun matkailumaksu oli keskimäärin 446,06 €.\n• Siirrä varalle vain se summa, jonka oikeasti jäi säästöön, kun pakolliset maksut on hoidettu."
           }
         },
         "2025-11": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 1 009,61 €: 1 009,61 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostot jakautuivat moneen maksuun ja päivään: lisäostomaksuja oli 16 ja niiden tyypillinen koko 118,05 €.",
+              "Lisäostoissa kuukauden keskivaihe erottui: 11.–20. päivän välillä meni 109,61 € päivässä, kun koko kuun vastaava keskiarvo oli 68,41 €.",
+              "Edelliseen kuuhun verrattuna ravintolat nousivat 1 009,61 €. Lokakuussa ravintolamaksuja ei ollut, nyt niitä oli 10 ja keskimäärin 100,96 €."
             ],
-            "answer": "• Ravintoloihin kului 1 009,61 €: 1 009,61 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen maksuun ja päivään: lisäostomaksuja oli 16 ja niiden tyypillinen koko 118,05 €.\n• Lisäostoissa kuukauden keskivaihe erottui: 11.–20. päivän välillä meni 109,61 € päivässä, kun koko kuun vastaava keskiarvo oli 68,41 €.\n• Edelliseen kuuhun verrattuna ravintolat nousivat 1 009,61 €. Lokakuussa ravintolamaksuja ei ollut, nyt niitä oli 10 ja keskimäärin 100,96 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 1 062,38 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 201,92 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Menojen jälkeen jäi miinusta 1 062,38 €, joten säästösiirtoja kannattaa tarkistaa.",
+              "Voit vaihtaa yhden ravintolaruokailun kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 100,96 €, mutta kotiruokakin maksaa.",
+              "Älä siirrä säästöön mitään ennen kuin pakolliset maksut on katettu. Tarkista seuraava lisäosto kuukauden budjettia vasten."
             ],
-            "answer": "• Menot ylittivät tulot 1 062,38 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 201,92 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Menojen jälkeen jäi miinusta 1 062,38 €, joten säästösiirtoja kannattaa tarkistaa.\n• Voit vaihtaa yhden ravintolaruokailun kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 100,96 €, mutta kotiruokakin maksaa.\n• Älä siirrä säästöön mitään ennen kuin pakolliset maksut on katettu. Tarkista seuraava lisäosto kuukauden budjettia vasten."
           }
         },
         "2025-12": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 241,52 €: 768,09 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot olivat sekalaisia: niitä oli 16 maksua ja yksi ostoksiin ja itsestä huolehtimiseen liittyvä maksu oli 403,06 €.",
+              "Lisäostoissa kuukauden alku erottui: 1.–10. päivän välillä meni 60,47 € päivässä, kun koko kuun keskiarvo oli 28,74 €.",
+              "Edelliseen kuuhun verrattuna ravintolat laskivat 768,09 €. Marraskuussa maksuja oli 10 ja keskimäärin 100,96 €, nyt 10 ja keskimäärin 24,15 €."
             ],
-            "answer": "• Ravintoloihin kului 241,52 €: 768,09 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot olivat sekalaisia: niitä oli 16 maksua ja yksi ostoksiin ja itsestä huolehtimiseen liittyvä maksu oli 403,06 €.\n• Lisäostoissa kuukauden alku erottui: 1.–10. päivän välillä meni 60,47 € päivässä, kun koko kuun keskiarvo oli 28,74 €.\n• Edelliseen kuuhun verrattuna ravintolat laskivat 768,09 €. Marraskuussa maksuja oli 10 ja keskimäärin 100,96 €, nyt 10 ja keskimäärin 24,15 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 16,33 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 80,61 €."
+              "Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 16,33 €, joten varalle ei jäänyt paljon.",
+              "Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen kirjattu maksu oli 403,06 €.",
+              "Aloita erillinen varapuskuri pienellä summalla vasta, kun pakolliset maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 16,33 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 80,61 €."
+            "answer": "• Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 16,33 €, joten varalle ei jäänyt paljon.\n• Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen kirjattu maksu oli 403,06 €.\n• Aloita erillinen varapuskuri pienellä summalla vasta, kun pakolliset maksut on hoidettu."
           }
         },
         "2026-01": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 973,05 €: 706,60 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa ravintolat näkyivät lisäostoissa: 10 maksua, yhteensä 632,41 €. Lisäostot jakautuivat moneen maksuun.",
+              "Lisäostoissa kuun loppu erottui: 21. päivästä eteenpäin meni 84,17 € päivässä, kun koko kuun keskiarvo oli 38,96 €.",
+              "Edelliseen kuuhun verrattuna koti ja tekniikka nousi 706,60 €. Joulukuussa maksu oli 266,45 €, nyt yksi maksu oli 973,05 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 973,05 €: 706,60 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa ravintolat näkyivät lisäostoissa: 10 maksua, yhteensä 632,41 €. Lisäostot jakautuivat moneen maksuun.\n• Lisäostoissa kuun loppu erottui: 21. päivästä eteenpäin meni 84,17 € päivässä, kun koko kuun keskiarvo oli 38,96 €.\n• Edelliseen kuuhun verrattuna koti ja tekniikka nousi 706,60 €. Joulukuussa maksu oli 266,45 €, nyt yksi maksu oli 973,05 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 486,14 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 126,48 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Menojen jälkeen jäi miinusta 486,14 €, joten säästösiirtoja kannattaa tarkistaa.",
+              "Voit vaihtaa yhden ravintolaruokailun kotiruokaan, jos se sopii. Ravintolamaksun keskiarvo oli 63,24 €, mutta kotiruokakin maksaa.",
+              "Siirrä varalle vain se summa, joka oikeasti jää yli, kun pakolliset maksut on maksettu."
             ],
-            "answer": "• Menot ylittivät tulot 486,14 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 126,48 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Menojen jälkeen jäi miinusta 486,14 €, joten säästösiirtoja kannattaa tarkistaa.\n• Voit vaihtaa yhden ravintolaruokailun kotiruokaan, jos se sopii. Ravintolamaksun keskiarvo oli 63,24 €, mutta kotiruokakin maksaa.\n• Siirrä varalle vain se summa, joka oikeasti jää yli, kun pakolliset maksut on maksettu."
           }
         },
         "2026-02": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 185,92 €: 787,13 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa muutama suurempi maksu muodosti suuren osan lisäostoista. Yksi ostoksiin ja itsestä huolehtimiseen liittyvä maksu oli 339,49 €.",
+              "Lisäostoissa iltapäivä erottui: 6 maksua, yhteensä 402,03 €. Muuta selvää ajoitusta ei näy.",
+              "Edelliseen kuuhun verrattuna koti ja tekniikka laski 787,13 €. Tammikuussa maksu oli 973,05 €, nyt yksi maksu oli 185,92 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 185,92 €: 787,13 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa muutama suurempi maksu muodosti suuren osan lisäostoista. Yksi ostoksiin ja itsestä huolehtimiseen liittyvä maksu oli 339,49 €.\n• Lisäostoissa iltapäivä erottui: 6 maksua, yhteensä 402,03 €. Muuta selvää ajoitusta ei näy.\n• Edelliseen kuuhun verrattuna koti ja tekniikka laski 787,13 €. Tammikuussa maksu oli 973,05 €, nyt yksi maksu oli 185,92 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 959,53 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 67,90 €."
+              "Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 959,53 €, eikä säästösiirtoja ollut.",
+              "Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen kirjattu maksu oli 339,49 €.",
+              "Aloita tai täydennä erillistä varapuskuria vain sillä summalla, joka jää yli pakollisten maksujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 959,53 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 67,90 €."
+            "answer": "• Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 959,53 €, eikä säästösiirtoja ollut.\n• Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen kirjattu maksu oli 339,49 €.\n• Aloita tai täydennä erillistä varapuskuria vain sillä summalla, joka jää yli pakollisten maksujen jälkeen."
           }
         },
         "2026-03": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 339,49 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot olivat vapaa-aikaa: 5 maksua, tyypillinen maksu 32,39 € ja suurin 61,53 €.",
+              "Selvää ajoitusta ei näy tämän kuun kirjatuissa lisäostoissa, koska maksuja oli vähän.",
+              "Edelliseen kuuhun verrattuna ostokset ja itsestä huolehtiminen laski 339,49 €. Helmikuussa maksuja oli yksi, nyt ei yhtään."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 339,49 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot olivat vapaa-aikaa: 5 maksua, tyypillinen maksu 32,39 € ja suurin 61,53 €.\n• Selvää ajoitusta ei näy tämän kuun kirjatuissa lisäostoissa, koska maksuja oli vähän.\n• Edelliseen kuuhun verrattuna ostokset ja itsestä huolehtiminen laski 339,49 €. Helmikuussa maksuja oli yksi, nyt ei yhtään."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 1 009,92 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,72 €."
+              "Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 1 009,92 €, eikä säästösiirtoja ollut.",
+              "Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 36,72 €.",
+              "Siirrä varapuskuriin vain se summa, joka oikeasti jää yli, kun pakolliset maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 1 009,92 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,72 €."
+            "answer": "• Tarkista ensin, että laskuille on rahaa erillään. Menojen jälkeen jäi 1 009,92 €, eikä säästösiirtoja ollut.\n• Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 36,72 €.\n• Siirrä varapuskuriin vain se summa, joka oikeasti jää yli, kun pakolliset maksut on hoidettu."
           }
         },
         "2025-04": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 1 939,57 €: 1 939,57 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoistasi 90 % oli ravintolamenoja. Ravintolamaksuja oli 10, keskimäärin 193,96 €, ja suurin 298,25 €.",
+              "Lisäostoissa euroja kului eniten perjantaisin: 201,19 € kalenteripäivää kohti. Kuukauden keskiarvo oli 71,59 € päivässä.",
+              "Ravintolamenot nousivat 1 939,57 € edellisestä kuusta, jolloin ravintolamaksuja ei ollut yhtään. Nyt maksuja oli 10."
             ],
-            "answer": "• Ravintoloihin kului 1 939,57 €: 1 939,57 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoistasi 90 % oli ravintolamenoja. Ravintolamaksuja oli 10, keskimäärin 193,96 €, ja suurin 298,25 €.\n• Lisäostoissa euroja kului eniten perjantaisin: 201,19 € kalenteripäivää kohti. Kuukauden keskiarvo oli 71,59 € päivässä.\n• Ravintolamenot nousivat 1 939,57 € edellisestä kuusta, jolloin ravintolamaksuja ei ollut yhtään. Nyt maksuja oli 10."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 929,39 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 387,91 €."
+              "Hoida ensin laskut, ruoka ja välttämättömät matkat, ennen kuin siirrät rahaa säästöön.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 193,96 €.",
+              "Kuun menojen jälkeen rahaa jäi −929,39 €, joten säästösiirtoja ei kannata lisätä."
             ],
-            "answer": "• Menot ylittivät tulot 929,39 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 387,91 €."
+            "answer": "• Hoida ensin laskut, ruoka ja välttämättömät matkat, ennen kuin siirrät rahaa säästöön.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 193,96 €.\n• Kuun menojen jälkeen rahaa jäi −929,39 €, joten säästösiirtoja ei kannata lisätä."
           }
         },
         "2025-05": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 715,60 €: 1 223,97 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoistasi 77 % oli ravintolamenoja. Ravintolamaksuja oli 7, keskimäärin 102,23 €.",
+              "Lisäostoissa euroja kului eniten lauantaisin: 78,54 € kalenteripäivää kohti. Iltapäivällä maksettiin 67 % lisäostojen eurosta.",
+              "Ravintolamenot laskivat 1 223,97 € edellisestä kuusta. Maksuja oli 7, kun edellisessä kuussa niitä oli 10, ja keskimääräinen maksu pieneni 193,96 eurosta 102,23 euroon."
             ],
-            "answer": "• Ravintoloihin kului 715,60 €: 1 223,97 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoistasi 77 % oli ravintolamenoja. Ravintolamaksuja oli 7, keskimäärin 102,23 €.\n• Lisäostoissa euroja kului eniten lauantaisin: 78,54 € kalenteripäivää kohti. Iltapäivällä maksettiin 67 % lisäostojen eurosta.\n• Ravintolamenot laskivat 1 223,97 € edellisestä kuusta. Maksuja oli 7, kun edellisessä kuussa niitä oli 10, ja keskimääräinen maksu pieneni 193,96 eurosta 102,23 euroon."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 464,45 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 143,12 €."
+              "Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 102,23 €.",
+              "Kuun menojen jälkeen rahaa jäi 464,45 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 464,45 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 143,12 €."
+            "answer": "• Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 102,23 €.\n• Kuun menojen jälkeen rahaa jäi 464,45 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen."
           }
         },
         "2025-06": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 0,00 €: 262,71 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 16 maksua 11 päivänä. Ravintolamaksuja oli 9, keskimäärin 56,25 €.",
+              "Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.",
+              "Koti ja tekniikka -menoja ei kirjattu lainkaan, kun edellisessä kuussa niitä oli 262,71 €. Maksuja oli silloin 2, keskimäärin 131,36 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 0,00 €: 262,71 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 16 maksua 11 päivänä. Ravintolamaksuja oli 9, keskimäärin 56,25 €.\n• Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.\n• Koti ja tekniikka -menoja ei kirjattu lainkaan, kun edellisessä kuussa niitä oli 262,71 €. Maksuja oli silloin 2, keskimäärin 131,36 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 96,00 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,25 €."
+              "Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Se maksoi keskimäärin 36,07 €.",
+              "Kuun menojen jälkeen rahaa jäi 96,00 €. Voit siirtää puskuriin vain sen summan, joka oikeasti jää laskujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 96,00 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,25 €."
+            "answer": "• Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Se maksoi keskimäärin 36,07 €.\n• Kuun menojen jälkeen rahaa jäi 96,00 €. Voit siirtää puskuriin vain sen summan, joka oikeasti jää laskujen jälkeen."
           }
         },
         "2025-07": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 5,65 €: 500,58 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 5 maksua, yhteensä 12,56 €. Maksut olivat pieniä, keskimäärin 2,51 €.",
+              "Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.",
+              "Ravintolamenot laskivat 500,58 € edellisestä kuusta. Maksuja oli 2, keskimäärin 2,83 €, kun edellisessä kuussa niitä oli 9."
             ],
-            "answer": "• Ravintoloihin kului 5,65 €: 500,58 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 5 maksua, yhteensä 12,56 €. Maksut olivat pieniä, keskimäärin 2,51 €.\n• Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.\n• Ravintolamenot laskivat 500,58 € edellisestä kuusta. Maksuja oli 2, keskimäärin 2,83 €, kun edellisessä kuussa niitä oli 9."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 1 178,96 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 1,38 €."
+              "Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Se maksoi keskimäärin 2,30 €.",
+              "Kuun menojen jälkeen rahaa jäi 1 178,96 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 1 178,96 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 1,38 €."
+            "answer": "• Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Se maksoi keskimäärin 2,30 €.\n• Kuun menojen jälkeen rahaa jäi 1 178,96 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
           }
         },
         "2025-08": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 18,79 €. Tästä menosta voi löytyä joustoa.",
-              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+              "Tässä kuussa lisäostoja kirjattiin vain yksi maksu, 18,79 €. Sen perusteella ostotyylistä ei voi sanoa mitään.",
+              "Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.",
+              "Ostokset ja itsestä huolehtiminen -menoja oli yksi maksu, 18,79 €. Edellisessä kuussa tähän ryhmään ei kirjattu yhtään maksua."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 18,79 €. Tästä menosta voi löytyä joustoa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+            "answer": "• Tässä kuussa lisäostoja kirjattiin vain yksi maksu, 18,79 €. Sen perusteella ostotyylistä ei voi sanoa mitään.\n• Selvää ajoitukseen liittyvää kaavaa ei tämän kuun maksuista löydy.\n• Ostokset ja itsestä huolehtiminen -menoja oli yksi maksu, 18,79 €. Edellisessä kuussa tähän ryhmään ei kirjattu yhtään maksua."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 1 951,82 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 3,76 €."
+              "Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.",
+              "Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostos oli keskimäärin 18,79 €.",
+              "Kuun menojen jälkeen rahaa jäi 1 951,82 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 1 951,82 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 3,76 €."
+            "answer": "• Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.\n• Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostos oli keskimäärin 18,79 €.\n• Kuun menojen jälkeen rahaa jäi 1 951,82 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
           }
         },
         "2025-09": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 47,90 €. Tästä menosta voi löytyä joustoa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostosi olivat pieniä maksuja monella päivällä. Niitä oli 10 maksua 8 päivänä, ja kaikki olivat ravintolamenoja.",
+              "Lisäostoissa euroja kului eniten illalla: 28,79 €, eli 60 % lisäostojen eurosta.",
+              "Ravintolamaksuja oli 10, keskimäärin 4,79 €, ja suurin 8,20 €. Edellisessä kuussa ravintolamaksuja ei kirjattu yhtään."
             ],
-            "answer": "• Ravintoloihin kului 47,90 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostosi olivat pieniä maksuja monella päivällä. Niitä oli 10 maksua 8 päivänä, ja kaikki olivat ravintolamenoja.\n• Lisäostoissa euroja kului eniten illalla: 28,79 €, eli 60 % lisäostojen eurosta.\n• Ravintolamaksuja oli 10, keskimäärin 4,79 €, ja suurin 8,20 €. Edellisessä kuussa ravintolamaksuja ei kirjattu yhtään."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 1 139,04 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 9,58 €."
+              "Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 4,79 €.",
+              "Kuun menojen jälkeen rahaa jäi 1 139,04 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 1 139,04 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 9,58 €."
+            "answer": "• Varmista ensin, että laskuille on rahaa, ja aloita erillinen varapuskuri, jos sitä ei vielä ole.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolaostos oli keskimäärin 4,79 €.\n• Kuun menojen jälkeen rahaa jäi 1 139,04 €. Voit siirtää puskuriin vain sen summan, joka jää laskujen jälkeen, jos haluat."
           }
         },
         "2024-10": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 1 575,82 €. Tästä menosta voi löytyä joustoa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoistasi suurin osa oli ravintolamaksuja: 10 maksua, yhteensä 1 575,82 €. Keskimäärin yksi ravintolamaksu oli 157,58 €.",
+              "Lisäostojen euroissa suurin osa osui iltaan: 8 maksua, yhteensä 1 216,58 €. Se oli 58 % lisäostoista.",
+              "Edelliseltä kuulta vertailua ei ole tässä aineistossa. Siksi muutosta ei voi selittää, vain tämän kuun maksut näkyvät."
             ],
-            "answer": "• Ravintoloihin kului 1 575,82 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoistasi suurin osa oli ravintolamaksuja: 10 maksua, yhteensä 1 575,82 €. Keskimäärin yksi ravintolamaksu oli 157,58 €.\n• Lisäostojen euroissa suurin osa osui iltaan: 8 maksua, yhteensä 1 216,58 €. Se oli 58 % lisäostoista.\n• Edelliseltä kuulta vertailua ei ole tässä aineistossa. Siksi muutosta ei voi selittää, vain tämän kuun maksut näkyvät."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 1 941,16 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 315,16 €."
+              "Kuun jälkeen jäi miinusta 1 941,16 €, joten maksa ensin välttämättömät laskut, ruoka ja kulkeminen.",
+              "Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 157,58 €.",
+              "Tarkista seuraava lisäosto kuukausibudjettia vasten, kun välttämättömät maksut on katettu."
             ],
-            "answer": "• Menot ylittivät tulot 1 941,16 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 315,16 €."
+            "answer": "• Kuun jälkeen jäi miinusta 1 941,16 €, joten maksa ensin välttämättömät laskut, ruoka ja kulkeminen.\n• Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 157,58 €.\n• Tarkista seuraava lisäosto kuukausibudjettia vasten, kun välttämättömät maksut on katettu."
           }
         },
         "2024-11": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 584,88 €: 990,94 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi jakautuivat moneen maksuun: 16 maksua 13 päivänä. Vapaa-aika oli suurin ryhmä, 5 maksua ja yhteensä 755,29 €.",
+              "Lisäostojen euroja oli eniten lauantaina: 93,53 € kalenteripäivää kohti. Kuukauden keskiarvo oli 48,24 € päivää kohti.",
+              "Ravintolamenot olivat 584,88 €, eli 990,94 € vähemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 10, mutta keskihinta oli nyt 58,49 € (edellisessä 157,58 €)."
             ],
-            "answer": "• Ravintoloihin kului 584,88 €: 990,94 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen maksuun: 16 maksua 13 päivänä. Vapaa-aika oli suurin ryhmä, 5 maksua ja yhteensä 755,29 €.\n• Lisäostojen euroja oli eniten lauantaina: 93,53 € kalenteripäivää kohti. Kuukauden keskiarvo oli 48,24 € päivää kohti.\n• Ravintolamenot olivat 584,88 €, eli 990,94 € vähemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 10, mutta keskihinta oli nyt 58,49 € (edellisessä 157,58 €)."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 1 880,86 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 151,06 €."
+              "Kuun jälkeen jäi miinusta 1 880,86 €, joten kata ensin välttämättömät maksut ennen muuta säästämistä.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 151,06 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Menot ylittivät tulot 1 880,86 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 151,06 €."
+            "answer": "• Kuun jälkeen jäi miinusta 1 880,86 €, joten kata ensin välttämättömät maksut ennen muuta säästämistä.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 151,06 €.\n• Siirrä varalle vain se summa, joka oikeasti jää, kun välttämättömät maksut on hoidettu."
           }
         },
         "2024-12": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 0,00 €: 896,27 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli vähän: 8 maksua 5 päivänä, yhteensä 416,12 €. Muutama suurempi maksu muodosti suuren osan, suurin 200,71 €.",
+              "Lisäostojen euroja oli eniten kuun alkupuolella, päivät 1–10: 28,30 € päivää kohti. Kuukauden keskiarvo oli 13,42 € päivää kohti. Maksut painottuivat iltaan.",
+              "Ruokaostoksia ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 13 maksua ja 896,27 €. Tämä kertoo vain kirjatuista maksuista tässä kuussa."
             ],
-            "answer": "• Ruokaostoksiin kului 0,00 €: 896,27 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli vähän: 8 maksua 5 päivänä, yhteensä 416,12 €. Muutama suurempi maksu muodosti suuren osan, suurin 200,71 €.\n• Lisäostojen euroja oli eniten kuun alkupuolella, päivät 1–10: 28,30 € päivää kohti. Kuukauden keskiarvo oli 13,42 € päivää kohti. Maksut painottuivat iltaan.\n• Ruokaostoksia ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 13 maksua ja 896,27 €. Tämä kertoo vain kirjatuista maksuista tässä kuussa."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 1 046,28 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 55,73 €."
+              "Kuun jälkeen jäi 1 046,28 €. Tarkista ensin, että laskuille ja varalle on erillistä rahaa.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 139,34 €.",
+              "Siirrä varalle vain todellinen jäljelle jäävä summa, kun välttämättömät maksut on katettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 1 046,28 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 55,73 €."
+            "answer": "• Kuun jälkeen jäi 1 046,28 €. Tarkista ensin, että laskuille ja varalle on erillistä rahaa.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 139,34 €.\n• Siirrä varalle vain todellinen jäljelle jäävä summa, kun välttämättömät maksut on katettu."
           }
         },
         "2025-01": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 856,79 €: 856,79 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi jakautuivat moneen maksuun: 15 maksua 9 päivänä. Ravintolat olivat suurin ryhmä, 10 maksua ja yhteensä 736,28 €.",
+              "Lisäostojen euroja oli eniten lauantaina: 116,07 € päivää kohti. Kuukauden keskiarvo oli 30,59 € päivää kohti.",
+              "Ruokaostoksia kirjautui 12 maksua, yhteensä 856,79 €. Edellisessä kuussa niitä ei kirjautunut yhtään."
             ],
-            "answer": "• Ruokaostoksiin kului 856,79 €: 856,79 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen maksuun: 15 maksua 9 päivänä. Ravintolat olivat suurin ryhmä, 10 maksua ja yhteensä 736,28 €.\n• Lisäostojen euroja oli eniten lauantaina: 116,07 € päivää kohti. Kuukauden keskiarvo oli 30,59 € päivää kohti.\n• Ruokaostoksia kirjautui 12 maksua, yhteensä 856,79 €. Edellisessä kuussa niitä ei kirjautunut yhtään."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 589,10 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 147,26 €."
+              "Kuun jälkeen jäi miinusta 589,10 €, joten kata ensin laskut, ruoka ja välttämätön kulkeminen.",
+              "Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 73,63 €.",
+              "Tarkista seuraava lisäosto kuukausibudjettia vasten, ennen kuin siirrät mitään sivuun."
             ],
-            "answer": "• Menot ylittivät tulot 589,10 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 147,26 €."
+            "answer": "• Kuun jälkeen jäi miinusta 589,10 €, joten kata ensin laskut, ruoka ja välttämätön kulkeminen.\n• Pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 73,63 €.\n• Tarkista seuraava lisäosto kuukausibudjettia vasten, ennen kuin siirrät mitään sivuun."
           }
         },
         "2025-02": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 0,00 €: 736,28 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 5 maksua 5 päivänä, ja ne olivat kaikki vapaa-aikaa: yhteensä 532,32 €. Yhden maksun keskihinta oli 106,46 €.",
+              "Selvää ajoitusta ei tässä kuussa löydy, koska lisäostojen kirjatut maksut eivät painotu selvästi mihinkään päivään tai ajankohtaan.",
+              "Ravintolamaksuja ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 10 maksua ja 736,28 €. Ruokaostoksia oli kuun suurin ryhmä, 1 506,89 €."
             ],
-            "answer": "• Ravintoloihin kului 0,00 €: 736,28 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 5 maksua 5 päivänä, ja ne olivat kaikki vapaa-aikaa: yhteensä 532,32 €. Yhden maksun keskihinta oli 106,46 €.\n• Selvää ajoitusta ei tässä kuussa löydy, koska lisäostojen kirjatut maksut eivät painotu selvästi mihinkään päivään tai ajankohtaan.\n• Ravintolamaksuja ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 10 maksua ja 736,28 €. Ruokaostoksia oli kuun suurin ryhmä, 1 506,89 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 285,91 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 106,46 €."
+              "Kuun jälkeen jäi miinusta 285,91 €, joten kata ensin välttämättömät maksut.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 106,46 €.",
+              "Voit myös tarkistaa seuraavan lisäoston kuukausibudjettia vasten, jos se tuntuu hyvältä."
             ],
-            "answer": "• Menot ylittivät tulot 285,91 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 106,46 €."
+            "answer": "• Kuun jälkeen jäi miinusta 285,91 €, joten kata ensin välttämättömät maksut.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 106,46 €.\n• Voit myös tarkistaa seuraavan lisäoston kuukausibudjettia vasten, jos se tuntuu hyvältä."
           }
         },
         "2025-03": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 0,00 €: 1 506,89 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 5 maksua 4 päivänä, ja ne olivat kaikki vapaa-aikaa: yhteensä 708,59 €. Yhden maksun keskihinta oli 141,72 €.",
+              "Selvää ajoitusta ei tässä kuussa löydy, koska lisäostojen kirjatut maksut eivät painotu selvästi mihinkään päivään tai ajankohtaan.",
+              "Ruokaostoksia ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 1 506,89 €. Liikkuminen oli kuun suurin ryhmä, 772,76 €."
             ],
-            "answer": "• Ruokaostoksiin kului 0,00 €: 1 506,89 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 5 maksua 4 päivänä, ja ne olivat kaikki vapaa-aikaa: yhteensä 708,59 €. Yhden maksun keskihinta oli 141,72 €.\n• Selvää ajoitusta ei tässä kuussa löydy, koska lisäostojen kirjatut maksut eivät painotu selvästi mihinkään päivään tai ajankohtaan.\n• Ruokaostoksia ei kirjautunut tässä kuussa lainkaan, kun edellisessä kuussa niitä oli 1 506,89 €. Liikkuminen oli kuun suurin ryhmä, 772,76 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 353,72 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 141,72 €."
+              "Kuun jälkeen jäi 353,72 €. Tarkista ensin, että laskuille ja varalle on erillistä rahaa.",
+              "Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 141,72 €.",
+              "Siirrä varalle vain todellinen jäljelle jäävä summa, kun välttämättömät maksut on katettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 353,72 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 141,72 €."
+            "answer": "• Kuun jälkeen jäi 353,72 €. Tarkista ensin, että laskuille ja varalle on erillistä rahaa.\n• Pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskihinta oli 141,72 €.\n• Siirrä varalle vain todellinen jäljelle jäävä summa, kun välttämättömät maksut on katettu."
           }
         }
       },
@@ -399,40 +449,40 @@
         "customer_id": "CUST00207",
         "as_of": "2026-09-30",
         "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
-        "model": "claude-haiku-5-5",
+        "model": "claude-sonnet-5-5",
         "insights": [
           {
-            "id": "insight-f54ed95ee5590a62-1",
-            "period": "monthly",
-            "title": "Valitse edullisempi tapa viettää vapaa-aikaa",
-            "headline_number": "260 € syyskuussa",
-            "explanation": "Vapaa-aikaan kului syyskuussa noin 260 €, kun tavallinen tasosi oli noin 170 €/kk. Valinnaisista menoista voi löytyä tilaa säästölle.",
-            "action": "Katso syyskuun vapaa-ajan ostokset ja valitse, minkä voisit korvata maksuttomalla tekemisellä."
-          },
-          {
-            "id": "insight-f54ed95ee5590a62-2",
+            "id": "insight-23734883aad77e61-1",
             "period": "weekly",
-            "title": "Suunnittele lisäostokset ennen ostamista",
-            "headline_number": "Arvio 260 €/vko",
-            "explanation": "Viikoittaisiin lisäostoihin arvioitiin olevan noin 260 €. Tämä oli arvio aineiston tilanteesta, ei nykyinen tilin saldo.",
-            "action": "Listaa suunnittelemasi lisäostokset ja vertaa niiden yhteissummaa arvioon. Tarkista nykyinen saldo ja laskut ennen ostamista."
+            "title": "Pidä ylimääräiset ostot tämän viikon rajan sisällä",
+            "headline_number": "€260 viikossa",
+            "explanation": "Arvion mukaan ylimääräisiin menoihin jäi noin €260 viikossa. Tavallinen viikko ravintoloineen ja noutoruokineen on noin €240, joten väliin jää vain vähän.",
+            "action": "Katso ennen seuraavaa ostosta, mahtuuko se tähän viikkorajaan. Jos ei mahdu, valitse, mikä jää pois."
           },
           {
-            "id": "insight-f54ed95ee5590a62-3",
+            "id": "insight-23734883aad77e61-2",
+            "period": "monthly",
+            "title": "Tarkista viime kuun poikkeukset ennen uutta kuukautta",
+            "headline_number": "Viihde €260",
+            "explanation": "Viime kuussa viihteeseen meni €260, kun tavallinen kuukausi on €170. Ravintolat jäivät viime kuussa tasolle €55, kun tavallinen kuukausi on €260.",
+            "action": "Avaa viime kuun viihdemaksut ja katso, mitkä olivat kertaluonteisia. Päätä sitten, mitkä niistä haluat pitää."
+          },
+          {
+            "id": "insight-23734883aad77e61-3",
             "period": "yearly",
-            "title": "Valitse säästötavoite ja etsi sille tilaa",
-            "headline_number": "Noin 130 €/kk jäi",
-            "explanation": "Viimeisen 12 kuukauden tuloista jäi menojen jälkeen keskimäärin noin 130 €/kk. Säästösiirtoja ei ollut, eikä summa kerro nykyisestä käyttövarasta.",
-            "action": "Nimeä säästötavoite ja etsi valinnaisista menoista joustoa sitä varten. Varaa ensin rahat laskuihin."
+            "title": "Valitse ravintolakäynneistä ne, joista nautit eniten",
+            "headline_number": "€130 jäi kuussa",
+            "explanation": "Viimeisen 12 kuukauden aikana tuloja oli €29,550 ja menoja €28,000. Keskimäärin rahaa jäi noin €130 kuukaudessa. Ravintolakäynnit maksavat noin €60 kerta, tyypilliset ikäisesi noin €25.",
+            "action": "Vertaa viime kuukausien ravintolakuitteja ja valitse, mitkä kerrat olivat tärkeimpiä. Kokeile halvempaa vaihtoehtoa muille kerroille."
           }
         ]
       },
       "week": {
         "bullets": [
-          "Arvio lisäostoihin: noin 260 € viikossa.",
-          "Tarkista kuukauden menot ennen suurempaa ostosta."
+          "Arvio: lisämenoihin on tällä viikolla noin 260 €.",
+          "Rajana on kuukauden tavallinen budjetti. Katso seuraava lisäostos sitä vasten."
         ],
-        "answer": "• Arvio lisäostoihin: noin 260 € viikossa.\n• Tarkista kuukauden menot ennen suurempaa ostosta."
+        "answer": "• Arvio: lisämenoihin on tällä viikolla noin 260 €.\n• Rajana on kuukauden tavallinen budjetti. Katso seuraava lisäostos sitä vasten."
       }
     },
     "CUST00127": {
@@ -440,385 +490,433 @@
         "2026-04": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 56,85 €: 423,64 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 16 maksua 14 päivänä. Tavallinen lisäosto oli 17,04 €, ja suurin oli 173,89 €.",
+              "Lisäostoista suurin osa tehtiin iltapäivällä: 313,92 € eli 64 %.",
+              "Ruokaostokset olivat 56,85 € eli 423,64 € vähemmän kuin maaliskuussa. Nyt maksuja oli 1, maaliskuussa 7."
             ],
-            "answer": "• Ruokaostoksiin kului 56,85 €: 423,64 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 16 maksua 14 päivänä. Tavallinen lisäosto oli 17,04 €, ja suurin oli 173,89 €.\n• Lisäostoista suurin osa tehtiin iltapäivällä: 313,92 € eli 64 %.\n• Ruokaostokset olivat 56,85 € eli 423,64 € vähemmän kuin maaliskuussa. Nyt maksuja oli 1, maaliskuussa 7."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 278,61 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 34,78 €."
+              "Ensin on hyvä varmistaa, että varalla on rahaa laskuihin. Tämän jälkeen voi miettiä säästämistä.",
+              "Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksia ja itsestä huolehtimista kului 173,89 €.",
+              "Jos rahaa jää, siirrä vain todella säästynyt summa erilliselle varatilille."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 278,61 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 34,78 €."
+            "answer": "• Ensin on hyvä varmistaa, että varalla on rahaa laskuihin. Tämän jälkeen voi miettiä säästämistä.\n• Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksia ja itsestä huolehtimista kului 173,89 €.\n• Jos rahaa jää, siirrä vain todella säästynyt summa erilliselle varatilille."
           }
         },
         "2026-05": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 173,89 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun. Niitä oli 11, ja tavallinen maksu oli 2,34 €.",
+              "Lisäostoista suurin osa tapahtui illalla: 19,68 € eli 81 %. Kuukauden alussa lisäostoja oli päivää kohden hieman enemmän.",
+              "Ostokset ja itsestä huolehtiminen oli 0,00 €, kun huhtikuussa se oli 173,89 €. Nyt maksuja ei kirjattu yhtään, huhtikuussa 1."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 173,89 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun. Niitä oli 11, ja tavallinen maksu oli 2,34 €.\n• Lisäostoista suurin osa tapahtui illalla: 19,68 € eli 81 %. Kuukauden alussa lisäostoja oli päivää kohden hieman enemmän.\n• Ostokset ja itsestä huolehtiminen oli 0,00 €, kun huhtikuussa se oli 173,89 €. Nyt maksuja ei kirjattu yhtään, huhtikuussa 1."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 670,08 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,47 €."
+              "Ensin on hyvä tarkistaa, että laskuille on varattu rahaa. Erillinen varatili kannattaa aloittaa tai täyttää.",
+              "Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamenot olivat 12,33 €.",
+              "Kun rahaa jää, siirrä vain säästynyt summa erilliselle varatilille."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 670,08 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,47 €."
+            "answer": "• Ensin on hyvä tarkistaa, että laskuille on varattu rahaa. Erillinen varatili kannattaa aloittaa tai täyttää.\n• Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamenot olivat 12,33 €.\n• Kun rahaa jää, siirrä vain säästynyt summa erilliselle varatilille."
           }
         },
         "2026-06": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 268,47 €: 248,57 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostoja oli 16 maksua 10 päivänä. Ravintolat olivat niistä suurin osa: 10 maksua, yhteensä 217,56 €.",
+              "Kuun lopussa lisäostoja oli päivää kohden eniten. Maksuista iltapäivä oli suurin ajankohta: 174,12 € eli 53 %.",
+              "Ruokaostokset olivat 268,47 €, 248,57 € enemmän kuin toukokuussa. Maksuja oli 4, toukokuussa 1, ja keskimaksu oli 67,12 €."
             ],
-            "answer": "• Ruokaostoksiin kului 268,47 €: 248,57 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostoja oli 16 maksua 10 päivänä. Ravintolat olivat niistä suurin osa: 10 maksua, yhteensä 217,56 €.\n• Kuun lopussa lisäostoja oli päivää kohden eniten. Maksuista iltapäivä oli suurin ajankohta: 174,12 € eli 53 %.\n• Ruokaostokset olivat 268,47 €, 248,57 € enemmän kuin toukokuussa. Maksuja oli 4, toukokuussa 1, ja keskimaksu oli 67,12 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 4,09 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 43,51 €."
+              "Ensin katetaan laskut, ruoka ja välttämättömät matkat. Vasta sen jälkeen kannattaa miettiä lisäsäästämistä.",
+              "Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 21,76 €.",
+              "Kuukausi jäi 4,09 € miinukselle, joten tarkista seuraava lisäosto kuukauden budjettia vasten."
             ],
-            "answer": "• Menot ylittivät tulot 4,09 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 43,51 €."
+            "answer": "• Ensin katetaan laskut, ruoka ja välttämättömät matkat. Vasta sen jälkeen kannattaa miettiä lisäsäästämistä.\n• Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 21,76 €.\n• Kuukausi jäi 4,09 € miinukselle, joten tarkista seuraava lisäosto kuukauden budjettia vasten."
           }
         },
         "2026-07": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 46,04 €: 149,51 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot painottuivat ravintoloihin: 10 maksua, yhteensä 270,20 €. Lisäostoja oli yhteensä 15 maksua 11 päivänä.",
+              "Kuun alussa lisäostoja oli päivää kohden eniten. Iltaisin maksettiin 227,01 € eli 71 % lisäostoista.",
+              "Koti ja tekniikka oli 46,04 €, 149,51 € vähemmän kuin kesäkuussa. Maksuja oli 2, kesäkuussa 3."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 46,04 €: 149,51 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot painottuivat ravintoloihin: 10 maksua, yhteensä 270,20 €. Lisäostoja oli yhteensä 15 maksua 11 päivänä.\n• Kuun alussa lisäostoja oli päivää kohden eniten. Iltaisin maksettiin 227,01 € eli 71 % lisäostoista.\n• Koti ja tekniikka oli 46,04 €, 149,51 € vähemmän kuin kesäkuussa. Maksuja oli 2, kesäkuussa 3."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 285,73 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,04 €."
+              "Ensin on hyvä tarkistaa, että laskuille on varattu rahaa. Erillinen varatili kannattaa aloittaa tai täyttää.",
+              "Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 27,02 €.",
+              "Rahaa jäi 285,73 € ennen säästöjä. Siirrä varalle vain se summa, joka jää laskujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 285,73 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,04 €."
+            "answer": "• Ensin on hyvä tarkistaa, että laskuille on varattu rahaa. Erillinen varatili kannattaa aloittaa tai täyttää.\n• Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 27,02 €.\n• Rahaa jäi 285,73 € ennen säästöjä. Siirrä varalle vain se summa, joka jää laskujen jälkeen."
           }
         },
         "2026-08": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 124,31 €: 124,31 € enemmän kuin edelliskuussa.",
-              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+              "Tässä kuussa lisäostoja oli 19 maksua 15 päivänä. Ravintolat olivat niistä 10 maksua, yhteensä 207,90 €.",
+              "Lisäostoista suurin osa maksettiin iltapäivällä: 246,85 € eli 56 %. Selvää viikonpäivä- tai kuun osa -kuviota ei ollut.",
+              "Ostokset ja itsestä huolehtiminen oli 124,31 €, 124,31 € enemmän kuin heinäkuussa. Maksuja oli 3, heinäkuussa 0."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 124,31 €: 124,31 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+            "answer": "• Tässä kuussa lisäostoja oli 19 maksua 15 päivänä. Ravintolat olivat niistä 10 maksua, yhteensä 207,90 €.\n• Lisäostoista suurin osa maksettiin iltapäivällä: 246,85 € eli 56 %. Selvää viikonpäivä- tai kuun osa -kuviota ei ollut.\n• Ostokset ja itsestä huolehtiminen oli 124,31 €, 124,31 € enemmän kuin heinäkuussa. Maksuja oli 3, heinäkuussa 0."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 4,29 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 41,58 €."
+              "Ensin katetaan laskut, ruoka ja välttämättömät matkat. Vasta sen jälkeen kannattaa miettiä lisäsäästämistä.",
+              "Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksia oli 3, keskimäärin 41,44 €.",
+              "Kuukausi jäi 4,29 € miinukselle, joten tarkista seuraava lisäosto kuukauden budjettia vasten."
             ],
-            "answer": "• Menot ylittivät tulot 4,29 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 41,58 €."
+            "answer": "• Ensin katetaan laskut, ruoka ja välttämättömät matkat. Vasta sen jälkeen kannattaa miettiä lisäsäästämistä.\n• Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksia oli 3, keskimäärin 41,44 €.\n• Kuukausi jäi 4,29 € miinukselle, joten tarkista seuraava lisäosto kuukauden budjettia vasten."
           }
         },
         "2026-09": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 508,80 €: 300,90 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoja oli 15 maksua 14 päivänä. Ravintolat olivat niistä 10 maksua, yhteensä 508,80 €.",
+              "Lisäostoista suurin osa maksettiin illalla: 425,80 € eli 68 %. Selvää viikonpäivä- tai kuun osa -kuviota ei ollut.",
+              "Ravintolat nousivat 300,90 € elokuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 50,88 € ja elokuussa 20,79 €."
             ],
-            "answer": "• Ravintoloihin kului 508,80 €: 300,90 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoja oli 15 maksua 14 päivänä. Ravintolat olivat niistä 10 maksua, yhteensä 508,80 €.\n• Lisäostoista suurin osa maksettiin illalla: 425,80 € eli 68 %. Selvää viikonpäivä- tai kuun osa -kuviota ei ollut.\n• Ravintolat nousivat 300,90 € elokuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 50,88 € ja elokuussa 20,79 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 694,50 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,76 €."
+              "Ensin katetaan laskut, ruoka ja välttämättömät matkat. Säästösiirtoja ei kuulu lisätä, kun kuukausi jäi 694,50 € miinukselle.",
+              "Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 50,88 €.",
+              "Varatavoite 950,00 € on arvion mukaan katettu, mutta tarkista silti seuraava lisäosto kuukauden budjettia vasten."
             ],
-            "answer": "• Menot ylittivät tulot 694,50 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,76 €."
+            "answer": "• Ensin katetaan laskut, ruoka ja välttämättömät matkat. Säästösiirtoja ei kuulu lisätä, kun kuukausi jäi 694,50 € miinukselle.\n• Yksi pieni askel: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 50,88 €.\n• Varatavoite 950,00 € on arvion mukaan katettu, mutta tarkista silti seuraava lisäosto kuukauden budjettia vasten."
           }
         },
         "2025-10": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 228,45 €: 228,45 € enemmän kuin edelliskuussa.",
-              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+              "Tässä kuussa lisäostoja oli 17 maksua, ja tyypillinen lisäosto oli 25,18 €. Lisäostot olivat yhteensä 592,97 €.",
+              "Selkein ajoitus: lauantaisin lisäostoja oli keskimäärin 79,16 € kalenteripäivää kohti, kun kuukauden keskiarvo oli 19,13 €.",
+              "Ostoksiin ja itsestä huolehtimiseen meni 228,45 €, kun edellisessä kuussa 0 €. Nyt maksuja oli 2, suurin 131,34 €."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 228,45 €: 228,45 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+            "answer": "• Tässä kuussa lisäostoja oli 17 maksua, ja tyypillinen lisäosto oli 25,18 €. Lisäostot olivat yhteensä 592,97 €.\n• Selkein ajoitus: lauantaisin lisäostoja oli keskimäärin 79,16 € kalenteripäivää kohti, kun kuukauden keskiarvo oli 19,13 €.\n• Ostoksiin ja itsestä huolehtimiseen meni 228,45 €, kun edellisessä kuussa 0 €. Nyt maksuja oli 2, suurin 131,34 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 88,75 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 45,69 €."
+              "Kata ensin vuokra, ruoka ja välttämättömät menot. Tässä kuussa rahaa jäi tulojen jälkeen -88,75 €, joten ylimääräistä säästöä ei ole.",
+              "Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen meni 228,45 €.",
+              "Siirrä varalle vain se raha, joka oikeasti jää, kun pakolliset maksut on hoidettu. Se on vapaa valinta."
             ],
-            "answer": "• Menot ylittivät tulot 88,75 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 45,69 €."
+            "answer": "• Kata ensin vuokra, ruoka ja välttämättömät menot. Tässä kuussa rahaa jäi tulojen jälkeen -88,75 €, joten ylimääräistä säästöä ei ole.\n• Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen meni 228,45 €.\n• Siirrä varalle vain se raha, joka oikeasti jää, kun pakolliset maksut on hoidettu. Se on vapaa valinta."
           }
         },
         "2025-11": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 228,45 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot jakautuivat moneen maksuun: 15 maksua, tyypillinen 16,88 €. Vapaa-aikaan meni 182,39 € eli 56 % lisäostoista.",
+              "Selkeää ajoitusta ei näy tämän kuun kirjatuissa maksuissa.",
+              "Ostokset ja itsestä huolehtiminen laskivat 228,45 € edellisestä kuusta: nyt 0 maksua, edellisessä kuussa 2 maksua ja 228,45 €."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 228,45 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen maksuun: 15 maksua, tyypillinen 16,88 €. Vapaa-aikaan meni 182,39 € eli 56 % lisäostoista.\n• Selkeää ajoitusta ei näy tämän kuun kirjatuissa maksuissa.\n• Ostokset ja itsestä huolehtiminen laskivat 228,45 € edellisestä kuusta: nyt 0 maksua, edellisessä kuussa 2 maksua ja 228,45 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 16,74 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,48 €."
+              "Hoida ensin pakolliset menot. Tässä kuussa rahaa jäi tulojen jälkeen -16,74 €, joten säästövaraa ei ole.",
+              "Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-aikaan meni 182,39 €, 5 maksua.",
+              "Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Voit valita itse, tehdäänkö se."
             ],
-            "answer": "• Menot ylittivät tulot 16,74 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,48 €."
+            "answer": "• Hoida ensin pakolliset menot. Tässä kuussa rahaa jäi tulojen jälkeen -16,74 €, joten säästövaraa ei ole.\n• Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-aikaan meni 182,39 €, 5 maksua.\n• Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Voit valita itse, tehdäänkö se."
           }
         },
         "2025-12": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 11,94 €: 247,06 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli vähän: 7 maksua, yhteensä 20,95 €. Tyypillinen lisäosto oli 2,94 €.",
+              "Selkeää ajoitusta ei näy tämän kuun kirjatuissa maksuissa.",
+              "Ruokaostoksia oli 1 maksu, 11,94 €. Edellisessä kuussa maksuja oli 4 ja summa 259,00 €, joten ero on 247,06 € alaspäin."
             ],
-            "answer": "• Ruokaostoksiin kului 11,94 €: 247,06 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli vähän: 7 maksua, yhteensä 20,95 €. Tyypillinen lisäosto oli 2,94 €.\n• Selkeää ajoitusta ei näy tämän kuun kirjatuissa maksuissa.\n• Ruokaostoksia oli 1 maksu, 11,94 €. Edellisessä kuussa maksuja oli 4 ja summa 259,00 €, joten ero on 247,06 € alaspäin."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 631,89 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 2,63 €."
+              "Tässä kuussa rahaa jäi tulojen jälkeen 631,89 €. Tarkista ensin, että laskuille on varattu raha.",
+              "Aloita erillinen varalle pantu raha, jos sellaista ei vielä ole. Pieni esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi.",
+              "Siirrä varalle vain se summa, joka oikeasti jää pakollisten maksujen jälkeen. Tee se vain, jos se sopii sinulle."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 631,89 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 2,63 €."
+            "answer": "• Tässä kuussa rahaa jäi tulojen jälkeen 631,89 €. Tarkista ensin, että laskuille on varattu raha.\n• Aloita erillinen varalle pantu raha, jos sellaista ei vielä ole. Pieni esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi.\n• Siirrä varalle vain se summa, joka oikeasti jää pakollisten maksujen jälkeen. Tee se vain, jos se sopii sinulle."
           }
         },
         "2026-01": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 297,44 €: 293,64 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostot jakautuivat moneen maksuun: 18 maksua, tyypillinen 32,59 €. Lisäostoja oli yhteensä 694,78 €.",
+              "Lisäostoista 52 % eli 358,11 € tehtiin kirjattuna iltana, kello 18–24.",
+              "Ravintoloihin meni 297,44 €, kun edellisessä kuussa 3,80 €. Maksuja oli nyt 10, keskimäärin 29,74 €."
             ],
-            "answer": "• Ravintoloihin kului 297,44 €: 293,64 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen maksuun: 18 maksua, tyypillinen 32,59 €. Lisäostoja oli yhteensä 694,78 €.\n• Lisäostoista 52 % eli 358,11 € tehtiin kirjattuna iltana, kello 18–24.\n• Ravintoloihin meni 297,44 €, kun edellisessä kuussa 3,80 €. Maksuja oli nyt 10, keskimäärin 29,74 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 111,68 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 59,49 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Tässä kuussa rahaa jäi tulojen jälkeen -111,68 €, joten säästövaraa ei ole.",
+              "Yksi pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan. Ravintoloihin meni 297,44 €, 10 maksua.",
+              "Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Se on oma valintasi."
             ],
-            "answer": "• Menot ylittivät tulot 111,68 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 59,49 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Tässä kuussa rahaa jäi tulojen jälkeen -111,68 €, joten säästövaraa ei ole.\n• Yksi pieni askel: vaihda yksi ravintolaostos kotona tehtyyn ateriaan. Ravintoloihin meni 297,44 €, 10 maksua.\n• Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Se on oma valintasi."
           }
         },
         "2026-02": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 50,90 €: 239,14 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot jakautuivat moneen maksuun: 17 maksua, tyypillinen 17,12 €. Ravintolat veivät 194,85 € eli 56 % lisäostoista.",
+              "Lauantaisin lisäostoja oli keskimäärin 31,28 € kalenteripäivää kohti, kun kuukauden keskiarvo oli 12,46 €. Illalla, kello 18–24, tehtiin 60 % lisäostoista.",
+              "Vapaa-aika laski 239,14 € edellisestä kuusta: nyt 5 maksua, suurin 14,52 €. Edellisessä kuussa suurin oli 100,11 €."
             ],
-            "answer": "• Vapaa-aikaan kului 50,90 €: 239,14 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen maksuun: 17 maksua, tyypillinen 17,12 €. Ravintolat veivät 194,85 € eli 56 % lisäostoista.\n• Lauantaisin lisäostoja oli keskimäärin 31,28 € kalenteripäivää kohti, kun kuukauden keskiarvo oli 12,46 €. Illalla, kello 18–24, tehtiin 60 % lisäostoista.\n• Vapaa-aika laski 239,14 € edellisestä kuusta: nyt 5 maksua, suurin 14,52 €. Edellisessä kuussa suurin oli 100,11 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 130,16 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 38,97 €."
+              "Tässä kuussa rahaa jäi tulojen jälkeen 130,16 €. Tarkista ensin, että laskuille on varattu raha, ja aloita erillinen varalle pantu raha.",
+              "Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen meni 103,15 €, 2 maksua.",
+              "Siirrä varalle vain se summa, joka oikeasti jää pakollisten maksujen jälkeen. Voit valita itse, tehdäänkö se."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 130,16 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 38,97 €."
+            "answer": "• Tässä kuussa rahaa jäi tulojen jälkeen 130,16 €. Tarkista ensin, että laskuille on varattu raha, ja aloita erillinen varalle pantu raha.\n• Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostoksiin ja itsestä huolehtimiseen meni 103,15 €, 2 maksua.\n• Siirrä varalle vain se summa, joka oikeasti jää pakollisten maksujen jälkeen. Voit valita itse, tehdäänkö se."
           }
         },
         "2026-03": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 423,58 €: 304,70 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostot jakautuivat moneen maksuun: 17 maksua, tyypillinen 40,45 €. Lisäostoja oli yhteensä 887,53 €.",
+              "Kuun puolivälissä, päivinä 11–20, lisäostoja oli keskimäärin 45,33 € päivää kohti, kun kuukauden keskiarvo oli 28,63 €. Illalla tehtiin 63 % lisäostoista.",
+              "Koti ja tekniikka nousi 304,70 € edellisestä kuusta, nyt 423,58 €. Maksuja oli 3, keskimäärin 141,19 €, suurin 160,52 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 423,58 €: 304,70 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen maksuun: 17 maksua, tyypillinen 40,45 €. Lisäostoja oli yhteensä 887,53 €.\n• Kuun puolivälissä, päivinä 11–20, lisäostoja oli keskimäärin 45,33 € päivää kohti, kun kuukauden keskiarvo oli 28,63 €. Illalla tehtiin 63 % lisäostoista.\n• Koti ja tekniikka nousi 304,70 € edellisestä kuusta, nyt 423,58 €. Maksuja oli 3, keskimäärin 141,19 €, suurin 160,52 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 769,92 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 66,80 €."
+              "Hoida ensin pakolliset menot. Tässä kuussa rahaa jäi tulojen jälkeen -769,92 €, joten säästövaraa ei ole.",
+              "Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-aikaan meni 333,99 €, 5 maksua.",
+              "Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Se on vapaa valinta."
             ],
-            "answer": "• Menot ylittivät tulot 769,92 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 66,80 €."
+            "answer": "• Hoida ensin pakolliset menot. Tässä kuussa rahaa jäi tulojen jälkeen -769,92 €, joten säästövaraa ei ole.\n• Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-aikaan meni 333,99 €, 5 maksua.\n• Siirrä varalle vain se raha, joka oikeasti jää pakollisten maksujen jälkeen. Se on vapaa valinta."
           }
         },
         "2025-04": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 273,01 €: 203,44 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostoja oli 17 maksua 10 päivänä, tyypillinen lisäosto oli 15,67 €. Lisäostot olivat yhteensä 522,29 €.",
+              "Lisäostot painottuivat kuun loppuun: päivää kohti niitä kertyi eniten kuun viimeisinä päivinä, ja useimmat maksut tehtiin iltapäivällä.",
+              "Koti ja tekniikka nousi 203,44 € edellisestä kuusta: 273,01 €. Maksuja oli 3 kuten ennenkin, mutta keskimaksu oli 91,00 € eikä 23,19 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 273,01 €: 203,44 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostoja oli 17 maksua 10 päivänä, tyypillinen lisäosto oli 15,67 €. Lisäostot olivat yhteensä 522,29 €.\n• Lisäostot painottuivat kuun loppuun: päivää kohti niitä kertyi eniten kuun viimeisinä päivinä, ja useimmat maksut tehtiin iltapäivällä.\n• Koti ja tekniikka nousi 203,44 € edellisestä kuusta: 273,01 €. Maksuja oli 3 kuten ennenkin, mutta keskimaksu oli 91,00 € eikä 23,19 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 891,92 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 43,38 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Tässä kuussa rahaa ei jäänyt: tilanne oli -891,92 €, eikä säästösiirtoja ollut.",
+              "Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Elämäntyyliostoksia oli 2, keskimäärin 108,45 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Menot ylittivät tulot 891,92 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 43,38 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Tässä kuussa rahaa ei jäänyt: tilanne oli -891,92 €, eikä säästösiirtoja ollut.\n• Voit siirtää yhden vapaaehtoisen ostoksen myöhemmäksi. Elämäntyyliostoksia oli 2, keskimäärin 108,45 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-05": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 485,26 €: 386,43 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoista yli puolet meni ravintoloihin: 10 maksua, yhteensä 485,26 €. Lisäostoja oli kaikkiaan 18 maksua.",
+              "Lisäostot painottuivat kuun keskivaiheelle, ja useimmat maksut tehtiin illalla. Päivää kohti eniten kului sunnuntaisin.",
+              "Ravintolat nousivat 386,43 € edellisestä kuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 48,53 € eikä 9,88 €."
             ],
-            "answer": "• Ravintoloihin kului 485,26 €: 386,43 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoista yli puolet meni ravintoloihin: 10 maksua, yhteensä 485,26 €. Lisäostoja oli kaikkiaan 18 maksua.\n• Lisäostot painottuivat kuun keskivaiheelle, ja useimmat maksut tehtiin illalla. Päivää kohti eniten kului sunnuntaisin.\n• Ravintolat nousivat 386,43 € edellisestä kuusta. Maksuja oli molempina kuukausina 10, mutta keskimaksu oli nyt 48,53 € eikä 9,88 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 1 091,53 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 97,05 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt: tilanne oli -1 091,53 €, eikä säästösiirtoja ollut.",
+              "Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 48,53 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Menot ylittivät tulot 1 091,53 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 97,05 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt: tilanne oli -1 091,53 €, eikä säästösiirtoja ollut.\n• Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 48,53 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-06": {
           "spending": {
             "bullets": [
-              "Liikkumiseen kului 210,05 €: 539,23 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot olivat hajallaan: 18 maksua 14 päivänä, tyypillinen lisäosto oli 32,22 €. Ravintoloiden osuus oli 389,59 €.",
+              "Lisäostoja kertyi päivää kohti eniten kuun alussa ja sunnuntaisin. Useimmat maksut tehtiin illalla.",
+              "Liikkuminen laski 539,23 € edellisestä kuusta: 210,05 €. Maksuja oli 5 eikä 17, ja keskimaksu oli 42,01 €."
             ],
-            "answer": "• Liikkumiseen kului 210,05 €: 539,23 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot olivat hajallaan: 18 maksua 14 päivänä, tyypillinen lisäosto oli 32,22 €. Ravintoloiden osuus oli 389,59 €.\n• Lisäostoja kertyi päivää kohti eniten kuun alussa ja sunnuntaisin. Useimmat maksut tehtiin illalla.\n• Liikkuminen laski 539,23 € edellisestä kuusta: 210,05 €. Maksuja oli 5 eikä 17, ja keskimaksu oli 42,01 €."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 364,20 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 77,92 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt: tilanne oli -364,20 €, eikä säästösiirtoja ollut.",
+              "Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 38,96 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Menot ylittivät tulot 364,20 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 77,92 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt: tilanne oli -364,20 €, eikä säästösiirtoja ollut.\n• Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 38,96 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-07": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 422,89 €: 236,61 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostot olivat hajallaan: 18 maksua 14 päivänä, tyypillinen lisäosto oli 14,92 €. Ravintoloita oli 10 maksua, yhteensä 169,44 €.",
+              "Selvää ajoitusta ei tässä kuussa ole: lisäostojen kirjatuista maksuista ei löydy selvää viikonpäivää, kuun osaa tai vuorokaudenaikaa.",
+              "Ruokaostokset nousivat 236,61 € edellisestä kuusta: 422,89 €. Maksuja oli 6 eikä 3, ja keskimaksu oli 70,48 €."
             ],
-            "answer": "• Ruokaostoksiin kului 422,89 €: 236,61 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostot olivat hajallaan: 18 maksua 14 päivänä, tyypillinen lisäosto oli 14,92 €. Ravintoloita oli 10 maksua, yhteensä 169,44 €.\n• Selvää ajoitusta ei tässä kuussa ole: lisäostojen kirjatuista maksuista ei löydy selvää viikonpäivää, kuun osaa tai vuorokaudenaikaa.\n• Ruokaostokset nousivat 236,61 € edellisestä kuusta: 422,89 €. Maksuja oli 6 eikä 3, ja keskimaksu oli 70,48 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 139,11 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 33,89 €."
+              "Tässä kuussa jäi rahaa 139,11 €, eikä säästösiirtoja ollut. Varmista ensin, että laskuihin on rahaa, ja aloita erillinen varapuskuri.",
+              "Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 16,94 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 139,11 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 33,89 €."
+            "answer": "• Tässä kuussa jäi rahaa 139,11 €, eikä säästösiirtoja ollut. Varmista ensin, että laskuihin on rahaa, ja aloita erillinen varapuskuri.\n• Voit vaihtaa yhden ravintolaostoksen kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskihinta oli 16,94 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-08": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 145,99 €: 276,90 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoista suurin osa oli vapaa-aikaa: 5 maksua, yhteensä 260,02 €. Lisäostoja oli kaikkiaan 16 maksua.",
+              "Lisäostot painottuivat kuun loppuun, ja useimmat maksut tehtiin illalla. Päivää kohti eniten kului lauantaisin.",
+              "Ruokaostokset laskivat 276,90 € edellisestä kuusta: 145,99 €. Maksuja oli 2 eikä 6, ja keskimaksu oli 73,00 €."
             ],
-            "answer": "• Ruokaostoksiin kului 145,99 €: 276,90 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoista suurin osa oli vapaa-aikaa: 5 maksua, yhteensä 260,02 €. Lisäostoja oli kaikkiaan 16 maksua.\n• Lisäostot painottuivat kuun loppuun, ja useimmat maksut tehtiin illalla. Päivää kohti eniten kului lauantaisin.\n• Ruokaostokset laskivat 276,90 € edellisestä kuusta: 145,99 €. Maksuja oli 2 eikä 6, ja keskimaksu oli 73,00 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 143,11 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 52,00 €."
+              "Tässä kuussa jäi rahaa 143,11 €, eikä säästösiirtoja ollut. Varmista ensin laskurahat ja aloita erillinen varapuskuri.",
+              "Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskihinta oli 52,00 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 143,11 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 52,00 €."
+            "answer": "• Tässä kuussa jäi rahaa 143,11 €, eikä säästösiirtoja ollut. Varmista ensin laskurahat ja aloita erillinen varapuskuri.\n• Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskihinta oli 52,00 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-09": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 70,40 €: 189,62 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 12 maksua 10 päivänä, tyypillinen lisäosto oli 2,86 €. Vapaa-aikaa oli 5 maksua, yhteensä 70,40 €.",
+              "Lisäostoja kertyi päivää kohti eniten kuun alussa ja lauantaisin. Useimmat maksut tehtiin illalla.",
+              "Vapaa-aika laski 189,62 € edellisestä kuusta: 70,40 €. Maksuja oli molempina kuukausina 5, mutta keskimaksu oli 14,08 € eikä 52,00 €."
             ],
-            "answer": "• Vapaa-aikaan kului 70,40 €: 189,62 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 12 maksua 10 päivänä, tyypillinen lisäosto oli 2,86 €. Vapaa-aikaa oli 5 maksua, yhteensä 70,40 €.\n• Lisäostoja kertyi päivää kohti eniten kuun alussa ja lauantaisin. Useimmat maksut tehtiin illalla.\n• Vapaa-aika laski 189,62 € edellisestä kuusta: 70,40 €. Maksuja oli molempina kuukausina 5, mutta keskimaksu oli 14,08 € eikä 52,00 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 783,01 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,08 €."
+              "Tässä kuussa jäi rahaa 783,01 €, eikä säästösiirtoja ollut. Varmista ensin laskurahat ja aloita erillinen varapuskuri.",
+              "Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskihinta oli 14,08 €.",
+              "Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 783,01 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,08 €."
+            "answer": "• Tässä kuussa jäi rahaa 783,01 €, eikä säästösiirtoja ollut. Varmista ensin laskurahat ja aloita erillinen varapuskuri.\n• Voit korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Vapaa-ajan maksun keskihinta oli 14,08 €.\n• Siirrä varalle vain se summa, joka oikeasti jää jäljelle, kun välttämättömät maksut on hoidettu."
           }
         },
         "2024-10": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 127,97 €. Tästä menosta voi löytyä joustoa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostosi jakautuivat moneen maksuun: 17 maksua 12 päivänä. Tyypillinen lisäosto oli 11,93 €.",
+              "Lisäostoista suurin osa oli ravintoloissa, 10 maksua yhteensä 127,97 €. Maksuista suurin osa tapahtui keskikuussa ja iltapäivällä.",
+              "Edellistä kuuta ei ole vertailuun, joten muutosta ei voi kertoa. Kuukauden kuvaus perustuu vain tämän kuun maksuihin."
             ],
-            "answer": "• Ravintoloihin kului 127,97 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen maksuun: 17 maksua 12 päivänä. Tyypillinen lisäosto oli 11,93 €.\n• Lisäostoista suurin osa oli ravintoloissa, 10 maksua yhteensä 127,97 €. Maksuista suurin osa tapahtui keskikuussa ja iltapäivällä.\n• Edellistä kuuta ei ole vertailuun, joten muutosta ei voi kertoa. Kuukauden kuvaus perustuu vain tämän kuun maksuihin."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 43,03 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 25,59 €."
+              "Hoida ensin vuokra, laskut, ruoka ja välttämättömät matkat. Kuukaudelle ei jäänyt rahaa yli (-43,03 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 12,80 €.",
+              "Voit asettaa ravintoloille kuukausirajaksi 102,38 €, jos haluat vähentää menoja. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 43,03 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 25,59 €."
+            "answer": "• Hoida ensin vuokra, laskut, ruoka ja välttämättömät matkat. Kuukaudelle ei jäänyt rahaa yli (-43,03 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 12,80 €.\n• Voit asettaa ravintoloille kuukausirajaksi 102,38 €, jos haluat vähentää menoja. Se on vapaaehtoinen valinta."
           }
         },
         "2024-11": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 494,20 €: 366,23 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoissa korostui ravintolat: 10 maksua, yhteensä 494,20 €. Lisäostoja oli 11 maksua ja tyypillinen maksu oli 48,22 €.",
+              "Lisäostoista suurin osa tehtiin kuun alussa ja iltaisin. Alkukuussa menoa oli enemmän kuin kuun muina päivinä.",
+              "Ravintolamenot olivat 366,23 € suuremmat kuin edellisessä kuussa. Maksuja oli molempina kuukausina 10, mutta keskimaksu nousi 12,80 eurosta 49,42 euroon."
             ],
-            "answer": "• Ravintoloihin kului 494,20 €: 366,23 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoissa korostui ravintolat: 10 maksua, yhteensä 494,20 €. Lisäostoja oli 11 maksua ja tyypillinen maksu oli 48,22 €.\n• Lisäostoista suurin osa tehtiin kuun alussa ja iltaisin. Alkukuussa menoa oli enemmän kuin kuun muina päivinä.\n• Ravintolamenot olivat 366,23 € suuremmat kuin edellisessä kuussa. Maksuja oli molempina kuukausina 10, mutta keskimaksu nousi 12,80 eurosta 49,42 euroon."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 34,12 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 98,84 €."
+              "Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-34,12 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostos oli 147,76 €.",
+              "Voit asettaa ravintoloille kuukausirajaksi 395,36 €. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 34,12 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 98,84 €."
+            "answer": "• Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-34,12 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostos oli 147,76 €.\n• Voit asettaa ravintoloille kuukausirajaksi 395,36 €. Se on vapaaehtoinen valinta."
           }
         },
         "2024-12": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 570,45 €: 570,45 € enemmän kuin edelliskuussa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+              "Tässä kuussa lisäostoissa korostui vapaa-aika: 5 maksua, yhteensä 570,45 €. Keskimaksu oli 114,09 €.",
+              "Lisäostoja oli eniten kuun keskivaiheilla, ja yhtenä päivänä rahaa kului selvästi enemmän kuin muina päivinä. Viikonpäivistä korostui sunnuntai.",
+              "Vapaa-aikaan meni 570,45 € enemmän kuin edellisessä kuussa, jolloin maksuja ei ollut. Ravintoloihin meni 326,84 € 10 maksulla."
             ],
-            "answer": "• Vapaa-aikaan kului 570,45 €: 570,45 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+            "answer": "• Tässä kuussa lisäostoissa korostui vapaa-aika: 5 maksua, yhteensä 570,45 €. Keskimaksu oli 114,09 €.\n• Lisäostoja oli eniten kuun keskivaiheilla, ja yhtenä päivänä rahaa kului selvästi enemmän kuin muina päivinä. Viikonpäivistä korostui sunnuntai.\n• Vapaa-aikaan meni 570,45 € enemmän kuin edellisessä kuussa, jolloin maksuja ei ollut. Ravintoloihin meni 326,84 € 10 maksulla."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 414,82 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 114,09 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Kuukaudelle ei jäänyt rahaa yli (-414,82 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan keskimaksu oli 114,09 €.",
+              "Voit asettaa vapaa-ajalle kuukausirajaksi 456,36 €. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 414,82 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 114,09 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Kuukaudelle ei jäänyt rahaa yli (-414,82 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan keskimaksu oli 114,09 €.\n• Voit asettaa vapaa-ajalle kuukausirajaksi 456,36 €. Se on vapaaehtoinen valinta."
           }
         },
         "2025-01": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 339,76 €: 339,76 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi jakautuivat moneen maksuun: 18 maksua 13 päivänä. Vapaa-aika oli suurin yksittäinen ryhmä, 473,17 €.",
+              "Lisäostoja oli eniten kuun keskivaiheilla ja iltapäivisin. Viikonpäivistä korostui sunnuntai.",
+              "Ruokaostoksia oli 339,76 € edellistä kuuta enemmän: 5 maksua, keskimaksu 67,95 €. Edellisessä kuussa maksuja ei ollut kirjattu."
             ],
-            "answer": "• Ruokaostoksiin kului 339,76 €: 339,76 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen maksuun: 18 maksua 13 päivänä. Vapaa-aika oli suurin yksittäinen ryhmä, 473,17 €.\n• Lisäostoja oli eniten kuun keskivaiheilla ja iltapäivisin. Viikonpäivistä korostui sunnuntai.\n• Ruokaostoksia oli 339,76 € edellistä kuuta enemmän: 5 maksua, keskimaksu 67,95 €. Edellisessä kuussa maksuja ei ollut kirjattu."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 269,59 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 94,63 €."
+              "Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-269,59 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Keskimaksu oli 94,63 €.",
+              "Voit asettaa vapaa-ajalle kuukausirajaksi 378,54 €. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 269,59 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 94,63 €."
+            "answer": "• Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-269,59 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Keskimaksu oli 94,63 €.\n• Voit asettaa vapaa-ajalle kuukausirajaksi 378,54 €. Se on vapaaehtoinen valinta."
           }
         },
         "2025-02": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 74,71 €: 398,46 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoissasi oli sekä pieniä että isoja maksuja: 18 maksua, tyypillinen maksu 12,53 €. Elämäntapaostoja oli 2 maksua, yhteensä 278,40 €.",
+              "Lisäostoista suurin osa tehtiin iltapäivisin. Viikonpäivästä tai kuun osasta ei löytynyt selvää painopistettä.",
+              "Vapaa-aikaan meni 398,46 € vähemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 5, mutta keskimaksu laski 94,63 eurosta 14,94 euroon."
             ],
-            "answer": "• Vapaa-aikaan kului 74,71 €: 398,46 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoissasi oli sekä pieniä että isoja maksuja: 18 maksua, tyypillinen maksu 12,53 €. Elämäntapaostoja oli 2 maksua, yhteensä 278,40 €.\n• Lisäostoista suurin osa tehtiin iltapäivisin. Viikonpäivästä tai kuun osasta ei löytynyt selvää painopistettä.\n• Vapaa-aikaan meni 398,46 € vähemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 5, mutta keskimaksu laski 94,63 eurosta 14,94 euroon."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 1 299,48 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 55,68 €."
+              "Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-1 299,48 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostoksen keskimaksu oli 139,20 €.",
+              "Voit asettaa elämäntapaostoksille kuukausirajaksi 222,72 €. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 1 299,48 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 55,68 €."
+            "answer": "• Hoida ensin välttämättömät maksut. Rahaa ei jäänyt yli (-1 299,48 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostoksen keskimaksu oli 139,20 €.\n• Voit asettaa elämäntapaostoksille kuukausirajaksi 222,72 €. Se on vapaaehtoinen valinta."
           }
         },
         "2025-03": {
           "spending": {
             "bullets": [
-              "Terveyteen kului 0,00 €: 287,18 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi jakautuivat moneen maksuun: 18 maksua 10 päivänä. Ravintoloita oli 10 maksua, yhteensä 293,44 €.",
+              "Lisäostoista suurin osa tehtiin iltaisin. Viikonpäivästä tai kuun osasta ei löytynyt selvää painopistettä.",
+              "Terveysmenoja ei kirjattu lainkaan, kun edellisessä kuussa niitä oli 3 maksua, yhteensä 287,18 €. Muutos oli 287,18 € alaspäin."
             ],
-            "answer": "• Terveyteen kului 0,00 €: 287,18 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen maksuun: 18 maksua 10 päivänä. Ravintoloita oli 10 maksua, yhteensä 293,44 €.\n• Lisäostoista suurin osa tehtiin iltaisin. Viikonpäivästä tai kuun osasta ei löytynyt selvää painopistettä.\n• Terveysmenoja ei kirjattu lainkaan, kun edellisessä kuussa niitä oli 3 maksua, yhteensä 287,18 €. Muutos oli 287,18 € alaspäin."
           },
           "saving": {
             "bullets": [
-              "Menot ylittivät tulot 158,94 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 58,69 €."
+              "Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt yli (-158,94 €), eikä säästösiirtoja ollut.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Keskimaksu oli 29,34 €.",
+              "Voit asettaa ravintoloille kuukausirajaksi 234,75 €. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Menot ylittivät tulot 158,94 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 58,69 €."
+            "answer": "• Hoida ensin vuokra, ruoka ja laskut. Rahaa ei jäänyt yli (-158,94 €), eikä säästösiirtoja ollut.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotiruokaan, jos se sopii sinulle. Keskimaksu oli 29,34 €.\n• Voit asettaa ravintoloille kuukausirajaksi 234,75 €. Se on vapaaehtoinen valinta."
           }
         }
       },
@@ -827,40 +925,40 @@
         "customer_id": "CUST00127",
         "as_of": "2026-09-30",
         "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
-        "model": "claude-haiku-5-5",
+        "model": "claude-sonnet-5-5",
         "insights": [
           {
-            "id": "insight-1eb02c49d65e9194-1",
-            "period": "monthly",
-            "title": "Vaihda noutoruoka edullisempaan vaihtoehtoon",
-            "headline_number": "340 € syyskuussa",
-            "explanation": "Pikaruokaan ja noutoruokaan kului syyskuussa noin 340 €, kun tavallinen tasosi oli noin 75 €/kk. Yksi kallis kuukausi ei vielä tarkoita pysyvää muutosta.",
-            "action": "Katso syyskuun noutoruokaostokset ja valitse tilaus, jonka voisit korvata kotona tehdyllä aterialla."
-          },
-          {
-            "id": "insight-1eb02c49d65e9194-2",
+            "id": "insight-c5229c39ba08c0a3-1",
             "period": "weekly",
-            "title": "Valitse tärkeimmät lisäostokset etukäteen",
-            "headline_number": "Arvio 120 €/vko",
-            "explanation": "Viikoittaisiin lisäostoihin arvioitiin olevan noin 120 €. Rajaa määräsi tavallinen kuukausibudjetti, ei pelkkä tilin saldo.",
-            "action": "Laita suunnittelemasi lisäostokset tärkeysjärjestykseen. Tarkista nykyiset laskut ja käyttöraha ennen ostamista."
+            "title": "Pidä viikon ylimääräiset menot tämän rajan sisällä",
+            "headline_number": "€120",
+            "explanation": "Arvio viikon ylimääräisille menoille oli €120. Tilillä oli rahaa enemmän, mutta tavallinen kuukausibudjetti rajaa summan.",
+            "action": "Katso ennen seuraavaa ostosta, mahtuuko se tähän viikon rajaan. Jos ei mahdu, siirrä ostos myöhemmin."
           },
           {
-            "id": "insight-1eb02c49d65e9194-3",
+            "id": "insight-c5229c39ba08c0a3-2",
+            "period": "monthly",
+            "title": "Tarkista pikaruokatilaukset ennen kuin ne jäävät tavaksi",
+            "headline_number": "€340",
+            "explanation": "Pikaruokaan ja noutoruokaan meni viime kuussa €340. Tavallisessa kuussa menoa on noin €75. Yksittäinen kuukausi on ok, mutta tavaksi jäädessään se tulisi kalliiksi.",
+            "action": "Selaa viime kuun ruokatilaukset ja merkitse ne, jotka olivat oikeasti tarpeen. Valitse sitten, mitkä haluat pitää."
+          },
+          {
+            "id": "insight-c5229c39ba08c0a3-3",
             "period": "yearly",
-            "title": "Varaa joustoa yllättäville laskuille",
-            "headline_number": "Noin 25 €/kk jäi",
-            "explanation": "Viimeisen 12 kuukauden tuloista jäi menojen jälkeen keskimäärin noin 25 €/kk. Pieni liikkumavara voi kulua yllättävään laskuun.",
-            "action": "Listaa valinnaiset menot ja merkitse, mistä voisit joustaa yllättävän laskun osuessa kohdalle."
+            "title": "Rakenna pieni puskuri ylijäämästä, jos se on mahdollista",
+            "headline_number": "noin €25/kk",
+            "explanation": "Viimeisen 12 kuukauden aikana tuloja oli €23,400 ja menoja €23,100. Rahaa jäi keskimäärin noin €25 kuussa, eikä säästöön mennyt mitään.",
+            "action": "Pidä tilillä vähintään €950 yllätyksiä varten. Jos haluat säästää, katso ensin matkailun ja viihteen menoja, joissa olet tyypillistä ryhmääsi ylempänä."
           }
         ]
       },
       "week": {
         "bullets": [
-          "Arvio lisäostoihin: noin 120 € viikossa.",
-          "Jätä rahaa myös kuukauden muihin menoihin."
+          "Arvio: lisäostoihin on tällä viikolla noin 120,00 €. Rajana on kuukauden tavallinen budjetti.",
+          "Pidä ensin huoli laskuista ja ruoasta. Käytä lisäostoihin vain se osa, joka sopii budjettiin."
         ],
-        "answer": "• Arvio lisäostoihin: noin 120 € viikossa.\n• Jätä rahaa myös kuukauden muihin menoihin."
+        "answer": "• Arvio: lisäostoihin on tällä viikolla noin 120,00 €. Rajana on kuukauden tavallinen budjetti.\n• Pidä ensin huoli laskuista ja ruoasta. Käytä lisäostoihin vain se osa, joka sopii budjettiin."
       }
     },
     "CUST00103": {
@@ -868,409 +966,433 @@
         "2026-04": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 22,81 €. Tästä menosta voi löytyä joustoa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostoja oli 16 maksua ja ne jakautuivat 11 päivälle. Ravintolat olivat suurin lisäostojen ryhmä: 10 maksua, yhteensä 22,81 €.",
+              "Euroina päivää kohti lisäostoja kertyi eniten torstaisin. Päivän aikana tapahtuvista ajoista iltapäivä erottui selvimmin.",
+              "Ravintoloissa oli 10 maksua, edellisessä kuussa 5. Keskimääräinen maksu pysyi lähes samana: 2,28 € ja 2,19 €."
             ],
-            "answer": "• Ravintoloihin kului 22,81 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostoja oli 16 maksua ja ne jakautuivat 11 päivälle. Ravintolat olivat suurin lisäostojen ryhmä: 10 maksua, yhteensä 22,81 €.\n• Euroina päivää kohti lisäostoja kertyi eniten torstaisin. Päivän aikana tapahtuvista ajoista iltapäivä erottui selvimmin.\n• Ravintoloissa oli 10 maksua, edellisessä kuussa 5. Keskimääräinen maksu pysyi lähes samana: 2,28 € ja 2,19 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 906,75 €.",
-              "Siirsit säästöön 2 847,88 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 58,87 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,56 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Tarkista myös, että laskuja varten on varattu rahaa.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 2,28 €.",
+              "Jos rahaa jää yli, voit siirtää sen erilliselle varalle vasta laskujen jälkeen. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 906,75 €.\n• Siirsit säästöön 2 847,88 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 58,87 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,56 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Tarkista myös, että laskuja varten on varattu rahaa.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 2,28 €.\n• Jos rahaa jää yli, voit siirtää sen erilliselle varalle vasta laskujen jälkeen. Se on vapaaehtoinen valinta."
           }
         },
         "2026-05": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 77,71 €: 64,88 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostoja oli 10 maksua ja ne jakautuivat 9 päivälle. Ostot olivat sekalaisia, eikä yksi ryhmä erottunut.",
+              "Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun alkupuolella. Iltapäivä oli päivän vilkkain aika.",
+              "Ruokaostokset nousivat 64,88 € edellisestä kuusta. Tässä kuussa oli 1 maksu, 77,71 €, ja edellisessä kuussa 1 maksu, 12,83 €."
             ],
-            "answer": "• Ruokaostoksiin kului 77,71 €: 64,88 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostoja oli 10 maksua ja ne jakautuivat 9 päivälle. Ostot olivat sekalaisia, eikä yksi ryhmä erottunut.\n• Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun alkupuolella. Iltapäivä oli päivän vilkkain aika.\n• Ruokaostokset nousivat 64,88 € edellisestä kuusta. Tässä kuussa oli 1 maksu, 77,71 €, ja edellisessä kuussa 1 maksu, 12,83 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 432,52 €.",
-              "Siirsit säästöön 2 583,80 €. Menot ja säästösiirrot ylittivät tulot 151,28 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 8,27 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksujen keskiarvo oli 8,27 €.",
+              "Siirrä varalle vain se summa, joka jää laskujen jälkeen oikeasti yli. Se on oma valintasi."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 432,52 €.\n• Siirsit säästöön 2 583,80 €. Menot ja säästösiirrot ylittivät tulot 151,28 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 8,27 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksujen keskiarvo oli 8,27 €.\n• Siirrä varalle vain se summa, joka jää laskujen jälkeen oikeasti yli. Se on oma valintasi."
           }
         },
         "2026-06": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 76,29 €: 66,51 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+              "Tässä kuussa lisäostot jakautuivat moneen pieneen maksuun: 18 maksua ja 15 eri päivää. Ravintolat olivat suurin ryhmä, 76,29 €.",
+              "Päivän aikana lisäostot painottuivat iltaan. Viikonpäivästä tai kuun osasta ei löytynyt selvää painotusta.",
+              "Ravintolamenot nousivat 66,51 € edellisestä kuusta. Maksuja oli nyt 10, edellisessä kuussa 4, ja keskimääräinen maksu oli 7,63 € (aiemmin 2,45 €)."
             ],
-            "answer": "• Ravintoloihin kului 76,29 €: 66,51 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen pieneen maksuun: 18 maksua ja 15 eri päivää. Ravintolat olivat suurin ryhmä, 76,29 €.\n• Päivän aikana lisäostot painottuivat iltaan. Viikonpäivästä tai kuun osasta ei löytynyt selvää painotusta.\n• Ravintolamenot nousivat 66,51 € edellisestä kuusta. Maksuja oli nyt 10, edellisessä kuussa 4, ja keskimääräinen maksu oli 7,63 € (aiemmin 2,45 €)."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 654,29 €.",
-              "Siirsit säästöön 2 755,84 €. Menot ja säästösiirrot ylittivät tulot 101,55 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,26 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 7,63 €.",
+              "Siirrä varalle vain laskujen jälkeen yli jäävä oikea summa. Voit tehdä sen omaan tahtiisi."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 654,29 €.\n• Siirsit säästöön 2 755,84 €. Menot ja säästösiirrot ylittivät tulot 101,55 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,26 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 7,63 €.\n• Siirrä varalle vain laskujen jälkeen yli jäävä oikea summa. Voit tehdä sen omaan tahtiisi."
           }
         },
         "2026-07": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 32,19 €: 97,30 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoista suuri osa oli yhtä isoa maksua: elämäntapaostos 92,90 €. Lisäostoja oli yhteensä 17 maksua.",
+              "Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun loppupuolella. Iltapäivä erottui päivän ajoista.",
+              "Ruokaostokset laskivat 97,30 € edellisestä kuusta. Tässä kuussa oli 1 maksu, 32,19 €, ja edellisessä kuussa 2 maksua, keskimäärin 64,75 €."
             ],
-            "answer": "• Ruokaostoksiin kului 32,19 €: 97,30 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoista suuri osa oli yhtä isoa maksua: elämäntapaostos 92,90 €. Lisäostoja oli yhteensä 17 maksua.\n• Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun loppupuolella. Iltapäivä erottui päivän ajoista.\n• Ruokaostokset laskivat 97,30 € edellisestä kuusta. Tässä kuussa oli 1 maksu, 32,19 €, ja edellisessä kuussa 2 maksua, keskimäärin 64,75 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 3 242,25 €.",
-              "Siirsit säästöön 3 270,39 €. Menot ja säästösiirrot ylittivät tulot 28,14 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 18,58 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.",
+              "Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Tässä kuussa sellainen ostos oli 92,90 €.",
+              "Siirrä varalle vain se summa, joka jää oikeasti yli laskujen jälkeen. Se on vapaaehtoinen valinta."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 3 242,25 €.\n• Siirsit säästöön 3 270,39 €. Menot ja säästösiirrot ylittivät tulot 28,14 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 18,58 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.\n• Yksi esimerkki: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Tässä kuussa sellainen ostos oli 92,90 €.\n• Siirrä varalle vain se summa, joka jää oikeasti yli laskujen jälkeen. Se on vapaaehtoinen valinta."
           }
         },
         "2026-08": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 1,50 €: 91,40 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostot jakautuivat moneen pieneen maksuun: 16 maksua ja 13 päivää. Ravintolat olivat suurin ryhmä, 24,13 €.",
+              "Päivän aikana lisäostot painottuivat iltaan. Viikonpäivästä tai kuun osasta ei löytynyt selvää painotusta.",
+              "Ostokset ja itsestä huolehtiminen laskivat 91,40 € edellisestä kuusta. Nyt oli 1 maksu, 1,50 €, ja edellisessä kuussa 1 maksu, 92,90 €."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 1,50 €: 91,40 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostot jakautuivat moneen pieneen maksuun: 16 maksua ja 13 päivää. Ravintolat olivat suurin ryhmä, 24,13 €.\n• Päivän aikana lisäostot painottuivat iltaan. Viikonpäivästä tai kuun osasta ei löytynyt selvää painotusta.\n• Ostokset ja itsestä huolehtiminen laskivat 91,40 € edellisestä kuusta. Nyt oli 1 maksu, 1,50 €, ja edellisessä kuussa 1 maksu, 92,90 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 869,73 €.",
-              "Siirsit säästöön 2 857,22 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 12,51 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,83 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa.",
+              "Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 2,41 €.",
+              "Siirrä varalle vain laskujen jälkeen yli jäävä oikea summa. Voit tehdä sen omaan tahtiisi."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 869,73 €.\n• Siirsit säästöön 2 857,22 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 12,51 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,83 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa.\n• Yksi esimerkki: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle. Ravintolamaksun keskiarvo oli 2,41 €.\n• Siirrä varalle vain laskujen jälkeen yli jäävä oikea summa. Voit tehdä sen omaan tahtiisi."
           }
         },
         "2026-09": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 122,59 €: 111,78 € enemmän kuin edelliskuussa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+              "Tässä kuussa lisäostoja oli 17 maksua ja 12 päivää. Vapaa-aika oli suurin ryhmä: 5 maksua, yhteensä 122,59 €.",
+              "Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun keskivaiheilla. Päivän aikana ilta oli selvästi vilkkain.",
+              "Vapaa-aikaan meni 111,78 € enemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 5, mutta keskimääräinen maksu oli nyt 24,52 € (aiemmin 2,16 €)."
             ],
-            "answer": "• Vapaa-aikaan kului 122,59 €: 111,78 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+            "answer": "• Tässä kuussa lisäostoja oli 17 maksua ja 12 päivää. Vapaa-aika oli suurin ryhmä: 5 maksua, yhteensä 122,59 €.\n• Euroina päivää kohti lisäostoja kertyi eniten lauantaisin ja kuun keskivaiheilla. Päivän aikana ilta oli selvästi vilkkain.\n• Vapaa-aikaan meni 111,78 € enemmän kuin edellisessä kuussa. Maksuja oli molempina kuukausina 5, mutta keskimääräinen maksu oli nyt 24,52 € (aiemmin 2,16 €)."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 3 259,37 €.",
-              "Siirsit säästöön 3 287,95 €. Menot ja säästösiirrot ylittivät tulot 28,58 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 24,52 €."
+              "Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.",
+              "Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 24,52 €.",
+              "Siirrä varalle vain se summa, joka jää laskujen jälkeen oikeasti yli. Varan tavoite on 800,00 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 3 259,37 €.\n• Siirsit säästöön 3 287,95 €. Menot ja säästösiirrot ylittivät tulot 28,58 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 24,52 €."
-          }
-        },
-        "2025-10": {
-          "spending": {
-            "bullets": [
-              "Ravintoloihin kului 10,59 €. Tästä menosta voi löytyä joustoa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
-            ],
-            "answer": "• Ravintoloihin kului 10,59 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
-          },
-          "saving": {
-            "bullets": [
-              "Tuloista jäi menojen jälkeen 3 041,38 €.",
-              "Siirsit säästöön 2 957,32 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 84,06 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,12 €."
-            ],
-            "answer": "• Tuloista jäi menojen jälkeen 3 041,38 €.\n• Siirsit säästöön 2 957,32 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 84,06 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,12 €."
-          }
-        },
-        "2025-11": {
-          "spending": {
-            "bullets": [
-              "Vapaa-aikaan kului 72,64 €: 72,64 € enemmän kuin edelliskuussa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
-            ],
-            "answer": "• Vapaa-aikaan kului 72,64 €: 72,64 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
-          },
-          "saving": {
-            "bullets": [
-              "Tuloista jäi menojen jälkeen 2 883,59 €.",
-              "Siirsit säästöön 3 002,57 €. Menot ja säästösiirrot ylittivät tulot 118,98 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,53 €."
-            ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 883,59 €.\n• Siirsit säästöön 3 002,57 €. Menot ja säästösiirrot ylittivät tulot 118,98 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,53 €."
-          }
-        },
-        "2025-12": {
-          "spending": {
-            "bullets": [
-              "Ravintoloihin kului 77,64 €: 77,64 € enemmän kuin edelliskuussa.",
-              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
-            ],
-            "answer": "• Ravintoloihin kului 77,64 €: 77,64 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
-          },
-          "saving": {
-            "bullets": [
-              "Tuloista jäi menojen jälkeen 3 367,77 €.",
-              "Siirsit säästöön 3 477,97 €. Menot ja säästösiirrot ylittivät tulot 110,20 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,53 €."
-            ],
-            "answer": "• Tuloista jäi menojen jälkeen 3 367,77 €.\n• Siirsit säästöön 3 477,97 €. Menot ja säästösiirrot ylittivät tulot 110,20 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,53 €."
-          }
-        },
-        "2026-01": {
-          "spending": {
-            "bullets": [
-              "Liikkumiseen kului 0,00 €: 60,45 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
-            ],
-            "answer": "• Liikkumiseen kului 0,00 €: 60,45 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
-          },
-          "saving": {
-            "bullets": [
-              "Tuloista jäi menojen jälkeen 2 604,42 €.",
-              "Siirsit säästöön 2 638,56 €. Menot ja säästösiirrot ylittivät tulot 34,14 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 20,12 €."
-            ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 604,42 €.\n• Siirsit säästöön 2 638,56 €. Menot ja säästösiirrot ylittivät tulot 34,14 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 20,12 €."
+            "answer": "• Ensin kannattaa kattaa laskut, ruoka ja välttämättömät menot. Harkitse säästösiirtojen ajoitusta ja summaa, ettei raha lopu kesken.\n• Yksi esimerkki: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 24,52 €.\n• Siirrä varalle vain se summa, joka jää laskujen jälkeen oikeasti yli. Varan tavoite on 800,00 €."
           }
         },
         "2026-02": {
           "spending": {
             "bullets": [
-              "Ravintoloihin kului 18,78 €: 81,84 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi olivat pieniä: 10 maksua, tyypillinen maksu 1,98 € ja suurin 23,06 € matkailuun.",
+              "Lisäostoja tehtiin eniten kuun alussa, päivien 1–10 aikana, noin 2,76 € päivässä. Kuun keskiarvo oli 1,49 € päivässä.",
+              "Ravintolamenot olivat 18,78 €, eli 81,84 € vähemmän kuin tammikuussa. Maksuja oli 9 (10 tammikuussa), ja keskimaksu laski 10,06 eurosta 2,09 euroon."
             ],
-            "answer": "• Ravintoloihin kului 18,78 €: 81,84 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi olivat pieniä: 10 maksua, tyypillinen maksu 1,98 € ja suurin 23,06 € matkailuun.\n• Lisäostoja tehtiin eniten kuun alussa, päivien 1–10 aikana, noin 2,76 € päivässä. Kuun keskiarvo oli 1,49 € päivässä.\n• Ravintolamenot olivat 18,78 €, eli 81,84 € vähemmän kuin tammikuussa. Maksuja oli 9 (10 tammikuussa), ja keskimaksu laski 10,06 eurosta 2,09 euroon."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 3 233,60 €.",
-              "Siirsit säästöön 3 058,83 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 174,77 €.",
-              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 4,61 €."
+              "Ensin kannattaa varmistaa, että laskuille ja ruokaan on rahaa, ja tarkistaa erillinen varaus yllättäville menoille.",
+              "Voit jättää yhden vapaaehtoisen matkailuun liittyvän lisäoston tekemättä. Sen keskihinta oli 23,06 €.",
+              "Siirrä erilliseen varaan vain summa, joka oikeasti jää laskujen jälkeen. Helmikuussa siirtoja oli 3 058,83 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 3 233,60 €.\n• Siirsit säästöön 3 058,83 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 174,77 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 4,61 €."
+            "answer": "• Ensin kannattaa varmistaa, että laskuille ja ruokaan on rahaa, ja tarkistaa erillinen varaus yllättäville menoille.\n• Voit jättää yhden vapaaehtoisen matkailuun liittyvän lisäoston tekemättä. Sen keskihinta oli 23,06 €.\n• Siirrä erilliseen varaan vain summa, joka oikeasti jää laskujen jälkeen. Helmikuussa siirtoja oli 3 058,83 €."
           }
         },
         "2026-03": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 19,78 €. Tästä menosta voi löytyä joustoa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+              "Tässä kuussa lisäostoksi kirjattiin 11 maksua, tyypillinen maksu 3,02 € ja suurin 8,76 €. Ne olivat siis pieniä ostoja.",
+              "Lisäostoista suurin osa osui iltaan, kello 18–24 välille: 20,67 € eli 52 %. Se oli kuun selvin ajankohta.",
+              "Vapaa-aikaan meni 19,78 € viidellä maksulla, kun helmikuussa maksuja ei ollut. Ravintoloissa maksuja oli 5 ja yhteensä 10,96 €."
             ],
-            "answer": "• Vapaa-aikaan kului 19,78 €. Tästä menosta voi löytyä joustoa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+            "answer": "• Tässä kuussa lisäostoksi kirjattiin 11 maksua, tyypillinen maksu 3,02 € ja suurin 8,76 €. Ne olivat siis pieniä ostoja.\n• Lisäostoista suurin osa osui iltaan, kello 18–24 välille: 20,67 € eli 52 %. Se oli kuun selvin ajankohta.\n• Vapaa-aikaan meni 19,78 € viidellä maksulla, kun helmikuussa maksuja ei ollut. Ravintoloissa maksuja oli 5 ja yhteensä 10,96 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 667,35 €.",
-              "Siirsit säästöön 2 609,54 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 57,81 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 3,96 €."
+              "Varmista ensin, että laskut, ruoka ja välttämättömät kulut on katettu, ja tarkista erillinen varaus yllättäviin menoihin.",
+              "Voit halutessasi korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Maksujen keskihinta oli 3,96 €.",
+              "Siirrä varaan vain se summa, joka oikeasti jää laskujen jälkeen. Maaliskuussa siirtoja oli jo 2 609,54 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 667,35 €.\n• Siirsit säästöön 2 609,54 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 57,81 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 3,96 €."
+            "answer": "• Varmista ensin, että laskut, ruoka ja välttämättömät kulut on katettu, ja tarkista erillinen varaus yllättäviin menoihin.\n• Voit halutessasi korvata yhden maksullisen vapaa-ajan tekemisen maksuttomalla. Maksujen keskihinta oli 3,96 €.\n• Siirrä varaan vain se summa, joka oikeasti jää laskujen jälkeen. Maaliskuussa siirtoja oli jo 2 609,54 €."
           }
         },
-        "2025-04": {
+        "2025-12": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 204,63 €: 177,73 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Joulukuussa lisäostosi jakautuivat moneen pieneen maksuun: lisäostoja oli 17, ja tyypillinen maksu oli 7,00 €. Ravintolat olivat selvin ryhmä.",
+              "Ravintolamenot olivat 77,64 € edellisen kuun 0,00 €:n jälkeen. Maksuja oli 10 ja keskimäärin 7,76 € per maksu.",
+              "Euroina päivää kohti ostoja kertyi eniten perjantaisin, 9,87 € päivässä. Iltapäivällä maksuja oli eniten, 76,42 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 204,63 €: 177,73 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Joulukuussa lisäostosi jakautuivat moneen pieneen maksuun: lisäostoja oli 17, ja tyypillinen maksu oli 7,00 €. Ravintolat olivat selvin ryhmä.\n• Ravintolamenot olivat 77,64 € edellisen kuun 0,00 €:n jälkeen. Maksuja oli 10 ja keskimäärin 7,76 € per maksu.\n• Euroina päivää kohti ostoja kertyi eniten perjantaisin, 9,87 € päivässä. Iltapäivällä maksuja oli eniten, 76,42 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 148,02 €.",
-              "Siirsit säästöön 2 694,56 €. Menot ja säästösiirrot ylittivät tulot 546,54 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 12,31 €."
+              "Maksa ensin laskut, ruoka ja tarpeellinen liikkuminen. Tarkista myös säästösiirtojen ajoitus ja summa, koska tilille jäi -110,20 €.",
+              "Yksi vaihtoehto on vaihtaa yksi ravintolaostos kotiruokaan. Ravintolaostoksen keskihinta oli 7,76 €, mutta ruoka maksaa kotonakin.",
+              "Siirrä varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen. Ennen säästöjä rahaa jäi 3 367,77 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 148,02 €.\n• Siirsit säästöön 2 694,56 €. Menot ja säästösiirrot ylittivät tulot 546,54 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 12,31 €."
+            "answer": "• Maksa ensin laskut, ruoka ja tarpeellinen liikkuminen. Tarkista myös säästösiirtojen ajoitus ja summa, koska tilille jäi -110,20 €.\n• Yksi vaihtoehto on vaihtaa yksi ravintolaostos kotiruokaan. Ravintolaostoksen keskihinta oli 7,76 €, mutta ruoka maksaa kotonakin.\n• Siirrä varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen. Ennen säästöjä rahaa jäi 3 367,77 €."
           }
         },
-        "2025-05": {
+        "2026-01": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 33,26 €: 171,37 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tammikuussa lisäostosi olivat kymmenen maksua kahdeksana päivänä, ja kaikki lisäostot olivat ravintoloissa. Tyypillinen maksu oli 7,96 €.",
+              "Liikkuminen laski 60,45 € joulukuusta: joulukuussa oli yksi 60,45 €:n maksu, tammikuussa ei yhtään. Tämä kertoo vain kyseisten kuukausien maksuista.",
+              "Euroina päivää kohti ostoja kertyi eniten lauantaisin, 8,51 € päivässä. Iltaisin maksuja oli eniten, 55,21 €."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 33,26 €: 171,37 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tammikuussa lisäostosi olivat kymmenen maksua kahdeksana päivänä, ja kaikki lisäostot olivat ravintoloissa. Tyypillinen maksu oli 7,96 €.\n• Liikkuminen laski 60,45 € joulukuusta: joulukuussa oli yksi 60,45 €:n maksu, tammikuussa ei yhtään. Tämä kertoo vain kyseisten kuukausien maksuista.\n• Euroina päivää kohti ostoja kertyi eniten lauantaisin, 8,51 € päivässä. Iltaisin maksuja oli eniten, 55,21 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 435,00 €.",
-              "Siirsit säästöön 2 398,08 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 36,92 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 11,12 €."
+              "Maksa ensin laskut, ruoka ja tarpeellinen liikkuminen. Tarkista säästösiirtojen ajoitus ja summa, koska tilille jäi -34,14 €.",
+              "Yksi vaihtoehto on vaihtaa yksi ravintolaostos kotiruokaan. Ravintolaostoksen keskihinta oli 10,06 €, mutta ruoka maksaa kotonakin.",
+              "Siirrä varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen. Ennen säästöjä rahaa jäi 2 604,42 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 435,00 €.\n• Siirsit säästöön 2 398,08 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 36,92 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 11,12 €."
+            "answer": "• Maksa ensin laskut, ruoka ja tarpeellinen liikkuminen. Tarkista säästösiirtojen ajoitus ja summa, koska tilille jäi -34,14 €.\n• Yksi vaihtoehto on vaihtaa yksi ravintolaostos kotiruokaan. Ravintolaostoksen keskihinta oli 10,06 €, mutta ruoka maksaa kotonakin.\n• Siirrä varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen. Ennen säästöjä rahaa jäi 2 604,42 €."
           }
         },
-        "2025-06": {
+        "2025-10": {
           "spending": {
             "bullets": [
-              "Kotiin ja tekniikkaan kului 112,12 €: 78,86 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi olivat pieniä: 6 maksua, tyypillinen maksu 2,38 €. Ravintolamaksuja oli 5, ja ne olivat suurin osa lisäostoista.",
+              "Selvää ajankohtaa, johon lisäostot painottuivat, ei tässä kuussa näy kirjatuissa maksuissa.",
+              "Ravintoloihin meni 10,59 € ja maksuja oli 5. Edellisessä kuussa ravintolamaksuja oli 10 ja yhteensä keskimäärin 2,02 € per maksu."
             ],
-            "answer": "• Kotiin ja tekniikkaan kului 112,12 €: 78,86 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi olivat pieniä: 6 maksua, tyypillinen maksu 2,38 €. Ravintolamaksuja oli 5, ja ne olivat suurin osa lisäostoista.\n• Selvää ajankohtaa, johon lisäostot painottuivat, ei tässä kuussa näy kirjatuissa maksuissa.\n• Ravintoloihin meni 10,59 € ja maksuja oli 5. Edellisessä kuussa ravintolamaksuja oli 10 ja yhteensä keskimäärin 2,02 € per maksu."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 401,16 €.",
-              "Siirsit säästöön 2 620,85 €. Menot ja säästösiirrot ylittivät tulot 219,69 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 11,84 €."
+              "Ensin kannattaa varmistaa, että laskuille on rahaa, ja aloittaa tai täydentää erillistä varaa.",
+              "Voit kokeilla yhtä esimerkkiä: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle.",
+              "Siirrä erilliseen varaan vain se summa, joka oikeasti jää laskujen jälkeen. Kuun jäljelle jäänyt raha ennen säästöjä oli 3 041,38 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 401,16 €.\n• Siirsit säästöön 2 620,85 €. Menot ja säästösiirrot ylittivät tulot 219,69 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 11,84 €."
+            "answer": "• Ensin kannattaa varmistaa, että laskuille on rahaa, ja aloittaa tai täydentää erillistä varaa.\n• Voit kokeilla yhtä esimerkkiä: vaihda yksi ravintolaostos kotona valmistettuun ateriaan, jos se sopii sinulle.\n• Siirrä erilliseen varaan vain se summa, joka oikeasti jää laskujen jälkeen. Kuun jäljelle jäänyt raha ennen säästöjä oli 3 041,38 €."
           }
         },
-        "2025-07": {
+        "2025-11": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 116,87 €: 91,18 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi olivat 6 maksua, tyypillinen maksu 13,70 €. Vapaa-aika oli selvä painopiste lisäostoissa.",
+              "Selvää viikonpäivää tai kuun osaa, johon lisäostot painottuivat, ei tässä kuussa näy kirjatuissa maksuissa.",
+              "Vapaa-aikaan meni 72,64 € eli 72,64 € enemmän kuin edellisessä kuussa. Maksuja oli 5, kun edellisessä kuussa niitä ei ollut, ja suurin maksu oli 24,82 €."
             ],
-            "answer": "• Ruokaostoksiin kului 116,87 €: 91,18 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi olivat 6 maksua, tyypillinen maksu 13,70 €. Vapaa-aika oli selvä painopiste lisäostoissa.\n• Selvää viikonpäivää tai kuun osaa, johon lisäostot painottuivat, ei tässä kuussa näy kirjatuissa maksuissa.\n• Vapaa-aikaan meni 72,64 € eli 72,64 € enemmän kuin edellisessä kuussa. Maksuja oli 5, kun edellisessä kuussa niitä ei ollut, ja suurin maksu oli 24,82 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 704,58 €.",
-              "Siirsit säästöön 2 891,46 €. Menot ja säästösiirrot ylittivät tulot 186,88 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,41 €."
+              "Ensin kannattaa maksaa laskut, ruoka ja tarpeelliset menot. Säästösiirtojen ajoitusta ja summaa kannattaa katsoa, ettei raha lopu kesken.",
+              "Voit kokeilla yhtä esimerkkiä: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla.",
+              "Siirrä erilliseen varaan vain se summa, joka oikeasti jää jäljelle. Säästösiirtojen jälkeen kuussa jäi -118,98 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 704,58 €.\n• Siirsit säästöön 2 891,46 €. Menot ja säästösiirrot ylittivät tulot 186,88 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,41 €."
+            "answer": "• Ensin kannattaa maksaa laskut, ruoka ja tarpeelliset menot. Säästösiirtojen ajoitusta ja summaa kannattaa katsoa, ettei raha lopu kesken.\n• Voit kokeilla yhtä esimerkkiä: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla.\n• Siirrä erilliseen varaan vain se summa, joka oikeasti jää jäljelle. Säästösiirtojen jälkeen kuussa jäi -118,98 €."
           }
         },
         "2025-08": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 39,66 €. Tästä menosta voi löytyä joustoa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+              "Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun: lisäostoja oli 17 maksua 15 eri päivänä. Tyypillinen lisäosto oli 4,73 €.",
+              "Lisäostojen kulutus painottui kuun loppuun, 21. päivästä eteenpäin, ja maksut tehtiin useimmin illalla. Illan maksuja oli 9, yhteensä 70,76 €.",
+              "Vapaa-aika maksoi 39,66 €, kun edellisessä kuussa se oli 21,61 € suurimmalla maksulla. Maksuja oli 5 kummassakin kuussa, mutta keskimaksu oli nyt 7,93 € ja aiemmin 14,41 €."
             ],
-            "answer": "• Vapaa-aikaan kului 39,66 €. Tästä menosta voi löytyä joustoa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun: lisäostoja oli 17 maksua 15 eri päivänä. Tyypillinen lisäosto oli 4,73 €.\n• Lisäostojen kulutus painottui kuun loppuun, 21. päivästä eteenpäin, ja maksut tehtiin useimmin illalla. Illan maksuja oli 9, yhteensä 70,76 €.\n• Vapaa-aika maksoi 39,66 €, kun edellisessä kuussa se oli 21,61 € suurimmalla maksulla. Maksuja oli 5 kummassakin kuussa, mutta keskimaksu oli nyt 7,93 € ja aiemmin 14,41 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 058,84 €.",
-              "Siirsit säästöön 2 274,06 €. Menot ja säästösiirrot ylittivät tulot 215,22 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 7,93 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Katso sen jälkeen säästösiirtojen ajoitus ja summa, ettei raha lopu kesken.",
+              "Jos haluat pienen askeleen, korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan keskimaksu oli 7,93 €.",
+              "Siirrä erilliselle varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 058,84 €.\n• Siirsit säästöön 2 274,06 €. Menot ja säästösiirrot ylittivät tulot 215,22 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 7,93 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Katso sen jälkeen säästösiirtojen ajoitus ja summa, ettei raha lopu kesken.\n• Jos haluat pienen askeleen, korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan keskimaksu oli 7,93 €.\n• Siirrä erilliselle varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen."
           }
         },
         "2025-09": {
           "spending": {
             "bullets": [
-              "Ostoksiin ja itsestä huolehtimiseen kului 36,34 €. Tästä menosta voi löytyä joustoa.",
-              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+              "Tässä kuussa lisäostoistasi suurin osa, 36,34 €, kertyi ostoksiin ja itsestä huolehtimiseen. Lisäostoja oli 12 maksua 10 eri päivänä, ja tyypillinen maksu oli 2,00 €.",
+              "Lisäostojen kulutus painottui kuun loppuun, 21. päivästä eteenpäin. Päivän aikana maksut tehtiin useimmin iltapäivällä, yhteensä 46,91 €.",
+              "Ostokset ja itsestä huolehtiminen: maksuja oli 2 kuten edellisessä kuussa. Keskimaksu oli nyt 18,17 € ja aiemmin 15,73 €, ja suurin maksu 26,07 € (aiemmin 19,13 €)."
             ],
-            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 36,34 €. Tästä menosta voi löytyä joustoa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
+            "answer": "• Tässä kuussa lisäostoistasi suurin osa, 36,34 €, kertyi ostoksiin ja itsestä huolehtimiseen. Lisäostoja oli 12 maksua 10 eri päivänä, ja tyypillinen maksu oli 2,00 €.\n• Lisäostojen kulutus painottui kuun loppuun, 21. päivästä eteenpäin. Päivän aikana maksut tehtiin useimmin iltapäivällä, yhteensä 46,91 €.\n• Ostokset ja itsestä huolehtiminen: maksuja oli 2 kuten edellisessä kuussa. Keskimaksu oli nyt 18,17 € ja aiemmin 15,73 €, ja suurin maksu 26,07 € (aiemmin 19,13 €)."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 523,56 €.",
-              "Siirsit säästöön 2 660,04 €. Menot ja säästösiirrot ylittivät tulot 136,48 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 7,27 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Katso sen jälkeen säästösiirtojen ajoitus ja summa, ettei raha lopu kesken.",
+              "Jos haluat pienen askeleen, siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostosten keskimaksu oli 18,17 €.",
+              "Siirrä erilliselle varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 523,56 €.\n• Siirsit säästöön 2 660,04 €. Menot ja säästösiirrot ylittivät tulot 136,48 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 7,27 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Katso sen jälkeen säästösiirtojen ajoitus ja summa, ettei raha lopu kesken.\n• Jos haluat pienen askeleen, siirrä yksi vapaaehtoinen ostos myöhemmäksi. Ostosten keskimaksu oli 18,17 €.\n• Siirrä erilliselle varalle vain se summa, joka jää oikeasti jäljelle pakollisten maksujen jälkeen."
           }
         },
-        "2024-10": {
+        "2025-06": {
           "spending": {
             "bullets": [
-              "Matkailuun kului 150,82 €. Tästä menosta voi löytyä joustoa.",
-              "Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
+              "Tässä kuussa lisäostoja oli 11 maksua, ja niistä 10 oli ravintolaostoja. Tyypillinen lisäostos oli 6,46 €.",
+              "Lisäostoja tehtiin eniten euroina päivää kohden perjantaisin (8,60 €/päivä) ja kuun keskivaiheella (4,21 €/päivä). Ravintolamaksut painottuivat iltaan.",
+              "Koti ja tekniikka nousi 33,26 eurosta 112,12 euroon, eli 78,86 € ylöspäin. Molempina kuukausina oli vain yksi maksu, mutta kesäkuun maksu oli suurempi."
             ],
-            "answer": "• Matkailuun kului 150,82 €. Tästä menosta voi löytyä joustoa.\n• Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
+            "answer": "• Tässä kuussa lisäostoja oli 11 maksua, ja niistä 10 oli ravintolaostoja. Tyypillinen lisäostos oli 6,46 €.\n• Lisäostoja tehtiin eniten euroina päivää kohden perjantaisin (8,60 €/päivä) ja kuun keskivaiheella (4,21 €/päivä). Ravintolamaksut painottuivat iltaan.\n• Koti ja tekniikka nousi 33,26 eurosta 112,12 euroon, eli 78,86 € ylöspäin. Molempina kuukausina oli vain yksi maksu, mutta kesäkuun maksu oli suurempi."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 469,98 €.",
-              "Siirsit säästöön 2 762,52 €. Menot ja säästösiirrot ylittivät tulot 292,54 €.",
-              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 30,16 €."
+              "Ruoan ja laskujen jälkeen jäi 2 401,16 €. Kun siirsit säästöön 2 620,85 €, tili jäi 219,69 € miinukselle.",
+              "Pakolliset maksut kannattaa hoitaa ensin. Voit tarkistaa säästösiirtojen ajan ja summan, ettei raha lopu kesken.",
+              "Yksi vaihtoehto: vaihda yksi ravintolaostos kotiruokaan. Ravintolamaksun keskiarvo oli 5,92 €, mutta ruoka maksaa silti jotain."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 469,98 €.\n• Siirsit säästöön 2 762,52 €. Menot ja säästösiirrot ylittivät tulot 292,54 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 30,16 €."
+            "answer": "• Ruoan ja laskujen jälkeen jäi 2 401,16 €. Kun siirsit säästöön 2 620,85 €, tili jäi 219,69 € miinukselle.\n• Pakolliset maksut kannattaa hoitaa ensin. Voit tarkistaa säästösiirtojen ajan ja summan, ettei raha lopu kesken.\n• Yksi vaihtoehto: vaihda yksi ravintolaostos kotiruokaan. Ravintolamaksun keskiarvo oli 5,92 €, mutta ruoka maksaa silti jotain."
           }
         },
-        "2024-11": {
+        "2025-07": {
           "spending": {
             "bullets": [
-              "Matkailuun kului 48,81 €: 102,01 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostoja oli 18 maksua 12 päivänä. Eniten niitä oli vapaa-aikaan, 5 maksua.",
+              "Lisäostoja tehtiin eniten euroina päivää kohden lauantaisin (13,55 €/päivä) ja kuun keskivaiheella (7,80 €/päivä).",
+              "Ruokaostokset nousivat 25,69 eurosta 116,87 euroon, eli 91,18 € ylöspäin. Maksuja oli 2 (edellisessä kuussa 1), ja suurin oli 61,46 €."
             ],
-            "answer": "• Matkailuun kului 48,81 €: 102,01 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostoja oli 18 maksua 12 päivänä. Eniten niitä oli vapaa-aikaan, 5 maksua.\n• Lisäostoja tehtiin eniten euroina päivää kohden lauantaisin (13,55 €/päivä) ja kuun keskivaiheella (7,80 €/päivä).\n• Ruokaostokset nousivat 25,69 eurosta 116,87 euroon, eli 91,18 € ylöspäin. Maksuja oli 2 (edellisessä kuussa 1), ja suurin oli 61,46 €."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 504,77 €.",
-              "Siirsit säästöön 2 764,20 €. Menot ja säästösiirrot ylittivät tulot 259,43 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,40 €."
+              "Ruoan ja laskujen jälkeen jäi 2 704,58 €. Säästösiirtojen 2 891,46 € jälkeen tili jäi 186,88 € miinukselle.",
+              "Hoida ensin laskut, ruoka ja tarvittavat matkat. Katso säästösiirtojen ajoitus ja summa uudelleen, ettei raha lopu kesken.",
+              "Yksi vaihtoehto: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 14,41 €."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 504,77 €.\n• Siirsit säästöön 2 764,20 €. Menot ja säästösiirrot ylittivät tulot 259,43 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,40 €."
+            "answer": "• Ruoan ja laskujen jälkeen jäi 2 704,58 €. Säästösiirtojen 2 891,46 € jälkeen tili jäi 186,88 € miinukselle.\n• Hoida ensin laskut, ruoka ja tarvittavat matkat. Katso säästösiirtojen ajoitus ja summa uudelleen, ettei raha lopu kesken.\n• Yksi vaihtoehto: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla. Vapaa-ajan maksun keskiarvo oli 14,41 €."
           }
         },
-        "2024-12": {
+        "2025-05": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 294,57 €: 148,19 € enemmän kuin edelliskuussa.",
-              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+              "Tässä kuussa lisäostosi olivat sekalaisia: 11 maksua 10 päivänä, tyypillinen maksu 3,70 €. Suurin yksittäinen lisäosto oli 55,59 € elämäntapaan.",
+              "Lisäostoista suurin osa, 81 %, osui kuun loppuun (päivät 21–loppu). Siellä rahaa kului noin 7,26 € päivässä, kun koko kuun keskiarvo oli 3,18 €.",
+              "Koti ja tekniikka laski 204,63 eurosta 33,26 euroon, eli 171,37 € vähemmän. Huhtikuussa maksuja oli yksi 204,63 €:n maksu, toukokuussa yksi 33,26 €:n maksu."
             ],
-            "answer": "• Ruokaostoksiin kului 294,57 €: 148,19 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
+            "answer": "• Tässä kuussa lisäostosi olivat sekalaisia: 11 maksua 10 päivänä, tyypillinen maksu 3,70 €. Suurin yksittäinen lisäosto oli 55,59 € elämäntapaan.\n• Lisäostoista suurin osa, 81 %, osui kuun loppuun (päivät 21–loppu). Siellä rahaa kului noin 7,26 € päivässä, kun koko kuun keskiarvo oli 3,18 €.\n• Koti ja tekniikka laski 204,63 eurosta 33,26 euroon, eli 171,37 € vähemmän. Huhtikuussa maksuja oli yksi 204,63 €:n maksu, toukokuussa yksi 33,26 €:n maksu."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 429,23 €.",
-              "Siirsit säästöön 2 814,25 €. Menot ja säästösiirrot ylittivät tulot 385,02 €.",
-              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 9,92 €."
+              "Ensin varmista, että laskuille on rahaa. Tarkista myös, onko sinulla erillistä vararahastoa, ja aloita sellainen, jos ei ole.",
+              "Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostosten keskihinta oli 55,59 €, mutta säästö ei ole varma.",
+              "Siirrä varalle vain se summa, joka jää laskujen jälkeen. Kuussa jäi 2 435,00 € ennen säästösiirtoja ja 36,92 € niiden jälkeen."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 429,23 €.\n• Siirsit säästöön 2 814,25 €. Menot ja säästösiirrot ylittivät tulot 385,02 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 9,92 €."
+            "answer": "• Ensin varmista, että laskuille on rahaa. Tarkista myös, onko sinulla erillistä vararahastoa, ja aloita sellainen, jos ei ole.\n• Yksi pieni askel: siirrä yksi vapaaehtoinen ostos myöhemmäksi. Elämäntapaostosten keskihinta oli 55,59 €, mutta säästö ei ole varma.\n• Siirrä varalle vain se summa, joka jää laskujen jälkeen. Kuussa jäi 2 435,00 € ennen säästösiirtoja ja 36,92 € niiden jälkeen."
           }
         },
-        "2025-01": {
+        "2025-04": {
           "spending": {
             "bullets": [
-              "Ruokaostoksiin kului 173,08 €: 121,49 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi olivat sekalaisia: 11 maksua kymmenellä eri päivällä, tyypillinen maksu 5,43 €. Suurin lisäosto oli 61,55 €.",
+              "Lisäostoja tehtiin eniten keskikuussa ja iltapäivällä. Viikonpäivistä sunnuntaina meni eniten euroja päivää kohti, 18,13 €.",
+              "Koti ja tekniikka nousi 26,90 eurosta 204,63 euroon eli 177,73 € ylöspäin. Nyt oli yksi 204,63 euron maksu, edellisessä kuussa kaksi pientä maksua."
             ],
-            "answer": "• Ruokaostoksiin kului 173,08 €: 121,49 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi olivat sekalaisia: 11 maksua kymmenellä eri päivällä, tyypillinen maksu 5,43 €. Suurin lisäosto oli 61,55 €.\n• Lisäostoja tehtiin eniten keskikuussa ja iltapäivällä. Viikonpäivistä sunnuntaina meni eniten euroja päivää kohti, 18,13 €.\n• Koti ja tekniikka nousi 26,90 eurosta 204,63 euroon eli 177,73 € ylöspäin. Nyt oli yksi 204,63 euron maksu, edellisessä kuussa kaksi pientä maksua."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 616,46 €.",
-              "Siirsit säästöön 2 943,22 €. Menot ja säästösiirrot ylittivät tulot 326,76 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 17,04 €."
+              "Kata ensin laskut, ruoka ja tarpeelliset matkat. Kuukauden jäännös ei ole pankkitilin saldo.",
+              "Kuussa siirrettiin säästöön 2 694,56 €, ja tilille jäi sen jälkeen -546,54 €. Tarkista siirtojen ajoitus ja summa.",
+              "Voit siirtää omaan varapottiin vain sen summan, joka jää, kun välttämättömät maksut on hoidettu."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 616,46 €.\n• Siirsit säästöön 2 943,22 €. Menot ja säästösiirrot ylittivät tulot 326,76 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 17,04 €."
-          }
-        },
-        "2025-02": {
-          "spending": {
-            "bullets": [
-              "Vapaa-aikaan kului 151,63 €: 135,86 € enemmän kuin edelliskuussa.",
-              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
-            ],
-            "answer": "• Vapaa-aikaan kului 151,63 €: 135,86 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
-          },
-          "saving": {
-            "bullets": [
-              "Tuloista jäi menojen jälkeen 2 091,12 €.",
-              "Siirsit säästöön 2 613,96 €. Menot ja säästösiirrot ylittivät tulot 522,84 €.",
-              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 30,33 €."
-            ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 091,12 €.\n• Siirsit säästöön 2 613,96 €. Menot ja säästösiirrot ylittivät tulot 522,84 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 30,33 €."
+            "answer": "• Kata ensin laskut, ruoka ja tarpeelliset matkat. Kuukauden jäännös ei ole pankkitilin saldo.\n• Kuussa siirrettiin säästöön 2 694,56 €, ja tilille jäi sen jälkeen -546,54 €. Tarkista siirtojen ajoitus ja summa.\n• Voit siirtää omaan varapottiin vain sen summan, joka jää, kun välttämättömät maksut on hoidettu."
           }
         },
         "2025-03": {
           "spending": {
             "bullets": [
-              "Vapaa-aikaan kului 43,66 €: 107,97 € vähemmän kuin edelliskuussa.",
-              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+              "Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun: 16 maksua 14 päivänä, tyypillinen maksu 9,03 €. Ravintolat veivät lisäostoista 57 %.",
+              "Selkeää viikonpäivän tai kellonajan painotusta ei näy tämän kuun maksuissa.",
+              "Vapaa-aikaan meni 43,66 €, eli 107,97 € vähemmän kuin helmikuussa. Maksuja oli 5 kumpanakin kuussa, mutta keskimaksu laski 30,33 eurosta 8,73 euroon."
             ],
-            "answer": "• Vapaa-aikaan kului 43,66 €: 107,97 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
+            "answer": "• Tässä kuussa lisäostosi jakautuivat moneen pieneen maksuun: 16 maksua 14 päivänä, tyypillinen maksu 9,03 €. Ravintolat veivät lisäostoista 57 %.\n• Selkeää viikonpäivän tai kellonajan painotusta ei näy tämän kuun maksuissa.\n• Vapaa-aikaan meni 43,66 €, eli 107,97 € vähemmän kuin helmikuussa. Maksuja oli 5 kumpanakin kuussa, mutta keskimaksu laski 30,33 eurosta 8,73 euroon."
           },
           "saving": {
             "bullets": [
-              "Tuloista jäi menojen jälkeen 2 410,79 €.",
-              "Siirsit säästöön 2 834,84 €. Menot ja säästösiirrot ylittivät tulot 424,05 €.",
-              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,43 €."
+              "Laskujen ja ruoan jälkeen jäi 2 410,79 €, ja säästösiirtojen jälkeen -424,05 €.",
+              "Voit katsoa siirtojen ajankohtaa ja summaa, jotta välttämättömät maksut varmasti kattuvat.",
+              "Valinnaisena askeleena yksi ravintolaosto voi vaihtua kotiruokaan, jos se sopii sinulle."
             ],
-            "answer": "• Tuloista jäi menojen jälkeen 2 410,79 €.\n• Siirsit säästöön 2 834,84 €. Menot ja säästösiirrot ylittivät tulot 424,05 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,43 €."
+            "answer": "• Laskujen ja ruoan jälkeen jäi 2 410,79 €, ja säästösiirtojen jälkeen -424,05 €.\n• Voit katsoa siirtojen ajankohtaa ja summaa, jotta välttämättömät maksut varmasti kattuvat.\n• Valinnaisena askeleena yksi ravintolaosto voi vaihtua kotiruokaan, jos se sopii sinulle."
+          }
+        },
+        "2025-02": {
+          "spending": {
+            "bullets": [
+              "Tässä kuussa lisäostosi olivat jakautuneet moneen maksuun: 18 maksua 11 päivänä, tyypillinen maksu 7,81 €. Vapaa-aika oli lisäostojen suurin ryhmä.",
+              "Painavin päivä oli perjantai: noin 26,46 € kalenteripäivää kohden, kun kuun keskiarvo oli 9,65 €. Illalla tehtiin eniten lisäostoja, yhteensä 157,02 €.",
+              "Vapaa-aikaan meni 151,63 €, eli 135,86 € enemmän kuin tammikuussa. Maksuja oli molempina kuukausina 5, mutta keskimaksu nousi 3,15 eurosta 30,33 euroon."
+            ],
+            "answer": "• Tässä kuussa lisäostosi olivat jakautuneet moneen maksuun: 18 maksua 11 päivänä, tyypillinen maksu 7,81 €. Vapaa-aika oli lisäostojen suurin ryhmä.\n• Painavin päivä oli perjantai: noin 26,46 € kalenteripäivää kohden, kun kuun keskiarvo oli 9,65 €. Illalla tehtiin eniten lisäostoja, yhteensä 157,02 €.\n• Vapaa-aikaan meni 151,63 €, eli 135,86 € enemmän kuin tammikuussa. Maksuja oli molempina kuukausina 5, mutta keskimaksu nousi 3,15 eurosta 30,33 euroon."
+          },
+          "saving": {
+            "bullets": [
+              "Maksa ensin laskut, ruoka ja välttämättömät matkat. Tarkista sitten säästösiirtojen ajoitus ja summa.",
+              "Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla, jos se sopii sinulle.",
+              "Siirrä erilliselle varalle vain se raha, joka jää jäljelle, kun välttämättömät maksut on hoidettu."
+            ],
+            "answer": "• Maksa ensin laskut, ruoka ja välttämättömät matkat. Tarkista sitten säästösiirtojen ajoitus ja summa.\n• Yksi pieni askel: korvaa yksi maksullinen vapaa-ajan tekeminen maksuttomalla, jos se sopii sinulle.\n• Siirrä erilliselle varalle vain se raha, joka jää jäljelle, kun välttämättömät maksut on hoidettu."
+          }
+        },
+        "2025-01": {
+          "spending": {
+            "bullets": [
+              "Tässä kuussa lisäostoja oli 17 maksua 13 eri päivänä. Tyypillinen lisäosto oli 5,33 euroa, joten kokonaisuus koostui pienistä maksuista.",
+              "Lisäostoja tehtiin eniten perjantaisin: 5 maksua, yhteensä 95,72 euroa. Päiväkohtaisesti se on 19,14 euroa, kun kuukauden keskiarvo oli 5,90 euroa.",
+              "Ruokaostokset olivat 173,08 euroa eli 121,49 euroa vähemmän kuin joulukuussa. Maksuja oli 2, kun joulukuussa niitä oli 4, ja keskimaksu oli 86,54 euroa."
+            ],
+            "answer": "• Tässä kuussa lisäostoja oli 17 maksua 13 eri päivänä. Tyypillinen lisäosto oli 5,33 euroa, joten kokonaisuus koostui pienistä maksuista.\n• Lisäostoja tehtiin eniten perjantaisin: 5 maksua, yhteensä 95,72 euroa. Päiväkohtaisesti se on 19,14 euroa, kun kuukauden keskiarvo oli 5,90 euroa.\n• Ruokaostokset olivat 173,08 euroa eli 121,49 euroa vähemmän kuin joulukuussa. Maksuja oli 2, kun joulukuussa niitä oli 4, ja keskimaksu oli 86,54 euroa."
+          },
+          "saving": {
+            "bullets": [
+              "Hoida ensin laskut, ruoka ja tarpeelliset matkat, ja tarkista säästösiirtojen ajoitus ja summa.",
+              "Kokeile vaihtaa yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle.",
+              "Siirrä erilliselle varalle vain se raha, joka jää jäljelle pakollisten maksujen jälkeen."
+            ],
+            "answer": "• Hoida ensin laskut, ruoka ja tarpeelliset matkat, ja tarkista säästösiirtojen ajoitus ja summa.\n• Kokeile vaihtaa yksi ravintolaostos kotona tehtyyn ateriaan, jos se sopii sinulle.\n• Siirrä erilliselle varalle vain se raha, joka jää jäljelle pakollisten maksujen jälkeen."
+          }
+        },
+        "2024-12": {
+          "spending": {
+            "bullets": [
+              "Tässä kuussa lisäostosi jakautuivat sekalaisesti: 16 maksua 12 päivänä, tyypillinen maksu 5,21 €. Suurin lisäosto oli 49,61 €.",
+              "Lisäostoja tehtiin eniten kuun alussa, päivien 1–10 aikana, ja iltapäivällä. Alkukuussa niitä oli 7,97 € päivässä.",
+              "Ruokaostokset nousivat 148,19 € edellisestä kuusta, 294,57 euroon. Maksuja oli 4 (edellä 2), ja suurin maksu oli 125,63 €."
+            ],
+            "answer": "• Tässä kuussa lisäostosi jakautuivat sekalaisesti: 16 maksua 12 päivänä, tyypillinen maksu 5,21 €. Suurin lisäosto oli 49,61 €.\n• Lisäostoja tehtiin eniten kuun alussa, päivien 1–10 aikana, ja iltapäivällä. Alkukuussa niitä oli 7,97 € päivässä.\n• Ruokaostokset nousivat 148,19 € edellisestä kuusta, 294,57 euroon. Maksuja oli 4 (edellä 2), ja suurin maksu oli 125,63 €."
+          },
+          "saving": {
+            "bullets": [
+              "Hoida ensin laskut, ruoka ja välttämättömät menot, ennen kuin siirrät rahaa säästöön.",
+              "Tarkista säästösiirtojen ajoitus ja summa, jotta rahaa riittää kuun menoihin.",
+              "Voit siirtää yhden vapaaehtoisen ostoksen, esimerkiksi 49,61 € ostoksen, myöhemmäksi."
+            ],
+            "answer": "• Hoida ensin laskut, ruoka ja välttämättömät menot, ennen kuin siirrät rahaa säästöön.\n• Tarkista säästösiirtojen ajoitus ja summa, jotta rahaa riittää kuun menoihin.\n• Voit siirtää yhden vapaaehtoisen ostoksen, esimerkiksi 49,61 € ostoksen, myöhemmäksi."
+          }
+        },
+        "2024-11": {
+          "spending": {
+            "bullets": [
+              "Tässä kuussa lisäostoksia oli 16 maksua, ja niistä 10 oli ravintoloissa. Tyypillinen lisäostos oli 6,51 €.",
+              "Lisäostokset painottuivat iltapäivään: ne toivat 116,58 € eli 76 % lisäostojen eurosta.",
+              "Matkailu oli 48,81 € ja yksi maksu, kun edellisessä kuussa se oli 150,82 € ja yksi maksu. Muutos oli 102,01 € alaspäin."
+            ],
+            "answer": "• Tässä kuussa lisäostoksia oli 16 maksua, ja niistä 10 oli ravintoloissa. Tyypillinen lisäostos oli 6,51 €.\n• Lisäostokset painottuivat iltapäivään: ne toivat 116,58 € eli 76 % lisäostojen eurosta.\n• Matkailu oli 48,81 € ja yksi maksu, kun edellisessä kuussa se oli 150,82 € ja yksi maksu. Muutos oli 102,01 € alaspäin."
+          },
+          "saving": {
+            "bullets": [
+              "Maksa ensin laskut, ruoka ja välttämättömät menot, ja tarkista sitten säästösiirtojen ajoitus ja summa.",
+              "Yksi vaihtoehto: korvaa yksi ravintolaosto kotiruoalla, ravintolaostoksen keskihinta oli 9,20 €.",
+              "Siirrä varalle vain se raha, joka jää pakollisten menojen jälkeen, jos haluat."
+            ],
+            "answer": "• Maksa ensin laskut, ruoka ja välttämättömät menot, ja tarkista sitten säästösiirtojen ajoitus ja summa.\n• Yksi vaihtoehto: korvaa yksi ravintolaosto kotiruoalla, ravintolaostoksen keskihinta oli 9,20 €.\n• Siirrä varalle vain se raha, joka jää pakollisten menojen jälkeen, jos haluat."
+          }
+        },
+        "2024-10": {
+          "spending": {
+            "bullets": [
+              "Tässä kuussa lisäostosi koostuivat muutamasta isommasta maksusta. Suurin yksittäinen maksu oli matkailuun, 150,82 €.",
+              "Lisäostoksia oli 17 maksua 14 päivänä. Kuun puolivälissä lisäostoja oli eniten päivää kohden, ja ne tehtiin enimmäkseen iltapäivällä.",
+              "Edellisen kuun tietoja ei ole tässä, joten muutosta ei voi eritellä. Tämä kuvaa vain lokakuun maksuja."
+            ],
+            "answer": "• Tässä kuussa lisäostosi koostuivat muutamasta isommasta maksusta. Suurin yksittäinen maksu oli matkailuun, 150,82 €.\n• Lisäostoksia oli 17 maksua 14 päivänä. Kuun puolivälissä lisäostoja oli eniten päivää kohden, ja ne tehtiin enimmäkseen iltapäivällä.\n• Edellisen kuun tietoja ei ole tässä, joten muutosta ei voi eritellä. Tämä kuvaa vain lokakuun maksuja."
+          },
+          "saving": {
+            "bullets": [
+              "Hoida ensin laskut, ruoka ja välttämättömät matkat ennen lisäsäästämistä.",
+              "Siirrot säästöön olivat 2 762,52 €, joten niiden ajoitusta ja summaa kannattaa tarkistaa.",
+              "Valinnainen askel: jätä yksi vapaaehtoinen matkailuostos tekemättä, jos se sopii sinulle."
+            ],
+            "answer": "• Hoida ensin laskut, ruoka ja välttämättömät matkat ennen lisäsäästämistä.\n• Siirrot säästöön olivat 2 762,52 €, joten niiden ajoitusta ja summaa kannattaa tarkistaa.\n• Valinnainen askel: jätä yksi vapaaehtoinen matkailuostos tekemättä, jos se sopii sinulle."
           }
         }
       },
@@ -1279,40 +1401,40 @@
         "customer_id": "CUST00103",
         "as_of": "2026-09-30",
         "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
-        "model": "claude-haiku-5-5",
+        "model": "claude-sonnet-5-5",
         "insights": [
           {
-            "id": "insight-b6fdddaf01929fd6-1",
+            "id": "insight-c27fc6779d7ca5dd-1",
             "period": "weekly",
-            "title": "Varaa rahat välttämättömiin maksuihin",
-            "headline_number": "Arvio 0 €/vko",
-            "explanation": "Viikoittaisiin lisäostoihin ei arvioitu jäävän rahaa, ja tilin saldo oli −152 €. Käyttöraha oli aineiston tilanteessa tiukalla.",
-            "action": "Tarkista erääntyvät laskut ja nykyinen saldo. Siirrä valinnaisia ostoksia, kunnes välttämättömiin maksuihin on rahaa."
+            "title": "Tarkista tilisiirtojen ajoitus ennen palkkapäivää",
+            "headline_number": "€0 viikossa",
+            "explanation": "Tilillä oli -€152 ja arvion mukaan ylimääräiseen ei jää rahaa ennen palkkaa. Palkka voi myös myöhästyä, noin 20 % kuukausista.",
+            "action": "Katso, mitkä säästösiirrot menevät tililtä ennen palkkaa. Siirrä tarvittaessa ajoitusta tai summaa, jotta pakolliset laskut tulevat maksettua."
           },
           {
-            "id": "insight-b6fdddaf01929fd6-2",
-            "period": "yearly",
-            "title": "Sovita säästösiirrot arjen maksuihin",
-            "headline_number": "35 350 € säästöön",
-            "explanation": "Viimeisen 12 kuukauden säästösiirrot olivat noin 35 350 €. Menot ja säästösiirrot ylittivät tulot keskimäärin noin 15 €/kk.",
-            "action": "Tarkista automaattisen säästösiirron summa ja ajoitus. Pienennä siirtoa tarvittaessa, jotta laskurahat jäävät käyttötilille."
-          },
-          {
-            "id": "insight-b6fdddaf01929fd6-3",
+            "id": "insight-c27fc6779d7ca5dd-2",
             "period": "monthly",
-            "title": "Etsi vapaa-ajan menoista kevennettävää",
-            "headline_number": "120 € syyskuussa",
-            "explanation": "Vapaa-aikaan kului syyskuussa noin 120 €, kun tavallinen tasosi oli noin 30 €/kk. Tästä voi löytyä joustoa arjen maksuihin.",
-            "action": "Käy syyskuun vapaa-ajan ostokset läpi ja valitse maksuton vaihtoehto sellaiselle menolle, jonka voisit jättää pois."
+            "title": "Pidä viime kuun viihdemenot silmällä",
+            "headline_number": "€120 viime kuussa",
+            "explanation": "Viihteeseen meni viime kuussa €120, kun tavallinen kuukausi on noin €30. Muu liikenne oli myös ennätyskuussa, €65 vs €5 tavallisesti.",
+            "action": "Katso viime kuun viihdemaksut läpi ja päätä, mitkä olivat kertaluonteisia. Jos jokin toistuu, tarkista, onko se sinulle tärkeä."
+          },
+          {
+            "id": "insight-c27fc6779d7ca5dd-3",
+            "period": "yearly",
+            "title": "Tee säästämisestä tilille turvallinen",
+            "headline_number": "€35,350 säästöön",
+            "explanation": "Viimeisen 12 kuukauden aikana tuloja oli €39,350 ja menoja €4,200. Silti menoja oli keskimäärin noin €15 kuukaudessa enemmän kuin tuloja.",
+            "action": "Mieti, kuinka suuri osa säästöstä kannattaa jättää tilille varalle yllätysmenoja varten. Tavoite on €800 varoiksi."
           }
         ]
       },
       "week": {
         "bullets": [
-          "Arvio lisäostoihin: 0 € viikossa.",
-          "Tarkista säästösiirtojen summa ja ajoitus, jotta rahaa riittää välttämättömiin maksuihin."
+          "Arvio: tällä viikolla lisämenoihin on noin 0,00 €, koska rahaa on vähän palkkapäivään asti.",
+          "Keskity ensin välttämättömiin maksuihin ja harkitse säästösiirtojen ajoitusta ja summaa."
         ],
-        "answer": "• Arvio lisäostoihin: 0 € viikossa.\n• Tarkista säästösiirtojen summa ja ajoitus, jotta rahaa riittää välttämättömiin maksuihin."
+        "answer": "• Arvio: tällä viikolla lisämenoihin on noin 0,00 €, koska rahaa on vähän palkkapäivään asti.\n• Keskity ensin välttämättömiin maksuihin ja harkitse säästösiirtojen ajoitusta ja summaa."
       }
     }
   }

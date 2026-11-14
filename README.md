@@ -66,7 +66,7 @@ frequency × size model, with burstiness-aware credibility weighting. Outputs:
 `BDA/engine/coach.py` exposes these as LLM tools. 27 self-checks pass, including a reproducibility check.
 
 ### Backend (`backend/`)
-FastAPI service where Claude Haiku 5.5 calls approved, customer-scoped tools and DuckDB calculates the answers.
+FastAPI service where Claude Sonnet 5.5 calls approved, customer-scoped tools and DuckDB calculates the answers.
 - **Customer isolation:** the customer ID never reaches the model.
 - **Agent loop:** at most 4 model rounds and 900 output tokens per round.
 - **Reasoning effort:** `low` by default (`CLAUDE_EFFORT`).

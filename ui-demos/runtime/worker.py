@@ -64,7 +64,7 @@ def definition(name, description, properties=None, required=()):
 
 
 TOOLS = [
-    definition("get_spending", "Exact historical consumer spending total, payment count, largest payment and category totals. With no filter, includes all ten consumer categories (Finnish 'arjen menot'), excluding investment flows. Omit category and line for that total; no basket argument exists. For both income and spending, use one get_cash_flow call.",
+    definition("get_spending", "Exact historical consumer spending total, payment count, largest payment, category totals and aggregate spending patterns by weekday, month part and recorded time of day. Patterns distinguish all spending from optional bank categories; payment counts are not visit counts. With no filter, includes all ten consumer categories (Finnish 'arjen menot'), excluding investment flows. Omit category and line for that total; no basket argument exists. For both income and spending, use one get_cash_flow call.",
                {**DATE_PROPERTIES, "category": {"type": "string", "description": "Optional bank category, e.g. Restaurants, Groceries or Home & Tech. Do not combine with line."}, "line": LINE_PROPERTY}, DATE_PROPERTIES),
     definition("get_cash_flow", "Exact historical income, spending, investment movements, net cash flow and latest recorded account balance before the period's end. spending_eur is total consumer spending (Finnish 'arjen menot') across all ten consumer categories, excluding investment flows. One call answers both income and spending. Separates remaining income from account balance.", DATE_PROPERTIES, DATE_PROPERTIES),
     definition("get_transactions", "Up to 20 of this customer's original transactions in a period, newest first. Use only when individual purchases are needed. Paginate with offset; never infer totals from a page.",
@@ -244,8 +244,36 @@ class CustomerRuntime:
                 row["amount"], row["balance"] = float(row["amount"]), float(row["balance"])
             weekly = build_insight_context(cid, self.source(cid))["safe_to_spend_detail"]
             self._bootstraps[cid] = {"summary": self._summary, "profiles": [profile], "as_of": self.as_of, "version": self.version,
-                                     "weekly_spending": {key: weekly[key] for key in ("eur_week", "usual_extras_eur_week")}}
+                                     "weekly_spending": self.weekly_spending(cid, weekly)}
         return self._bootstraps[cid]
+
+    def weekly_spending(self, customer_id, detail=None):
+        """Recorded extras against an explicit planning envelope, not a live balance.
+
+        The envelope adopts the snapshot's modeled weekly pace as a planning limit.
+        Subtracting recorded spending describes progress against that limit; it must
+        not be presented as a fresh estimate of safely spendable bank funds.
+        """
+        cid = self.customer(customer_id)
+        detail = detail or build_insight_context(cid, self.source(cid))["safe_to_spend_detail"]
+        observed = date.fromisoformat(self.as_of)
+        start = observed - timedelta(days=observed.weekday())
+        end = start + timedelta(days=6)
+        lines = tuple(self.cfg.DISCRETIONARY)
+        spent = self.query("""select coalesce(sum(cast(spend as decimal(18,2))),0) spent_eur
+            from transactions where customer_id = ? and tx_date >= ? and tx_date <= ?
+            and spend > 0 and tx_amount_eur < 0 and line in (""" + ",".join("?" for _ in lines) + ")",
+            [cid, start, observed, *lines])[0]["spent_eur"]
+        spent_cents = int(Decimal(spent) * 100)
+        budget_cents = int(Decimal(str(detail["eur_week"])) * 100)
+        remaining = max(0, budget_cents - spent_cents)
+        days = (end - observed).days
+        return {"eur_week": detail["eur_week"], "usual_extras_eur_week": detail["usual_extras_eur_week"],
+                "week_start": start.isoformat(), "week_end": end.isoformat(), "observed_through": observed.isoformat(),
+                "spent_eur_week": spent_cents / 100, "weekly_budget_eur": budget_cents / 100,
+                "remaining_eur_week": remaining / 100, "over_budget_eur_week": max(0, spent_cents - budget_cents) / 100,
+                "days_remaining_in_week": days, "daily_remaining_eur": (remaining // days) / 100 if days else None,
+                "planning_note": "Weekly planning envelope: the snapshot's modeled weekly limit minus this customer's recorded discretionary spending. Remaining money is budget headroom, not an account balance or a new safe-to-spend estimate. The spending period runs from Monday through the snapshot date; future days have not been observed."}
 
     def period(self, arguments):
         try:
@@ -351,6 +379,56 @@ class CustomerRuntime:
             raise RequestError("Unexpected identifier in purchase plan")
         return result
 
+    def spending_patterns(self, where, params, start, end):
+        """Aggregate the exact get_spending scope without exposing individual payments."""
+        rows = self.query(f"""select tx_date payment_date, extract(hour from ts) recorded_hour,
+            cast(ts as time) <> time '00:00:00' non_midnight_time,
+            category, cast(-tx_amount_eur as decimal(18,2)) amount_eur
+            from transactions where {where}""", params)
+        records = [(date.fromisoformat(row["payment_date"]), row["recorded_hour"], row["category"],
+                    int(Decimal(row["amount_eur"]) * 100), row["non_midnight_time"]) for row in rows]
+        weekday_days, part_days = [0] * 7, [0] * 3
+        for offset in range((end - start).days):
+            day = start + timedelta(days=offset)
+            weekday_days[day.weekday()] += 1
+            part_days[min((day.day - 1) // 10, 2)] += 1
+
+        def stats(selected, categories):
+            # Integer cents preserve the same exact totals as the original SQL aggregates.
+            category_totals = {category: [0, 0] for category in categories}
+            weekdays, month_parts, dayparts = [[0, 0] for _ in range(7)], [[0, 0] for _ in range(3)], [[0, 0] for _ in range(4)]
+            for day, hour, category, amount, _ in selected:
+                if hour is None or not 0 <= hour < 24:
+                    raise RequestError("Recorded payment time is unavailable for spending patterns")
+                for bucket in (category_totals[category], weekdays[day.weekday()],
+                               month_parts[min((day.day - 1) // 10, 2)], dayparts[hour // 6]):
+                    bucket[0] += 1
+                    bucket[1] += amount
+            amounts = sorted(row[3] for row in selected)
+            count, total = len(amounts), sum(amounts)
+            median = (Decimal(amounts[(count - 1) // 2]) + amounts[count // 2]) / 2 if count else None
+
+            def bucket(key, identity, values, calendar_days=None):
+                return {key: identity, "payments": values[0], "total_eur": money(Decimal(values[1]) / 100),
+                        **({"calendar_days": calendar_days} if calendar_days is not None else {})}
+
+            return {"payments": count, "active_days": len({row[0] for row in selected}),
+                    "timed_payments": sum(bool(row[4]) for row in selected),
+                    "total_eur": money(Decimal(total) / 100),
+                    "average_payment_eur": money(Decimal(total) / count / 100) if count else None,
+                    "median_payment_eur": money(median / 100) if count else None,
+                    "biggest_payment_eur": money(Decimal(amounts[-1]) / 100) if count else "0.00",
+                    "top_three_payments_eur": money(Decimal(sum(amounts[-3:])) / 100),
+                    "categories": [bucket("category", category, values) for category, values in category_totals.items()],
+                    "weekdays": [bucket("day", i + 1, values, weekday_days[i]) for i, values in enumerate(weekdays)],
+                    "month_parts": [bucket("part", part, month_parts[i], part_days[i]) for i, part in enumerate(("early", "middle", "late"))],
+                    "dayparts": [bucket("part", part, dayparts[i]) for i, part in enumerate(("night", "morning", "afternoon", "evening"))]}
+
+        optional = tuple(PURCHASE_CATEGORIES)
+        return {"all": stats(records, SPENDING_CATEGORIES),
+                "discretionary": stats([row for row in records if row[2] in optional], optional),
+                "scope_note": "Both groups use the requested customer's date, category or line filter and only negative consumer payments; refunds, income and transfers are excluded. Discretionary additionally selects the Restaurants, Lifestyle, Entertainment and Travel bank categories, not an assessment of which purchases were necessary. Counts are payments, not visits. Weekdays and month parts use recorded transaction dates; dayparts use the recorded timestamp hour, not an inferred visit time or converted local timezone; the source timezone is unspecified. Night is 00:00-06:00, morning 06:00-12:00, afternoon 12:00-18:00 and evening 18:00-24:00, with exclusive upper bounds. timed_payments counts non-midnight timestamps only; midnight may mean a date-only record or a real midnight payment, so this is a precision proxy, not proof of visit timing. Month parts are days 1-10, 11-20 and 21 onward. Calendar-day counts cover the requested inclusive start and exclusive end, including days without payments; consult coverage before interpreting dates outside the snapshot. Top-three amount sums the largest up to three payments, retaining ties. Average and median amounts are rounded half up to cents."}
+
     def _execute(self, cid, name, args):
         if name == "afford":
             return {**_afford(cid, **args, query=self.query_frame), "model_estimate": True,
@@ -373,11 +451,13 @@ class CustomerRuntime:
                     coalesce(max(cast(-tx_amount_eur as decimal(18,2))),0) biggest_payment_eur
                     from transactions where {where}""", params)[0])
                 result["categories"] = self.query(f"""select category, count(*) payments,
-                    sum(cast(-tx_amount_eur as decimal(18,2))) total_eur
+                    sum(cast(-tx_amount_eur as decimal(18,2))) total_eur,
+                    max(cast(-tx_amount_eur as decimal(18,2))) biggest_payment_eur
                     from transactions where {where} group by category order by total_eur desc""", params)
                 result["months"] = self.query(f"""select strftime(tx_date,'%Y-%m') as "month", count(*) payments,
                     sum(cast(-tx_amount_eur as decimal(18,2))) total_eur
                     from transactions where {where} group by 1 order by 1""", params)
+                result["patterns"] = self.spending_patterns(where, params, start, end)
             elif name == "get_transactions":
                 limit, offset = args.get("limit", 10), args.get("offset", 0)
                 result["total_matches"] = self.query(f"select count(*) n from transactions where {where}", params)[0]["n"]
@@ -410,7 +490,7 @@ class CustomerRuntime:
             return {"model_estimate": True, "topic": args["topic"], "detail": card[args["topic"]]}
         if name == "safe_to_spend":
             detail = build_insight_context(cid, source)["safe_to_spend_detail"]
-            result = {"model_estimate": True, **detail,
+            result = {"model_estimate": True, **detail, **self.weekly_spending(cid, detail),
                       "next_payday": card["income"]["next_payday"], "recorded_balance_eur": card["balance_eur"],
                       "safe_to_save_eur_month": card["safe_to_save_eur_month"],
                       "surprise_fund_target_eur": card["surprise_fund_target_eur"],

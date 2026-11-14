@@ -1,4 +1,5 @@
-const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
+import { locale } from './language.js';
+const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
 
 // Periods follow the historical data date, never the visitor's clock or a chart selector.
 export function insightPeriod(period, asOf) {

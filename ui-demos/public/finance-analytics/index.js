@@ -1,11 +1,12 @@
+import { locale } from '../language.js';
 import { prepareDataset, breakdown, annualSpending, spendingRhythm, historySeries, canShift, shiftAnchor, monthEnd, dateOf } from './model.js';
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-const money = (value, digits = 2) => value === null ? 'Ei aineistoa' : new Intl.NumberFormat('fi-FI', { style:'currency', currency:'EUR', minimumFractionDigits:digits, maximumFractionDigits:digits }).format(value || 0);
-const number = (value, digits = 0) => new Intl.NumberFormat('fi-FI', { maximumFractionDigits:digits }).format(value || 0);
-const dateLabel = date => dateOf(date).toLocaleDateString('fi-FI', { day:'numeric', month:'numeric', year:'numeric', timeZone:'UTC' });
-const monthLabel = month => { const value = dateOf(month + '-01').toLocaleDateString('fi-FI', { month:'long', year:'numeric', timeZone:'UTC' }); return value[0].toUpperCase() + value.slice(1); };
-const monthShort = ['Tam','Hel','Maa','Huh','Tou','Kes','Hei','Elo','Syy','Lok','Mar','Jou'];
+const money = (value, digits = 2) => value === null ? 'Ei aineistoa' : new Intl.NumberFormat(locale(), { style:'currency', currency:'EUR', minimumFractionDigits:digits, maximumFractionDigits:digits }).format(value || 0);
+const number = (value, digits = 0) => new Intl.NumberFormat(locale(), { maximumFractionDigits:digits }).format(value || 0);
+const dateLabel = date => dateOf(date).toLocaleDateString(locale(), { day:'numeric', month:'numeric', year:'numeric', timeZone:'UTC' });
+const monthLabel = month => { const value = dateOf(month + '-01').toLocaleDateString(locale(), { month:'long', year:'numeric', timeZone:'UTC' }); return value[0].toUpperCase() + value.slice(1); };
+const monthShort = () => Array.from({ length: 12 }, (_, month) => new Intl.DateTimeFormat(locale(), { month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, month, 1))));
 const palette = ['#007e43','#42a77c','#81b9a4','#aecf61','#668f9d','#b6c9be','#58835c','#d4c77a','#637f75','#bac9a0'];
 const chevron = direction => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${direction === 'left' ? 'm15 5-7 7 7 7' : direction === 'down' ? 'm5 9 7 7 7-7' : 'm9 5 7 7-7 7'}"/></svg>`;
 const chartIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h19M8 17v-6m6 6V5m6 12V8"/></svg>';
@@ -43,7 +44,7 @@ function plot({ bins, comparison = true, income = false, selected = -1, patternI
     ${bins.map((b,i) => b.spending === null ? `<text class="fa-missing" x="${x(i)}" y="${bottom-7}" text-anchor="middle">–</text>` : `<rect class="fa-bar ${i === selected ? 'fa-selected-bar' : ''}" x="${x(i)-Math.min(18,step*.6)/2}" y="${y(b.spending)}" width="${Math.min(18,step*.6)}" height="${Math.max(b.spending ? 1 : 0,bottom-y(b.spending))}" rx="3"/>`).join('')}
     ${comparison ? line('comparison', annual ? 'fa-annual-line' : 'fa-comparison-line') : ''}${income ? line('income','fa-income-line') : ''}
     ${selected >= 0 ? `<line class="fa-selection-line" x1="${x(selected)}" x2="${x(selected)}" y1="${top}" y2="${bottom}"/>` : ''}
-    ${bins.map((b,i) => (annual || bins.length <= 12 || i === 0 || i === bins.length-1 || (i+1)%5 === 0) ? `<text class="fa-axis ${i === selected ? 'fa-selected-label' : ''}" x="${x(i)}" y="222" text-anchor="middle">${annual ? monthShort[i] : escape(b.label)}</text>` : '').join('')}
+    ${bins.map((b,i) => (annual || bins.length <= 12 || i === 0 || i === bins.length-1 || (i+1)%5 === 0) ? `<text class="fa-axis ${i === selected ? 'fa-selected-label' : ''}" x="${x(i)}" y="222" text-anchor="middle">${annual ? monthShort()[i] : escape(b.label)}</text>` : '').join('')}
   </svg>`;
 }
 
@@ -119,7 +120,7 @@ export function createFinanceAnalytics(host, options) {
       <div class="fa-chart-legend"><span><i class="fa-dot" style="--swatch:var(--fa-green)"></i>Menot ${state.year}</span><button type="button" data-fa="annual-compare" aria-pressed="${state.annualCompare}"><i class="fa-dot fa-striped"></i>${state.year-1}${state.annualCompare?' ✓':''}</button></div>
       <p class="fa-chart-hint">Valitse kuukausi pylväästä. – = ei aineistoa.</p>
       ${model.change!==null?`<p class="fa-year-comparison"><b>${model.change>0?'+':''}${number(model.change,1)} %</b> edellisen vuoden samoihin ${model.comparableMonths} kuukauteen verrattuna.</p>`:'<p class="fa-chart-hint">Vuosivertailuun ei ole riittävästi yhteistä aineistoa.</p>'}
-      <details class="fa-data-table"><summary>Näytä luvut taulukkona</summary><table><caption>Menot euroina, kalenterikuukausittain</caption><thead><tr><th>Kuukausi</th><th>${state.year}</th><th>${state.year-1}</th></tr></thead><tbody>${bins.map((b,i)=>`<tr><th>${monthShort[i]}</th><td>${money(b.spending)}</td><td>${money(b.comparison)}</td></tr>`).join('')}</tbody></table></details>
+      <details class="fa-data-table"><summary>Näytä luvut taulukkona</summary><table><caption>Menot euroina, kalenterikuukausittain</caption><thead><tr><th>Kuukausi</th><th>${state.year}</th><th>${state.year-1}</th></tr></thead><tbody>${bins.map((b,i)=>`<tr><th>${monthShort()[i]}</th><td>${money(b.spending)}</td><td>${money(b.comparison)}</td></tr>`).join('')}</tbody></table></details>
     </div></section>`;
   }
   function historyLauncher() {
