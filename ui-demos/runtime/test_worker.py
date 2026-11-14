@@ -45,6 +45,7 @@ class RuntimeTests(unittest.TestCase):
     def test_context_queries_only_selected_rows_and_contains_no_ids(self):
         for cid in worker.DEMO_CUSTOMERS:
             context = self.request("context", cid)
+            self.assertEqual((context["coverage_from"], context["coverage_to"]), ("2024-10-01", "2026-09-30"))
             source = self.runtime.source(cid)
             for collection in (source.summary, source.lines, source.insights, source.spender):
                 self.assertEqual(list(collection), [cid])
@@ -187,6 +188,8 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         responses = [json.loads(line) for line in proc.stdout.splitlines()]
         self.assertEqual([row["id"] for row in responses], ["ready", "bad", "good", "filter"])
+        self.assertEqual(responses[0]["result"]["coverage_from"], "2024-10-01")
+        self.assertEqual(responses[0]["result"]["coverage_to"], "2026-09-30")
         self.assertEqual(responses[1]["error"]["code"], "invalid_request")
         self.assertNotIn("CUST99999", proc.stdout)
         self.assertIn("profile", responses[2]["result"])

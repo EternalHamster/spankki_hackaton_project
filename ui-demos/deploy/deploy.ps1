@@ -83,12 +83,15 @@ Push-Location -LiteralPath $sourceRoot
 try {
     if ($Plan) {
         Write-Host 'node scripts/prepare-runtime.mjs'
+        Write-Host 'node scripts/check-prepared.mjs'
         Write-Host 'node scripts/check.mjs'
     } else {
         if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'Install Node.js 24 LTS to validate the package.' }
         if (-not (Get-Command gcloud -ErrorAction SilentlyContinue)) { throw 'Install the Google Cloud CLI and run gcloud init first.' }
         & node scripts/prepare-runtime.mjs
         if ($LASTEXITCODE -ne 0) { throw 'Runtime packaging failed; deployment stopped.' }
+        & node scripts/check-prepared.mjs
+        if ($LASTEXITCODE -ne 0) { throw 'Prepared AI answers are missing or stale; regenerate them before deployment.' }
         & node scripts/check.mjs
         if ($LASTEXITCODE -ne 0) { throw 'Local validation failed; deployment stopped.' }
     }

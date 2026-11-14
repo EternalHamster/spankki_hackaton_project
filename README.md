@@ -18,7 +18,7 @@ which figures to fetch and explains them in plain language, in Finnish or Englis
 | [`BDA/`](BDA/README.md) | Hierarchical Bayesian spending model with Statistics Finland priors; insights and LLM tools | Done, validated |
 | [`backend/`](backend/README.md) | FastAPI + Claude (direct Anthropic API) + DuckDB coach, Cloud Run deployment | Running; chat tools not yet BDA-backed |
 | [`coach_context/`](coach_context/README.md) | Profile card and insight context: compact per-customer summaries for the model's prompt | Connected to web insights and every chat |
-| [`ui-demos/`](ui-demos/README.md) | **Oma talous** web app: three demo customers, live Claude insights/chat, private DuckDB tools and Rahavuotesi | Local and Cloud Run runtime |
+| [`ui-demos/`](ui-demos/README.md) | **Oma talous** web app: three demo customers, prepared Claude insights/summaries, live chat, private DuckDB tools and Rahavuotesi | Local and Cloud Run runtime |
 | [`wrapped/`](wrapped/README.md) | **Rahavuotesi**: Spotify Wrapped-style year in money, in the UI | Done (Finnish) |
 | [`demo/`](demo/PERSONAS.md) | Four narrative personas with stories and demo questions | Separate from the three live UI selections |
 | [`scripts/`](scripts/) | `build_features.py` (Features/), `select_personas.py` (demo/) | Done |
@@ -37,7 +37,8 @@ Data/ (raw CSVs)
  ├─ backend ingest ───────────► DuckDB snapshot ─► backend /v1/chat (Claude + customer-scoped tools)
  └─ BDA/output/coach.duckdb ──► ui-demos/runtime/worker.py (persistent, read-only)
                                       ├─► selected-customer chart bootstrap ─► Oma talous UI
-                                      ├─► compact profile + insight context ─► /api/insights (Claude, 1-hour card cache)
+                                      ├─► prepare-coach.mjs + Claude ─► private coach-answers.json
+                                      │                                    └─► /api/insights + /api/summaries (prepared reads)
                                       └─► compact profile + seven scoped tools ─► /api/chat (Claude)
 ```
 
@@ -79,7 +80,7 @@ Deploys to Cloud Run with `deploy.cmd`.
 - **`profile_card.py`:** a deterministic 500–860-token summary of one customer. It lets overview questions
   ("what kind of spender am I?") be answered without tool calls. It is designed to go after the shared, cached
   part of the prompt, so prompt caching keeps working. Safe amounts are rounded down, like BDA's.
-- **`insight_context.py`:** the profile card plus the detail behind it, used by the web app's `/api/insights` and the separate backend's `/v1/insights`.
+- **`insight_context.py`:** the profile card plus the detail behind it, used to prepare the web app's key insights and by the separate backend's `/v1/insights`.
 
 The web worker caches both contexts per customer and database snapshot. Every web chat includes the compact profile; detailed transaction questions use bounded tools instead of putting the full customer history into each prompt.
 
@@ -92,11 +93,13 @@ A mobile-first **Oma talous** tab in S-mobiili's style. It shows:
 - the three baskets,
 - a savings slider.
 
-The front-page selector offers three synthetic demo customers. Node signs the selection in an HttpOnly cookie and checks a fresh selection nonce on every data, insight, recap and chat request. Switching customers clears the old display and conversation; late responses cannot populate the new selection.
+The front-page selector offers three synthetic demo customers. Node signs the selection in an HttpOnly cookie and checks a fresh selection nonce on every data, insight, summary, recap and chat request. Switching customers clears the old display and conversation; late responses cannot populate the new selection. Spending, saving and transactions have independent month selectors, with no global calendar; transaction filtering preserves the selected category. The original Rahavuotesi card remains below the key insights.
 
-Claude generates three clickable insights when a customer is first opened. A per-customer/snapshot application cache reuses validated cards for one hour; charts load independently while the first model request takes several seconds. Failed generation requires an explicit retry. **Kysy** and insight chats both receive the selected customer's compact, dated profile. Seven bounded tools query that customer's historical spending, cash flow, transactions, safe-to-spend, scenarios, model details and group peer comparisons. The worker runs Python/DuckDB 2 read-only inside the same container; the visitor needs only a browser. Anthropic prompt caching reuses eligible prompt prefixes separately from the application's card cache.
+Claude prepares the three clickable key insights for each customer from their broader historical context, plus concise Finnish section summaries, before deployment. The private tracked bundle contains spending and saving answers for all 24 recorded months for each of the three customers (144 monthly answers), three weekly answers dated to the snapshot, and nine insight cards. Page load preloads the default month's three topic answers. Startup, page loads, section expansion and month changes only read prepared content; they do not call the model. The bundle is checked against the database hash, prompt version, model and complete customer/month coverage. Missing or stale content blocks deployment and readiness; regenerate it when the database, prompts or model change.
 
-The public selector intentionally exposes all three synthetic personas. Server scoping prevents a chat/tool request from switching identity; other people appear only as group aggregates. Real customer data still requires verified authentication and a server-side ownership mapping. Database/context sources stay outside the public directory. The frontend uses plain JavaScript ES modules with a strict CSP and no build step. Cloud Run uses 1 GiB, zero minimum instances and one maximum instance; cold starts clear in-memory caches.
+**Kysy** and insight follow-up chats remain live Claude calls. Both receive the selected customer's compact, dated profile. Seven bounded tools query that customer's historical spending, cash flow, transactions, safe-to-spend, scenarios, model details and group peer comparisons. The worker runs Python/DuckDB 2 read-only inside the same container; the visitor needs only a browser. Anthropic prompt caching reuses eligible chat prefixes. Exact selected-month scenarios use that month's transaction totals; the BDA context summarizes the 23 complete training months, recent trends and last-12-month figures within the 24-month recorded snapshot.
+
+The public selector intentionally exposes all three synthetic personas. Server scoping prevents a chat/tool request from switching identity; other people appear only as group aggregates. Real customer data still requires verified authentication and a server-side ownership mapping. Database/context sources and the multi-customer prepared bundle stay outside the public directory. The frontend uses plain JavaScript ES modules with a strict CSP and no build step. Cloud Run uses 1 GiB, zero minimum instances and one maximum instance; cold starts rebuild local data caches and validate the packaged answers without generating new text.
 
 ### Rahavuotesi (`wrapped/`)
 A full-screen, swipeable story of the customer's last 12 months (Oct 2025 – Sep 2026), in Finnish and in the
@@ -135,10 +138,13 @@ cd ui-demos
 py -3.12 -m venv .venv
 .venv\Scripts\python.exe -m pip install -r runtime\requirements.txt
 Copy-Item .env.example .env                 # set ANTHROPIC_API_KEY privately
+node --env-file=.env scripts/check-prepared.mjs # validate the tracked bundle; no model calls
 node --env-file=.env server.mjs            # http://127.0.0.1:4173/
 ```
 
 Keep this DuckDB 2 environment isolated from the existing project/backend DuckDB 1.5.6 environment. Node automatically finds `ui-demos/.venv`. Cloud deployment packages the database and minimal Python code via `ui-demos/deploy/deploy.ps1`; production uses Secret Manager for the provider key and a stable session signing secret of at least 32 characters.
+
+After changing the database, prompts or model, run `node --env-file=.env scripts/prepare-coach.mjs --generate` from `ui-demos/` before validation and deployment. This explicitly makes billable Claude calls using the three approved synthetic customers and writes `server-data/coach-answers.json`. It resumes compatible unfinished work from an ignored `.runtime/` checkpoint. The generated synthetic bundle is tracked; API keys and local checkpoints are not. See [ui-demos/README.md](ui-demos/README.md) for the complete preparation workflow.
 
 ```bash
 # Regenerate derived data (stdlib Python unless noted)
@@ -156,6 +162,7 @@ Backend setup, local run and Cloud Run deployment: [`backend/README.md`](backend
 ```bash
 # From the repository root:
 node ui-demos/scripts/check.mjs                           # UI, chat server, Rahavuotesi rendering
+node ui-demos/scripts/check-prepared.mjs                  # prepared content matches DB/prompts/model; no model calls
 ui-demos/.venv/Scripts/python -m unittest discover -s ui-demos/runtime -p test_worker.py -v
 python -m unittest discover -s wrapped/tests -t .          # Rahavuotesi facts and cards, all customers
 python -m unittest discover -s coach_context/tests -t .    # profile card, insight context

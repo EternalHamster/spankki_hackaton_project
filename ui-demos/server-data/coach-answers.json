@@ -1,0 +1,1310 @@
+{
+  "schema_version": 1,
+  "content_version": "duckdb-coach-v6",
+  "model": "claude-haiku-5-5",
+  "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
+  "coverage_from": "2024-10-01",
+  "as_of": "2026-09-30",
+  "generated_at": "2026-11-14T13:10:34.169Z",
+  "customers": {
+    "CUST00207": {
+      "months": {
+        "2026-04": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 912,28 €.",
+              "Eniten kului asumiseen, 692,48 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 912,28 €.\n• Eniten kului asumiseen, 692,48 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 615,65 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 85,53 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 615,65 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 85,53 €."
+          }
+        },
+        "2026-05": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 694,04 €.",
+              "Eniten kului ruokaostoksiin, 1 056,39 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 694,04 €.\n• Eniten kului ruokaostoksiin, 1 056,39 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 229,78 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 48,79 €."
+            ],
+            "answer": "• Menot ylittivät tulot 229,78 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 48,79 €."
+          }
+        },
+        "2026-06": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 3 324,35 €.",
+              "Eniten kului ravintoloihin, 809,29 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 3 324,35 €.\n• Eniten kului ravintoloihin, 809,29 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 847,36 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 161,86 €."
+            ],
+            "answer": "• Menot ylittivät tulot 847,36 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 161,86 €."
+          }
+        },
+        "2026-07": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 947,04 €.",
+              "Eniten kului asumiseen, 642,47 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 947,04 €.\n• Eniten kului asumiseen, 642,47 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 452,94 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,79 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 452,94 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,79 €."
+          }
+        },
+        "2026-08": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 3 044,25 €.",
+              "Eniten kului ravintoloihin, 997,13 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 3 044,25 €.\n• Eniten kului ravintoloihin, 997,13 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 395,30 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 199,43 €."
+            ],
+            "answer": "• Menot ylittivät tulot 395,30 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 199,43 €."
+          }
+        },
+        "2026-09": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 653,22 €.",
+              "Eniten kului asumiseen, 693,62 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 653,22 €.\n• Eniten kului asumiseen, 693,62 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 688,96 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 51,35 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 688,96 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 51,35 €."
+          }
+        },
+        "2025-10": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 611,65 €.",
+              "Eniten kului asumiseen, 640,07 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 611,65 €.\n• Eniten kului asumiseen, 640,07 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 827,47 €.",
+              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 89,21 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 827,47 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 89,21 €."
+          }
+        },
+        "2025-11": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 3 746,57 €.",
+              "Eniten kului ravintoloihin, 1 009,61 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 3 746,57 €.\n• Eniten kului ravintoloihin, 1 009,61 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 1 062,38 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 201,92 €."
+            ],
+            "answer": "• Menot ylittivät tulot 1 062,38 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 201,92 €."
+          }
+        },
+        "2025-12": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 220,14 €.",
+              "Eniten kului asumiseen, 667,40 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 220,14 €.\n• Eniten kului asumiseen, 667,40 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 16,33 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 80,61 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 16,33 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 80,61 €."
+          }
+        },
+        "2026-01": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 3 159,81 €.",
+              "Eniten kului kotiin ja tekniikkaan, 973,05 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 3 159,81 €.\n• Eniten kului kotiin ja tekniikkaan, 973,05 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 486,14 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 126,48 €."
+            ],
+            "answer": "• Menot ylittivät tulot 486,14 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 126,48 €."
+          }
+        },
+        "2026-02": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 485,20 €.",
+              "Eniten kului asumiseen, 693,79 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 485,20 €.\n• Eniten kului asumiseen, 693,79 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 959,53 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 67,90 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 959,53 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 67,90 €."
+          }
+        },
+        "2026-03": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 197,99 €.",
+              "Eniten kului asumiseen, 686,71 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 197,99 €.\n• Eniten kului asumiseen, 686,71 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 1 009,92 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,72 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 1 009,92 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,72 €."
+          }
+        },
+        "2025-04": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 3 584,47 €.",
+              "Eniten kului ravintoloihin, 1 939,57 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 3 584,47 €.\n• Eniten kului ravintoloihin, 1 939,57 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 929,39 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 387,91 €."
+            ],
+            "answer": "• Menot ylittivät tulot 929,39 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 387,91 €."
+          }
+        },
+        "2025-05": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 1 775,77 €.",
+              "Eniten kului ravintoloihin, 715,60 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 1 775,77 €.\n• Eniten kului ravintoloihin, 715,60 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 464,45 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 143,12 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 464,45 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 143,12 €."
+          }
+        },
+        "2025-06": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 250,34 €.",
+              "Eniten kului asumiseen, 656,66 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 250,34 €.\n• Eniten kului asumiseen, 656,66 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 96,00 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,25 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 96,00 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,25 €."
+          }
+        },
+        "2025-07": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 802,13 €.",
+              "Eniten kului asumiseen, 685,72 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 802,13 €.\n• Eniten kului asumiseen, 685,72 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 1 178,96 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 1,38 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 1 178,96 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 1,38 €."
+          }
+        },
+        "2025-08": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 869,03 €.",
+              "Eniten kului asumiseen, 693,90 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 869,03 €.\n• Eniten kului asumiseen, 693,90 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 1 951,82 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 3,76 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 1 951,82 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 3,76 €."
+          }
+        },
+        "2025-09": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 875,99 €.",
+              "Eniten kului asumiseen, 687,39 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 875,99 €.\n• Eniten kului asumiseen, 687,39 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 1 139,04 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 9,58 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 1 139,04 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 9,58 €."
+          }
+        },
+        "2024-10": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 4 126,85 €.",
+              "Eniten kului ravintoloihin, 1 575,82 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 4 126,85 €.\n• Eniten kului ravintoloihin, 1 575,82 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 1 941,16 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 315,16 €."
+            ],
+            "answer": "• Menot ylittivät tulot 1 941,16 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 315,16 €."
+          }
+        },
+        "2024-11": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 3 950,80 €.",
+              "Eniten kului ruokaostoksiin, 896,27 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 3 950,80 €.\n• Eniten kului ruokaostoksiin, 896,27 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 1 880,86 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 151,06 €."
+            ],
+            "answer": "• Menot ylittivät tulot 1 880,86 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 151,06 €."
+          }
+        },
+        "2024-12": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 291,37 €.",
+              "Eniten kului asumiseen, 684,26 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 291,37 €.\n• Eniten kului asumiseen, 684,26 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 1 046,28 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 55,73 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 1 046,28 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 55,73 €."
+          }
+        },
+        "2025-01": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 981,40 €.",
+              "Eniten kului ruokaostoksiin, 856,79 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 981,40 €.\n• Eniten kului ruokaostoksiin, 856,79 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 589,10 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 147,26 €."
+            ],
+            "answer": "• Menot ylittivät tulot 589,10 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 147,26 €."
+          }
+        },
+        "2025-02": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 878,51 €.",
+              "Eniten kului ruokaostoksiin, 1 506,89 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 878,51 €.\n• Eniten kului ruokaostoksiin, 1 506,89 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 285,91 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 106,46 €."
+            ],
+            "answer": "• Menot ylittivät tulot 285,91 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 106,46 €."
+          }
+        },
+        "2025-03": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 339,89 €.",
+              "Eniten kului liikkumiseen, 772,76 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 339,89 €.\n• Eniten kului liikkumiseen, 772,76 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 353,72 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 141,72 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 353,72 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 141,72 €."
+          }
+        }
+      },
+      "insights": {
+        "status": "ready",
+        "customer_id": "CUST00207",
+        "as_of": "2026-09-30",
+        "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
+        "model": "claude-haiku-5-5",
+        "insights": [
+          {
+            "id": "insight-eef09545f90c4ae2-1",
+            "title": "Ravintola- ja kahvilakulut ovat korkeat",
+            "headline_number": "250 €/kk",
+            "explanation": "Käytät ravintoloihin ja kahviloihin noin 250 € kuukaudessa, kun vertailuryhmän tyypillinen summa on 95 €. Syy on se, että käyt yhtä usein, mutta jokainen käynti maksaa enemmän.",
+            "action": "Pienempi summa per käynti voisi auttaa säästämään rahaa varalle."
+          },
+          {
+            "id": "insight-eef09545f90c4ae2-2",
+            "title": "Pikaruoka ja noutoruoka vievät rahaa",
+            "headline_number": "130 €/kk",
+            "explanation": "Pikaruokaan ja noutoruokaan menee arviolta 130 € kuukaudessa, kun tyypillinen summa samassa ryhmässä on 50 €. Ero syntyy pääosin siitä, että yksi ostos maksaa enemmän.",
+            "action": "Valitse edullisempi annos tai pienennä yksittäisen ostoksen hintaa."
+          },
+          {
+            "id": "insight-eef09545f90c4ae2-3",
+            "title": "Rahaa on varalla yllättäviin menoihin",
+            "headline_number": "1 250 €",
+            "explanation": "Tilin saldo kattoi 1 250 euron vararahaston. Yllättäviä menoja tulee arviolta kerran parissa vuodessa, tyypillisesti noin 790 €.",
+            "action": "Pidä vähintään 1 250 € koskemattomana yllättäviä menoja varten."
+          }
+        ]
+      },
+      "week": {
+        "bullets": [
+          "Arvio lisäostoihin: noin 260 € viikossa.",
+          "Tarkista kuukauden menot ennen suurempaa ostosta."
+        ],
+        "answer": "• Arvio lisäostoihin: noin 260 € viikossa.\n• Tarkista kuukauden menot ennen suurempaa ostosta."
+      }
+    },
+    "CUST00127": {
+      "months": {
+        "2026-04": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 679,11 €.",
+              "Eniten kului asumiseen, 900,84 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 679,11 €.\n• Eniten kului asumiseen, 900,84 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 278,61 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 34,78 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 278,61 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 34,78 €."
+          }
+        },
+        "2026-05": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 035,34 €.",
+              "Eniten kului asumiseen, 858,14 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 035,34 €.\n• Eniten kului asumiseen, 858,14 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 670,08 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,47 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 670,08 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,47 €."
+          }
+        },
+        "2026-06": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 832,56 €.",
+              "Eniten kului asumiseen, 867,81 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 832,56 €.\n• Eniten kului asumiseen, 867,81 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 4,09 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 43,51 €."
+            ],
+            "answer": "• Menot ylittivät tulot 4,09 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 43,51 €."
+          }
+        },
+        "2026-07": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 863,42 €.",
+              "Eniten kului asumiseen, 898,08 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 863,42 €.\n• Eniten kului asumiseen, 898,08 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 285,73 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,04 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 285,73 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 54,04 €."
+          }
+        },
+        "2026-08": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 074,31 €.",
+              "Eniten kului asumiseen, 885,82 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 074,31 €.\n• Eniten kului asumiseen, 885,82 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 4,29 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 41,58 €."
+            ],
+            "answer": "• Menot ylittivät tulot 4,29 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 41,58 €."
+          }
+        },
+        "2026-09": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 756,61 €.",
+              "Eniten kului asumiseen, 926,09 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 756,61 €.\n• Eniten kului asumiseen, 926,09 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 694,50 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,76 €."
+            ],
+            "answer": "• Menot ylittivät tulot 694,50 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 101,76 €."
+          }
+        },
+        "2025-10": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 131,43 €.",
+              "Eniten kului asumiseen, 930,88 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 131,43 €.\n• Eniten kului asumiseen, 930,88 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 88,75 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 45,69 €."
+            ],
+            "answer": "• Menot ylittivät tulot 88,75 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 45,69 €."
+          }
+        },
+        "2025-11": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 926,33 €.",
+              "Eniten kului asumiseen, 924,30 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 926,33 €.\n• Eniten kului asumiseen, 924,30 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 16,74 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,48 €."
+            ],
+            "answer": "• Menot ylittivät tulot 16,74 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 36,48 €."
+          }
+        },
+        "2025-12": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 023,99 €.",
+              "Eniten kului asumiseen, 873,66 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 023,99 €.\n• Eniten kului asumiseen, 873,66 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 631,89 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 2,63 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 631,89 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 2,63 €."
+          }
+        },
+        "2026-01": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 055,79 €.",
+              "Eniten kului asumiseen, 924,20 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 055,79 €.\n• Eniten kului asumiseen, 924,20 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 111,68 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 59,49 €."
+            ],
+            "answer": "• Menot ylittivät tulot 111,68 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 59,49 €."
+          }
+        },
+        "2026-02": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 1 730,87 €.",
+              "Eniten kului asumiseen, 895,70 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 1 730,87 €.\n• Eniten kului asumiseen, 895,70 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 130,16 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 38,97 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 130,16 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 38,97 €."
+          }
+        },
+        "2026-03": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 2 989,15 €.",
+              "Eniten kului asumiseen, 872,76 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 2 989,15 €.\n• Eniten kului asumiseen, 872,76 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 769,92 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 66,80 €."
+            ],
+            "answer": "• Menot ylittivät tulot 769,92 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 66,80 €."
+          }
+        },
+        "2025-04": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 710,77 €.",
+              "Eniten kului asumiseen, 922,36 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 710,77 €.\n• Eniten kului asumiseen, 922,36 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 891,92 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 43,38 €."
+            ],
+            "answer": "• Menot ylittivät tulot 891,92 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 43,38 €."
+          }
+        },
+        "2025-05": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 3 306,52 €.",
+              "Eniten kului asumiseen, 868,47 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 3 306,52 €.\n• Eniten kului asumiseen, 868,47 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 1 091,53 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 97,05 €."
+            ],
+            "answer": "• Menot ylittivät tulot 1 091,53 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 97,05 €."
+          }
+        },
+        "2025-06": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 234,73 €.",
+              "Eniten kului asumiseen, 913,09 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 234,73 €.\n• Eniten kului asumiseen, 913,09 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 364,20 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 77,92 €."
+            ],
+            "answer": "• Menot ylittivät tulot 364,20 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 77,92 €."
+          }
+        },
+        "2025-07": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 1 896,30 €.",
+              "Eniten kului asumiseen, 886,88 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 1 896,30 €.\n• Eniten kului asumiseen, 886,88 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 139,11 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 33,89 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 139,11 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 33,89 €."
+          }
+        },
+        "2025-08": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 1 672,66 €.",
+              "Eniten kului asumiseen, 931,41 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 1 672,66 €.\n• Eniten kului asumiseen, 931,41 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 143,11 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 52,00 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 143,11 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 52,00 €."
+          }
+        },
+        "2025-09": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 1 240,52 €.",
+              "Eniten kului asumiseen, 915,38 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 1 240,52 €.\n• Eniten kului asumiseen, 915,38 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 783,01 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,08 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 783,01 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,08 €."
+          }
+        },
+        "2024-10": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 1 923,56 €.",
+              "Eniten kului asumiseen, 873,39 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 1 923,56 €.\n• Eniten kului asumiseen, 873,39 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 43,03 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 25,59 €."
+            ],
+            "answer": "• Menot ylittivät tulot 43,03 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 25,59 €."
+          }
+        },
+        "2024-11": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 229,23 €.",
+              "Eniten kului asumiseen, 863,11 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 229,23 €.\n• Eniten kului asumiseen, 863,11 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 34,12 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 98,84 €."
+            ],
+            "answer": "• Menot ylittivät tulot 34,12 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 98,84 €."
+          }
+        },
+        "2024-12": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 541,23 €.",
+              "Eniten kului asumiseen, 902,96 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 541,23 €.\n• Eniten kului asumiseen, 902,96 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 414,82 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 114,09 €."
+            ],
+            "answer": "• Menot ylittivät tulot 414,82 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 114,09 €."
+          }
+        },
+        "2025-01": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 407,99 €.",
+              "Eniten kului asumiseen, 872,54 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 407,99 €.\n• Eniten kului asumiseen, 872,54 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 269,59 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 94,63 €."
+            ],
+            "answer": "• Menot ylittivät tulot 269,59 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 94,63 €."
+          }
+        },
+        "2025-02": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 3 134,37 €.",
+              "Eniten kului asumiseen, 898,93 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 3 134,37 €.\n• Eniten kului asumiseen, 898,93 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 1 299,48 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 55,68 €."
+            ],
+            "answer": "• Menot ylittivät tulot 1 299,48 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 55,68 €."
+          }
+        },
+        "2025-03": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 2 092,51 €.",
+              "Eniten kului asumiseen, 913,65 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 2 092,51 €.\n• Eniten kului asumiseen, 913,65 €."
+          },
+          "saving": {
+            "bullets": [
+              "Menot ylittivät tulot 158,94 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 58,69 €."
+            ],
+            "answer": "• Menot ylittivät tulot 158,94 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 58,69 €."
+          }
+        }
+      },
+      "insights": {
+        "status": "ready",
+        "customer_id": "CUST00127",
+        "as_of": "2026-09-30",
+        "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
+        "model": "claude-haiku-5-5",
+        "insights": [
+          {
+            "id": "insight-04b73a4dbb3b860c-1",
+            "title": "Pikaruoka nousi esiin syyskuussa",
+            "headline_number": "340 € syyskuussa",
+            "explanation": "Syyskuussa pikaruokaan ja noutoruokaan kului noin 340 €, kun tavallinen kuukausi oli noin 75 €. Yksi kuukausi ei vielä kerro pysyvästä muutoksesta.",
+            "action": "Vertaa tulevia kuukausia tavalliseen tasoosi."
+          },
+          {
+            "id": "insight-04b73a4dbb3b860c-2",
+            "title": "Varaudu yllättäviin menoihin",
+            "headline_number": "950 €",
+            "explanation": "Tilin saldo kattoi 950 euron vararahaston. Yllättävään laskuun voi kulua noin 930 €.",
+            "action": "Pidä vähintään 950 € erillään yllättäviä menoja varten."
+          },
+          {
+            "id": "insight-04b73a4dbb3b860c-3",
+            "title": "Matkailu näkyy menoissasi",
+            "headline_number": "40 €/kk",
+            "explanation": "Matkailuun menee arviolta 40 € kuukaudessa, kun vertailuryhmän tyypillinen summa on 30 €. Ero liittyy enemmän matkojen määrään kuin niiden hintaan.",
+            "action": "Mieti, mitkä matkamenot ovat sinulle tärkeitä ja mitkä voisivat jäädä vähemmälle."
+          }
+        ]
+      },
+      "week": {
+        "bullets": [
+          "Arvio lisäostoihin: noin 120 € viikossa.",
+          "Jätä rahaa myös kuukauden muihin menoihin."
+        ],
+        "answer": "• Arvio lisäostoihin: noin 120 € viikossa.\n• Jätä rahaa myös kuukauden muihin menoihin."
+      }
+    },
+    "CUST00103": {
+      "months": {
+        "2026-04": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 263,55 €.",
+              "Eniten kului laskuihin, yhteensä 169,26 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 263,55 €.\n• Eniten kului laskuihin, yhteensä 169,26 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 906,75 €.",
+              "Siirsit säästöön 2 847,88 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 58,87 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,56 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 906,75 €.\n• Siirsit säästöön 2 847,88 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 58,87 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,56 €."
+          }
+        },
+        "2026-05": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 443,81 €.",
+              "Eniten kului laskuihin, yhteensä 207,77 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 443,81 €.\n• Eniten kului laskuihin, yhteensä 207,77 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 432,52 €.",
+              "Siirsit säästöön 2 583,80 €. Menot ja säästösiirrot ylittivät tulot 151,28 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 8,27 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 432,52 €.\n• Siirsit säästöön 2 583,80 €. Menot ja säästösiirrot ylittivät tulot 151,28 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 8,27 €."
+          }
+        },
+        "2026-06": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 413,54 €.",
+              "Eniten kului ruokaostoksiin, yhteensä 129,49 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 413,54 €.\n• Eniten kului ruokaostoksiin, yhteensä 129,49 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 654,29 €.",
+              "Siirsit säästöön 2 755,84 €. Menot ja säästösiirrot ylittivät tulot 101,55 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,26 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 654,29 €.\n• Siirsit säästöön 2 755,84 €. Menot ja säästösiirrot ylittivät tulot 101,55 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,26 €."
+          }
+        },
+        "2026-07": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 398,40 €.",
+              "Eniten kului laskuihin, yhteensä 127,17 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 398,40 €.\n• Eniten kului laskuihin, yhteensä 127,17 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 3 242,25 €.",
+              "Siirsit säästöön 3 270,39 €. Menot ja säästösiirrot ylittivät tulot 28,14 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 18,58 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 3 242,25 €.\n• Siirsit säästöön 3 270,39 €. Menot ja säästösiirrot ylittivät tulot 28,14 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 18,58 €."
+          }
+        },
+        "2026-08": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 310,97 €.",
+              "Eniten kului laskuihin, yhteensä 185,18 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 310,97 €.\n• Eniten kului laskuihin, yhteensä 185,18 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 869,73 €.",
+              "Siirsit säästöön 2 857,22 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 12,51 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,83 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 869,73 €.\n• Siirsit säästöön 2 857,22 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 12,51 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 4,83 €."
+          }
+        },
+        "2026-09": {
+          "spending": {
+            "bullets": [
+              "Rahaa kului yhteensä 400,82 €.",
+              "Eniten kului vapaa-aikaan, yhteensä 122,59 €."
+            ],
+            "answer": "• Rahaa kului yhteensä 400,82 €.\n• Eniten kului vapaa-aikaan, yhteensä 122,59 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 3 259,37 €.",
+              "Siirsit säästöön 3 287,95 €. Menot ja säästösiirrot ylittivät tulot 28,58 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 24,52 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 3 259,37 €.\n• Siirsit säästöön 3 287,95 €. Menot ja säästösiirrot ylittivät tulot 28,58 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 24,52 €."
+          }
+        },
+        "2025-10": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 250,75 €.",
+              "Eniten kului laskuihin, yhteensä 134,86 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 250,75 €.\n• Eniten kului laskuihin, yhteensä 134,86 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 3 041,38 €.",
+              "Siirsit säästöön 2 957,32 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 84,06 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,12 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 3 041,38 €.\n• Siirsit säästöön 2 957,32 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 84,06 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 2,12 €."
+          }
+        },
+        "2025-11": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 458,91 €.",
+              "Eniten kului laskuihin, yhteensä 199,45 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 458,91 €.\n• Eniten kului laskuihin, yhteensä 199,45 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 883,59 €.",
+              "Siirsit säästöön 3 002,57 €. Menot ja säästösiirrot ylittivät tulot 118,98 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,53 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 883,59 €.\n• Siirsit säästöön 3 002,57 €. Menot ja säästösiirrot ylittivät tulot 118,98 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,53 €."
+          }
+        },
+        "2025-12": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 503,96 €.",
+              "Eniten kului laskuihin, yhteensä 202,95 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 503,96 €.\n• Eniten kului laskuihin, yhteensä 202,95 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 3 367,77 €.",
+              "Siirsit säästöön 3 477,97 €. Menot ja säästösiirrot ylittivät tulot 110,20 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,53 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 3 367,77 €.\n• Siirsit säästöön 3 477,97 €. Menot ja säästösiirrot ylittivät tulot 110,20 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 15,53 €."
+          }
+        },
+        "2026-01": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 332,86 €.",
+              "Eniten kului laskuihin, yhteensä 128,61 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 332,86 €.\n• Eniten kului laskuihin, yhteensä 128,61 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 604,42 €.",
+              "Siirsit säästöön 2 638,56 €. Menot ja säästösiirrot ylittivät tulot 34,14 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 20,12 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 604,42 €.\n• Siirsit säästöön 2 638,56 €. Menot ja säästösiirrot ylittivät tulot 34,14 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 20,12 €."
+          }
+        },
+        "2026-02": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 171,53 €.",
+              "Eniten kului laskuihin, yhteensä 61,95 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 171,53 €.\n• Eniten kului laskuihin, yhteensä 61,95 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 3 233,60 €.",
+              "Siirsit säästöön 3 058,83 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 174,77 €.",
+              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 4,61 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 3 233,60 €.\n• Siirsit säästöön 3 058,83 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 174,77 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 4,61 €."
+          }
+        },
+        "2026-03": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 237,63 €.",
+              "Eniten kului laskuihin, yhteensä 151,16 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 237,63 €.\n• Eniten kului laskuihin, yhteensä 151,16 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 667,35 €.",
+              "Siirsit säästöön 2 609,54 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 57,81 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 3,96 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 667,35 €.\n• Siirsit säästöön 2 609,54 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 57,81 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 3,96 €."
+          }
+        },
+        "2025-04": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 851,60 €.",
+              "Eniten kului ruokaostoksiin, 255,71 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 851,60 €.\n• Eniten kului ruokaostoksiin, 255,71 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 148,02 €.",
+              "Siirsit säästöön 2 694,56 €. Menot ja säästösiirrot ylittivät tulot 546,54 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 12,31 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 148,02 €.\n• Siirsit säästöön 2 694,56 €. Menot ja säästösiirrot ylittivät tulot 546,54 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 12,31 €."
+          }
+        },
+        "2025-05": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 465,75 €.",
+              "Eniten kului laskuihin, 167,16 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 465,75 €.\n• Eniten kului laskuihin, 167,16 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 435,00 €.",
+              "Siirsit säästöön 2 398,08 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 36,92 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 11,12 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 435,00 €.\n• Siirsit säästöön 2 398,08 €. Menojen ja säästösiirtojen jälkeen tuloista jäi 36,92 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 11,12 €."
+          }
+        },
+        "2025-06": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 516,40 €.",
+              "Eniten kului laskuihin, 191,27 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 516,40 €.\n• Eniten kului laskuihin, 191,27 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 401,16 €.",
+              "Siirsit säästöön 2 620,85 €. Menot ja säästösiirrot ylittivät tulot 219,69 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 11,84 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 401,16 €.\n• Siirsit säästöön 2 620,85 €. Menot ja säästösiirrot ylittivät tulot 219,69 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 11,84 €."
+          }
+        },
+        "2025-07": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 514,24 €.",
+              "Eniten kului laskuihin, 166,14 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 514,24 €.\n• Eniten kului laskuihin, 166,14 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 704,58 €.",
+              "Siirsit säästöön 2 891,46 €. Menot ja säästösiirrot ylittivät tulot 186,88 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,41 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 704,58 €.\n• Siirsit säästöön 2 891,46 €. Menot ja säästösiirrot ylittivät tulot 186,88 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 14,41 €."
+          }
+        },
+        "2025-08": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 472,68 €.",
+              "Eniten kului laskuihin, 128,69 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 472,68 €.\n• Eniten kului laskuihin, 128,69 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 058,84 €.",
+              "Siirsit säästöön 2 274,06 €. Menot ja säästösiirrot ylittivät tulot 215,22 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 7,93 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 058,84 €.\n• Siirsit säästöön 2 274,06 €. Menot ja säästösiirrot ylittivät tulot 215,22 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 7,93 €."
+          }
+        },
+        "2025-09": {
+          "spending": {
+            "bullets": [
+              "Kulutus oli yhteensä 437,63 €.",
+              "Eniten kului laskuihin, 218,00 €."
+            ],
+            "answer": "• Kulutus oli yhteensä 437,63 €.\n• Eniten kului laskuihin, 218,00 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 523,56 €.",
+              "Siirsit säästöön 2 660,04 €. Menot ja säästösiirrot ylittivät tulot 136,48 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 7,27 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 523,56 €.\n• Siirsit säästöön 2 660,04 €. Menot ja säästösiirrot ylittivät tulot 136,48 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 7,27 €."
+          }
+        },
+        "2024-10": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 605,30 €.",
+              "Eniten kului laskuihin, yhteensä 168,52 €."
+            ],
+            "answer": "• Menot olivat yhteensä 605,30 €.\n• Eniten kului laskuihin, yhteensä 168,52 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 469,98 €.",
+              "Siirsit säästöön 2 762,52 €. Menot ja säästösiirrot ylittivät tulot 292,54 €.",
+              "Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 30,16 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 469,98 €.\n• Siirsit säästöön 2 762,52 €. Menot ja säästösiirrot ylittivät tulot 292,54 €.\n• Jos käyttäisit matkailuun 20 % vähemmän, säästäisit 30,16 €."
+          }
+        },
+        "2024-11": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 572,38 €.",
+              "Eniten kului laskuihin, yhteensä 254,33 €."
+            ],
+            "answer": "• Menot olivat yhteensä 572,38 €.\n• Eniten kului laskuihin, yhteensä 254,33 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 504,77 €.",
+              "Siirsit säästöön 2 764,20 €. Menot ja säästösiirrot ylittivät tulot 259,43 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,40 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 504,77 €.\n• Siirsit säästöön 2 764,20 €. Menot ja säästösiirrot ylittivät tulot 259,43 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,40 €."
+          }
+        },
+        "2024-12": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 703,63 €.",
+              "Eniten kului ruokaostoksiin, yhteensä 294,57 €."
+            ],
+            "answer": "• Menot olivat yhteensä 703,63 €.\n• Eniten kului ruokaostoksiin, yhteensä 294,57 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 429,23 €.",
+              "Siirsit säästöön 2 814,25 €. Menot ja säästösiirrot ylittivät tulot 385,02 €.",
+              "Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 9,92 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 429,23 €.\n• Siirsit säästöön 2 814,25 €. Menot ja säästösiirrot ylittivät tulot 385,02 €.\n• Jos käyttäisit ostoksiin ja itsestä huolehtimiseen 20 % vähemmän, säästäisit 9,92 €."
+          }
+        },
+        "2025-01": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 659,98 €.",
+              "Eniten kului ruokaostoksiin, yhteensä 173,08 €."
+            ],
+            "answer": "• Menot olivat yhteensä 659,98 €.\n• Eniten kului ruokaostoksiin, yhteensä 173,08 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 616,46 €.",
+              "Siirsit säästöön 2 943,22 €. Menot ja säästösiirrot ylittivät tulot 326,76 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 17,04 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 616,46 €.\n• Siirsit säästöön 2 943,22 €. Menot ja säästösiirrot ylittivät tulot 326,76 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 17,04 €."
+          }
+        },
+        "2025-02": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 818,77 €.",
+              "Eniten kului laskuihin, yhteensä 169,48 €."
+            ],
+            "answer": "• Menot olivat yhteensä 818,77 €.\n• Eniten kului laskuihin, yhteensä 169,48 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 091,12 €.",
+              "Siirsit säästöön 2 613,96 €. Menot ja säästösiirrot ylittivät tulot 522,84 €.",
+              "Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 30,33 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 091,12 €.\n• Siirsit säästöön 2 613,96 €. Menot ja säästösiirrot ylittivät tulot 522,84 €.\n• Jos käyttäisit vapaa-aikaan 20 % vähemmän, säästäisit 30,33 €."
+          }
+        },
+        "2025-03": {
+          "spending": {
+            "bullets": [
+              "Menot olivat yhteensä 744,99 €.",
+              "Eniten kului laskuihin, yhteensä 243,74 €."
+            ],
+            "answer": "• Menot olivat yhteensä 744,99 €.\n• Eniten kului laskuihin, yhteensä 243,74 €."
+          },
+          "saving": {
+            "bullets": [
+              "Tuloista jäi menojen jälkeen 2 410,79 €.",
+              "Siirsit säästöön 2 834,84 €. Menot ja säästösiirrot ylittivät tulot 424,05 €.",
+              "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,43 €."
+            ],
+            "answer": "• Tuloista jäi menojen jälkeen 2 410,79 €.\n• Siirsit säästöön 2 834,84 €. Menot ja säästösiirrot ylittivät tulot 424,05 €.\n• Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit 18,43 €."
+          }
+        }
+      },
+      "insights": {
+        "status": "ready",
+        "customer_id": "CUST00103",
+        "as_of": "2026-09-30",
+        "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
+        "model": "claude-haiku-5-5",
+        "insights": [
+          {
+            "id": "insight-b36e03dbff98964c-1",
+            "title": "Menot ja säästösiirrot ylittivät tulot",
+            "headline_number": "−152 € tilillä",
+            "explanation": "Tilin saldo oli −152 €. Viimeisen vuoden aikana menot ja säästösiirrot ylittivät tulot keskimäärin noin 15 € kuukaudessa.",
+            "action": "Tarkista säästösiirtojen ajoitus ja summa, jotta välttämättömät maksut ovat katettuja."
+          },
+          {
+            "id": "insight-b36e03dbff98964c-2",
+            "title": "Kerää rahaa yllättäviä menoja varten",
+            "headline_number": "800 € varalle",
+            "explanation": "Yllättävään laskuun voi kulua noin 750 €. Vararahaston tavoite on 800 €, mutta tilin saldo oli miinuksella.",
+            "action": "Huolehdi ensin laskuista ja kerää vararahastoa vasta, kun käyttöraha riittää."
+          },
+          {
+            "id": "insight-b36e03dbff98964c-3",
+            "title": "Tarkista säästösiirtojen määrä",
+            "headline_number": "2 800 €/kk",
+            "explanation": "Siirrät säästöön arviolta 2 800 € kuukaudessa, noin 89 % tuloista. Suuri säästösumma voi jättää arjen maksuihin liian vähän rahaa.",
+            "action": "Jätä käyttötilille riittävästi rahaa laskuihin ennen säästösiirtoa."
+          }
+        ]
+      },
+      "week": {
+        "bullets": [
+          "Arvio lisäostoihin: 0 € viikossa.",
+          "Tarkista säästösiirtojen summa ja ajoitus, jotta rahaa riittää välttämättömiin maksuihin."
+        ],
+        "answer": "• Arvio lisäostoihin: 0 € viikossa.\n• Tarkista säästösiirtojen summa ja ajoitus, jotta rahaa riittää välttämättömiin maksuihin."
+      }
+    }
+  }
+}

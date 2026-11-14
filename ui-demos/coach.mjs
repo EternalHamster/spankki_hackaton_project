@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-const PROMPT_VERSION = 'duckdb-coach-v4';
+export const PROMPT_VERSION = 'duckdb-coach-v6';
 const CACHE_CONTROL = { type: 'ephemeral' };
 // Both entry points share these blocks and tool definitions so the customer's cached prefix is reusable.
 const SYSTEM = `You are a concise, kind financial coach in the Finnish Oma talous synthetic demo.
@@ -35,10 +35,17 @@ rent, groceries, health or necessary transport. You cannot move money or modify 
 If the recorded balance is negative or available cash is constrained, do not recommend keeping automatic
 saving transfers unchanged or increasing them. Suggest reviewing their timing and amount so necessary
 payments have enough cash; distinguish a saving habit from sufficient liquidity.
-For normal chat use short plain-text paragraphs without Markdown. When the application requests three
-insight cards as JSON, obey that output format and use its supplied detailed context without tool calls.`;
+For normal chat default to two or three brief bullet points in easy Finnish, unless the user asks for more
+detail. Avoid technical
+explanations and financial jargon. Say "arvio", "rahaa jäi" or "rahaa varalle" instead of model mechanics,
+median, liquidity or cash-flow terminology. Keep uncertainty, but explain it in ordinary words.
+When the application requests JSON insight cards or summaries, obey that exact output format without tools.`;
 
 const INSIGHT_REQUEST = `Write exactly three distinct key-insight cards in Finnish, ordered by usefulness.
+Consider the customer's entire supplied history. These home-page insights are independent of any month
+selected in the app. Use very short everyday Finnish: one idea per sentence, no technical or financial
+jargon. Do not explain the model, snapshot, data processing or calculations. Say "noin" or "arvio" when
+needed. The app displays the historical date separately; do not repeat dates in every card.
 Use the supplied ranked model insights and their explanations as the factual starting point. Prioritize a
 documented income shortfall or cash constraint kindly. Distinguish model estimates from actual spending.
 Describe every balance, budget and payday as belonging to the dated historical snapshot. A historical
@@ -60,9 +67,42 @@ Return ONLY valid JSON with this shape and no extra fields:
 {"title":"...","headline_number":"...","explanation":"...","action":"..."},
 {"title":"...","headline_number":"...","explanation":"...","action":"..."}
 ]}
-Exactly three objects. Each title at most 60 characters; headline_number 60; explanation 850 (2-3 short
-sentences); action 200. Count the objects before answering: three cards are required, not two.
+Exactly three objects. Each title at most 60 characters; headline_number 60; explanation 240 (1-2 short
+sentences); action 120. Count the objects before answering: three cards are required, not two.
 Use plain text in every field. Never include a customer identifier.`;
+
+const SUMMARY_REQUEST = `Write prepared topic summaries in very easy Finnish for the supplied facts only.
+Return exactly the requested months, with spending and saving for each, plus week only if week facts exist.
+Every topic must be an array of two or three distinct short bullet texts, each at most 140 characters.
+Use one simple sentence per bullet. No headings, Markdown, bullet prefixes, customer identifiers, technical
+terms or explanations of models. Avoid words like mediaani, likviditeetti, kassavirta, snapshot or malliarvio.
+The app displays the period separately. Do not repeat the date or explain the date in every bullet.
+For spending, give the total and the supplied largest spending category. That category really is ranked
+first; do not label another category largest. For saving, distinguish money left after everyday expenses
+(remaining_before_savings_eur) from money left after saving transfers (remaining_after_savings_eur).
+Saving transfers are money moved aside, not consumer expenses. Never present either remainder as bank
+balance or a promise of spendable money. Mention actual saving transfers only with the supplied amounts.
+If cut_example exists, state its saving_eur as the concrete euros that could be saved, not a new remaining
+balance: "Jos käyttäisit ravintoloihin 20 % vähemmän, säästäisit ... €." Inflect the category naturally in
+Finnish (e.g. vapaa-aikaan, matkailuun). Do not write "Jos Vapaa-aika olisi vähemmän" or require the reader
+to subtract two remaining balances to discover the saving. Prefer "Rahaa kului ..." and "Eniten kului ...".
+It is an example based on this exact month, not money already saved or a guaranteed future saving. Do not
+suggest cutting essentials. Never calculate, round amounts, invent frequencies or use profile estimates
+in a monthly summary. Each month's numerical facts may be used only for that same month.
+For week, say "Arvio" or "noin" with eur_week, explain limited_by in ordinary words, and give one gentle
+next step. This refers only to the displayed snapshot date, not any selected month or today's live balance.
+If cash is tight, prioritize necessary payments and reviewing saving transfers; never promise affordability.
+Use supplied numbers exactly, with Finnish decimal commas and optional space thousands separators.
+Exact recorded monthly totals do not need "noin"; use it for the estimated weekly amount only.
+Return JSON only in this shape (repeat the month object for every supplied month):
+{"months":{"YYYY-MM":{"spending":["...","..."],"saving":["...","...","..."]}},"week":["...","..."]}
+Omit week entirely when no week facts are supplied; months may be empty when only week was requested.`;
+
+const CATEGORY_NAMES = { Housing: 'Asuminen', Utilities: 'Laskut', Groceries: 'Ruokaostokset', Health: 'Terveys',
+  'Home & Tech': 'Koti ja tekniikka', Transportation: 'Liikkuminen', Restaurants: 'Ravintolat',
+  Lifestyle: 'Ostokset ja itsestä huolehtiminen', Entertainment: 'Vapaa-aika', Travel: 'Matkailu' };
+const OPTIONAL_CATEGORIES = new Set(['Restaurants', 'Entertainment', 'Lifestyle', 'Travel']);
+const COMPLEX_WORDS = /snapshot|mediaan|likviditeet|kassavirt|malliarvio|malliperust|\bmalli(?:n|sta|lla|lle)?\b|parametr|algoritm|dataversio/i;
 
 export class CoachError extends Error {
   constructor(status, message) { super(message); this.name = 'CoachError'; this.status = status; }
@@ -104,7 +144,7 @@ function validateInsights(text, context, idPrefix) {
     return { error: 'The outer JSON must contain only an insights array.' };
   }
   if (body.insights.length !== 3) return { error: `Exactly three complete insight objects are required; the previous response had ${body.insights.length}.` };
-  const limits = { title: 60, headline_number: 60, explanation: 850, action: 200 };
+  const limits = { title: 60, headline_number: 60, explanation: 240, action: 120 };
   const allowed = numbers(context);
   // Small grammatical counts are allowed, matching the existing Python insight validator.
   for (let i = 0; i <= 12; i++) allowed.add(String(i));
@@ -112,17 +152,103 @@ function validateInsights(text, context, idPrefix) {
   for (const row of body.insights) {
     if (!row || typeof row !== 'object' || Array.isArray(row) || Object.keys(row).length !== 4 ||
         Object.entries(limits).some(([key, max]) => typeof row[key] !== 'string' || !row[key].trim() || row[key].trim().length > max)) {
-      return { error: `Card ${rows.length + 1} must have only four nonempty text fields within their character limits: title 60, headline_number 60, explanation 850, action 200.` };
+      return { error: `Card ${rows.length + 1} must have only four nonempty text fields within their character limits: title 60, headline_number 60, explanation 240, action 120.` };
     }
     const clean = Object.fromEntries(Object.keys(limits).map(key => [key, row[key].trim()]));
     const combined = Object.values(clean).join(' ');
     if (/CUST\d+/i.test(combined)) return { error: 'Remove all customer identifiers.' };
+    if (COMPLEX_WORDS.test(combined)) return { error: 'Use easy Finnish without technical or financial jargon. Replace model explanations with a short phrase such as arvio or noin.' };
     const unsupported = [...numbers(combined)].find(number => !allowed.has(number));
     if (unsupported) return { error: `Card ${rows.length + 1} contains an unsupported number or date (${unsupported}). Use only figures and exact dates in the supplied customer context.` };
     rows.push({ id: `${idPrefix}-${rows.length + 1}`, ...clean });
   }
   return new Set(rows.map(row => row.title.toLocaleLowerCase('fi'))).size === 3
     ? { insights: rows } : { error: 'Use three distinct titles for three distinct insights.' };
+}
+
+function cents(value) {
+  const match = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(String(value));
+  if (!match) throw new CoachError(503, 'Kuukauden tiedot eivät ole käytettävissä.');
+  const amount = Number(match[2]) * 100 + Number((match[3] || '').padEnd(2, '0'));
+  if (!Number.isSafeInteger(amount) || amount > 100000000000) throw new CoachError(503, 'Kuukauden tietoja ei voitu tarkistaa.');
+  return match[1] ? -amount : amount;
+}
+
+function euros(amount) {
+  return `${amount < 0 ? '-' : ''}${Math.floor(Math.abs(amount) / 100)}.${String(Math.abs(amount) % 100).padStart(2, '0')}`;
+}
+
+function monthlyFacts(month, cash, spending) {
+  const income = cents(cash.income_eur), expenses = cents(cash.spending_eur);
+  const transfers = cents(cash.investment_out_eur), withdrawals = cents(cash.investment_in_eur);
+  const remainder = income - expenses;
+  if (!Array.isArray(spending.categories) || spending.categories.length > 10 ||
+      spending.categories.some(row => !Object.hasOwn(CATEGORY_NAMES, row.category)) ||
+      new Set(spending.categories.map(row => row.category)).size !== spending.categories.length) {
+    throw new CoachError(503, 'Kuukauden menotietoja ei voitu tarkistaa.');
+  }
+  const categories = spending.categories.map(row => ({ category: row.category, amount: cents(row.total_eur) }))
+    .sort((a, b) => b.amount - a.amount || a.category.localeCompare(b.category));
+  if (categories.some(row => row.amount < 0) || categories.reduce((sum, row) => sum + row.amount, 0) !== expenses ||
+      cents(spending.total_eur) !== expenses || cents(cash.remaining_income_eur) !== remainder) {
+    throw new CoachError(503, 'Kuukauden rahasummat eivät täsmää.');
+  }
+  const optional = categories.find(row => OPTIONAL_CATEGORIES.has(row.category) && row.amount > 0);
+  const reduction = optional ? Math.floor((optional.amount + 2) / 5) : 0; // Exact 20%, nearest cent (positive half-up).
+  return {
+    month, income_eur: euros(income), spending_eur: euros(expenses),
+    remaining_before_savings_eur: euros(remainder), saving_transfers_eur: euros(transfers),
+    withdrawals_from_savings_eur: euros(withdrawals), remaining_after_savings_eur: euros(remainder - transfers + withdrawals),
+    largest_spending_category: categories.length ? { category: CATEGORY_NAMES[categories[0].category], amount_eur: euros(categories[0].amount) } : null,
+    cut_example: optional ? { category: CATEGORY_NAMES[optional.category], percent: 20, before_eur: euros(optional.amount),
+      saving_eur: euros(reduction), after_eur: euros(optional.amount - reduction),
+      remaining_after_expenses_if_cut_eur: euros(remainder + reduction) } : null,
+  };
+}
+
+function validateSummaryBatch(text, facts) {
+  let body;
+  try { body = JSON.parse(text); } catch { return { error: 'Return only valid JSON, with no Markdown fences.' }; }
+  const monthKeys = Object.keys(facts.months);
+  if (!body || typeof body !== 'object' || Array.isArray(body) ||
+      Object.keys(body).sort().join(',') !== (facts.week ? 'months,week' : 'months') ||
+      !body.months || typeof body.months !== 'object' || Array.isArray(body.months) ||
+      Object.keys(body.months).sort().join(',') !== monthKeys.join(',')) {
+    return { error: 'Return exactly the requested months and include week only when week facts were supplied.' };
+  }
+  const normalized = { months: {} };
+  function validateBullets(bullets, topicFacts, location) {
+    if (!Array.isArray(bullets) || bullets.length < 2 || bullets.length > 3 || bullets.some(bullet =>
+      typeof bullet !== 'string' || !bullet.trim() || bullet.trim().length > 140 || /[\r\n]|^\s*[•*#-]/.test(bullet))) {
+      return { error: `${location} needs two or three single-line bullet texts, each at most 140 characters, without bullet prefixes.` };
+    }
+    const clean = bullets.map(bullet => bullet.trim());
+    if (new Set(clean).size !== clean.length) return { error: `${location} must use distinct bullet texts.` };
+    const joined = clean.join(' '), allowed = numbers(JSON.stringify(topicFacts));
+    if (/CUST\d+/i.test(joined) || COMPLEX_WORDS.test(joined)) {
+      return { error: `${location} must use easy Finnish without customer identifiers, model explanations or financial jargon.` };
+    }
+    const unsupported = [...numbers(joined)].find(number => !allowed.has(number));
+    if (unsupported) return { error: `${location} uses an unsupported number/date (${unsupported}). Use only this topic's supplied exact facts; do not calculate or borrow another month's numbers.` };
+    return { bullets: clean, answer: clean.map(bullet => `• ${bullet}`).join('\n') };
+  }
+  for (const month of monthKeys) {
+    const topics = body.months[month];
+    if (!topics || typeof topics !== 'object' || Array.isArray(topics) || Object.keys(topics).sort().join(',') !== 'saving,spending') {
+      return { error: `${month} needs only spending and saving arrays.` };
+    }
+    normalized.months[month] = {};
+    for (const topic of ['spending', 'saving']) {
+      const result = validateBullets(topics[topic], facts.months[month], `${month}.${topic}`);
+      if (result.error) return result;
+      normalized.months[month][topic] = result;
+    }
+  }
+  if (facts.week) {
+    normalized.week = validateBullets(body.week, facts.week, 'week');
+    if (normalized.week.error) return normalized.week;
+  }
+  return { value: normalized };
 }
 
 function validMessages(messages) {
@@ -274,6 +400,77 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
     return created;
   }
 
+  async function primeInsights(customerId, value) {
+    const snapshot = await context(customerId), key = cacheKey(customerId, snapshot);
+    if (!value || value.status !== 'ready' || value.customer_id !== customerId || value.as_of !== snapshot.as_of ||
+        value.data_version !== snapshot.version || value.model !== model || !Array.isArray(value.insights) ||
+        value.insights.some(row => !row || typeof row !== 'object' || Object.keys(row).sort().join(',') !== 'action,explanation,headline_number,id,title')) {
+      throw new CoachError(503, 'Valmiit havainnot eivät vastaa asiakkaan tietoja.');
+    }
+    const idPrefix = `insight-${createHash('sha256').update(key).digest('hex').slice(0, 16)}`;
+    const checked = validateInsights(JSON.stringify({ insights: value.insights.map(({ id, ...card }) => card) }),
+      `${snapshot.as_of}\n${snapshot.profile}\n${snapshot.insight_context}`, idPrefix);
+    if (!checked.insights || checked.insights.some((row, index) => row.id !== value.insights[index].id)) {
+      throw new CoachError(503, 'Valmiiden havaintojen tarkistus epäonnistui.');
+    }
+    const prepared = { status: 'ready', customer_id: customerId, as_of: snapshot.as_of,
+      data_version: snapshot.version, model, insights: checked.insights };
+    cache.delete(key);
+    while (cache.size >= maxCacheEntries) {
+      const victim = [...cache].find(([, candidate]) => candidate.status !== 'generating');
+      if (!victim) throw new CoachError(503, 'Havaintoja ei voitu ladata juuri nyt.');
+      cache.delete(victim[0]);
+    }
+    cache.set(key, { status: 'ready', value: prepared, error: null,
+      promise: Promise.resolve(prepared), expires: now() + cacheTtlMs });
+    return prepared;
+  }
+
+  async function summaryBatch(customerId, { months = [], includeWeek = false } = {}) {
+    if (!Array.isArray(months) || months.length > 6 || new Set(months).size !== months.length ||
+        months.some(month => typeof month !== 'string' || !/^(19|20|21)\d{2}-(0[1-9]|1[0-2])$/.test(month)) ||
+        typeof includeWeek !== 'boolean' || (!months.length && !includeWeek)) {
+      throw new CoachError(400, 'Valitse yhdestä kuuteen kelvollista kuukautta tai käyttövara-arvio.');
+    }
+    const snapshot = await context(customerId), selected = [...months].sort();
+    function checkedTool(value) {
+      if (!value || value.as_of !== snapshot.as_of || value.data_version !== snapshot.version ||
+          /CUST\d+/i.test(JSON.stringify(value)) || value.error) throw new CoachError(503, 'Yhteenvedon tietoja ei voitu tarkistaa.');
+      if (value.outside_observed_range || value.outside_snapshot_range) throw new CoachError(400, 'Kuukausi ei kuulu käytettävissä olevaan ajanjaksoon.');
+      return value;
+    }
+    let monthRows, week;
+    try {
+      monthRows = await Promise.all(selected.map(async month => {
+        const year = Number(month.slice(0, 4)), index = Number(month.slice(5));
+        const args = { start_date: `${month}-01`, end_date: index === 12 ? `${year + 1}-01-01` : `${year}-${String(index + 1).padStart(2, '0')}-01` };
+        const [cash, spending] = await Promise.all([
+          dataSource.execute(customerId, 'get_cash_flow', args), dataSource.execute(customerId, 'get_spending', args),
+        ]);
+        return [month, monthlyFacts(month, checkedTool(cash), checkedTool(spending))];
+      }));
+      if (includeWeek) {
+        const source = checkedTool(await dataSource.execute(customerId, 'safe_to_spend', {}));
+        week = { as_of: snapshot.as_of, eur_week: euros(cents(source.eur_week)), limited_by: source.limited_by,
+          recorded_balance_eur: euros(cents(source.recorded_balance_eur)), safe_to_save_eur_month: euros(cents(source.safe_to_save_eur_month)) };
+      }
+    } catch (error) { throw safeError(error); }
+    const facts = { months: Object.fromEntries(monthRows), ...(week ? { week } : {}) };
+    const tools = await definitions(), deadline = now() + 75000;
+    let validationError;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await request({ max_tokens: 5000, system: system(snapshot), tools, tool_choice: { type: 'none' },
+        messages: [{ role: 'user', content: `EXACT TOPIC FACTS:\n${JSON.stringify(facts)}\n\n${SUMMARY_REQUEST}${validationError ? `\nPrevious response failed validation: ${validationError}\nReturn the full corrected JSON for every requested topic.` : ''}` }],
+      }, 'summaries', deadline);
+      const text = result.content.filter(block => block.type === 'text').map(block => block.text).join('\n');
+      const checked = result.stop_reason === 'end_turn' && !result.content.some(block => block.type === 'tool_use')
+        ? validateSummaryBatch(text, facts) : { error: 'Return complete concise JSON without calling tools.' };
+      if (checked.value) return { ...checked.value, as_of: snapshot.as_of, data_version: snapshot.version, model };
+      validationError = checked.error;
+    }
+    throw new CoachError(502, 'Yhteenvetojen tarkistus epäonnistui. Yritä uudelleen.');
+  }
+
   async function insights(customerId, { retry = false } = {}) {
     const snapshot = await context(customerId);
     return entry(customerId, snapshot, retry).promise;
@@ -348,5 +545,5 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
     throw new CoachError(422, 'Kysymys vaati liian monta hakua. Kokeile rajatumpaa kysymystä.');
   }
 
-  return { insights, beginInsights, chat };
+  return { insights, beginInsights, primeInsights, summaryBatch, chat };
 }

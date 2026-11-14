@@ -62,6 +62,8 @@ test('real persistent DuckDB worker serves isolated selected customers over HTTP
   const ready = await dataSource.ready();
   assert.equal(ready.status, 'ready');
   assert.equal(ready.as_of, '2026-09-30');
+  assert.equal(ready.coverage_from, '2024-10-01');
+  assert.equal(ready.coverage_to, '2026-09-30');
   assert.equal(typeof ready.version, 'string');
   assert.ok(ready.version.length > 0);
   assert.deepEqual(ready.customers, DEMO_CUSTOMERS.map(row => row.id));

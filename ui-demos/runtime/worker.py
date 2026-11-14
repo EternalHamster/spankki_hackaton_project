@@ -192,7 +192,8 @@ class CustomerRuntime:
             details = details.replace("Account balance now:", "Recorded account balance at snapshot date:")
             if re.search(r"CUST\d+", profile + details):
                 raise RequestError("Unexpected identifier in model context")
-            self._contexts[cid] = {"profile": profile, "insight_context": details, "as_of": self.as_of, "version": self.version}
+            self._contexts[cid] = {"profile": profile, "insight_context": details, "as_of": self.as_of, "version": self.version,
+                                   "coverage_from": self.coverage["first"], "coverage_to": self.coverage["last"]}
         return self._contexts[cid]
 
     def bootstrap(self, customer_id):
@@ -365,7 +366,8 @@ class CustomerRuntime:
             if operation == "ready":
                 if args:
                     raise RequestError("Unexpected arguments")
-                return {"status": "ready", "as_of": self.as_of, "version": self.version, "customers": list(DEMO_CUSTOMERS)}
+                return {"status": "ready", "as_of": self.as_of, "version": self.version, "customers": list(DEMO_CUSTOMERS),
+                        "coverage_from": self.coverage["first"], "coverage_to": self.coverage["last"]}
             if operation == "tools":
                 if args:
                     raise RequestError("Unexpected arguments")

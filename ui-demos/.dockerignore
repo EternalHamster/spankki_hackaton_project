@@ -5,6 +5,7 @@
 !server.mjs
 !chat.mjs
 !coach.mjs
+!prepared.mjs
 !customers.mjs
 !data-source.mjs
 !.runtime/
@@ -24,10 +25,12 @@
 !server-data/
 !server-data/demo-data.json
 !server-data/wrapped-data.json
+!server-data/coach-answers.json
 !public/
 !public/**
 !scripts/
 !scripts/check.mjs
+!scripts/check-prepared.mjs
 !tests/
 !tests/**
 **/.env*

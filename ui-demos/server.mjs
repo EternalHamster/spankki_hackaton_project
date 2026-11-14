@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createChatHandler } from './chat.mjs';
 import { createDataSource } from './data-source.mjs';
 import { createCoach } from './coach.mjs';
+import { createPreparedCoach } from './prepared.mjs';
 import { createSessions, DEMO_CUSTOMERS, isDemoCustomer, sameOrigin } from './customers.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
 const requiredFiles = ['index.html', 'app.js', 'chat.js', 'exploration.js', 'model.js', 'styles.css',
@@ -30,7 +31,7 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   sessions = createSessions(), customerId = process.env.PUBLIC_DEMO_CUSTOMER_ID || 'CUST00207' } = {}) {
   if (!isDemoCustomer(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
-  const model = coach || createCoach({ dataSource, ...chatOptions });
+  const model = coach || createPreparedCoach({ dataSource, coach: createCoach({ dataSource, ...chatOptions }) });
   const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight) =>
     model.chat(session.customer_id, { messages, insightId: insight?.insight_id }) });
   let wrappedData;
@@ -43,6 +44,7 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   }
   async function ready() {
     await dataSource.ready();
+    await model.ready?.();
     await scopedWrapped(customerId);
     await Promise.all(requiredFiles.map(async file => {
       const stat = await fs.stat(path.join(root, file));
@@ -59,7 +61,7 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
     catch { send(400, 'Bad request'); return; }
     const json = (status, body, extra = {}) => send(status, JSON.stringify(body), 'application/json; charset=utf-8',
       { 'Cache-Control': 'no-store', Vary: 'Cookie, X-Demo-Selection', ...extra });
-    const customerRoute = ['/api/session', '/api/insights', '/api/chat', '/demo-data.json', '/wrapped-data.json'].includes(route);
+    const customerRoute = ['/api/session', '/api/insights', '/api/summaries', '/api/chat', '/demo-data.json', '/wrapped-data.json'].includes(route);
     if (customerRoute && !sameOrigin(req)) { req.resume(); json(403, { error: 'Avaa palvelu sovelluksesta.' }); return; }
     if (route === '/api/session') {
       if (!['GET', 'POST'].includes(req.method)) { req.resume(); json(405, { error: 'Method not allowed' }, { Allow: 'GET, POST' }); return; }
@@ -97,6 +99,19 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
       send(405, 'Method not allowed', undefined, { Allow: 'GET, HEAD' });
       return;
     }
+    if (route === '/api/summaries') {
+      try {
+        const keys = [...url.searchParams.keys()];
+        if (keys.some(key => !['topic', 'month'].includes(key)) || new Set(keys).size !== keys.length) {
+          json(400, { error: 'Virheellinen pyyntö.' }); return;
+        }
+        const selected = req.demoSession;
+        const result = await model.summary(selected.customer_id, { topic: url.searchParams.get('topic'),
+          month: url.searchParams.has('month') ? url.searchParams.get('month') : undefined });
+        json(200, { ...result, customer_id: selected.customer_id, selection_id: selected.selection_id });
+      } catch (error) { json(error.status || 503, { error: error.status ? error.message : 'Vastaus ei latautunut. Yritä uudelleen.' }); }
+      return;
+    }
     if (route === '/api/insights' || route === '/demo-data.json' || route === '/wrapped-data.json') {
       try {
         const allowedRetry = route === '/api/insights' && url.search === '?retry=1';
@@ -106,8 +121,7 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
         const selected = req.demoSession;
         const result = route === '/demo-data.json' ? await dataSource.bootstrap(selected.customer_id) :
           route === '/wrapped-data.json' ? await scopedWrapped(selected.customer_id) :
-          // Keep the request alive while generating so Cloud Run allocates CPU until the cache is filled.
-          // The browser fetches this independently; figures and charts render immediately.
+          // Prepared content is checked against the database and prompt version before serving.
           await model.insights(selected.customer_id, { retry: allowedRetry });
         json(result.status === 'generating' ? 202 : 200, { ...result, customer_id: selected.customer_id,
           selection_id: selected.selection_id, ...(result.status === 'generating' ? { retry_after_ms: 1000 } : {}) });

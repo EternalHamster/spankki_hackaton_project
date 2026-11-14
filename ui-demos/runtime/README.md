@@ -17,15 +17,17 @@ Successful replies are `{ "id": ..., "result": ... }`. Failures are `{ "id": ...
 
 | Operation | Result |
 | --- | --- |
-| `ready` | `status`, `as_of`, `version`, demo customer allowlist |
+| `ready` | `status`, `as_of`, `version`, demo customer allowlist, `coverage_from`, `coverage_to` |
 | `bootstrap` | `summary`, `profiles: [selectedProfile]`, `as_of`, `version`; profile transaction shape matches the existing UI |
-| `context` | `profile`, `insight_context`, `as_of`, `version`; both prompt strings omit customer IDs |
+| `context` | `profile`, `insight_context`, `as_of`, `version`, `coverage_from`, `coverage_to`; both prompt strings omit customer IDs |
 | `tools` | Seven Anthropic-compatible tool definitions |
 | `tool` | Selected customer's bounded tool result; `args` must contain only `name` and `arguments` |
 
 Available tools: `get_spending`, `get_cash_flow`, `get_transactions`, `safe_to_spend`, `what_if`, `compare_to_peers`, and `get_model_detail`. Date ranges are start-inclusive/end-exclusive and at most 1,096 days. Individual transaction results are limited to 20 rows per page. Exact totals use per-transaction decimal casts; scenarios use the existing model's rounding policy. Every tool result is explicitly dated and distinguishes model estimates from historical amounts.
 
 Historical coverage comes from `meta.first_month` through `meta.as_of`, read once at startup. The current snapshot covers October 1, 2024 through September 30, 2026, inclusive. A customer's first/last transaction dates are returned separately as `observed_transactions`; days without a transaction do not create coverage gaps. `outside_snapshot_range` signals a request extending beyond dataset coverage; the original `outside_observed_range` field is retained as an alias of that corrected flag. Invalid filters return controlled validation feedback with allowed fields/values, never raw arguments or database errors.
+
+The raw snapshot contains 24 recorded calendar months. The fitted BDA model uses the 23 complete months from November 2024 through September 2026; its training excludes the first month because accounts opened on different days. Profile/context figures are model estimates over that history, last-12-month totals, recent trends and ranked snapshot insights, rather than facts about an arbitrary selected calendar month. Use period tools for exact selected-month facts and arithmetic.
 
 ## Configuration and caching
 

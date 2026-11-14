@@ -76,6 +76,10 @@ dialog{width:calc(100% - 24px);max-width:456px;max-height:calc(100dvh - 48px);pa
 .topic-summary{padding:15px 16px;border-left:2px solid #7ea78b;background:#e6f0e8;border-radius:0 8px 8px 0}
 .ai-label{font-size:11px;font-weight:400;color:#526e5c;line-height:1.5}
 .topic-summary>p{font-size:14px;line-height:1.7;color:#304f3c;margin-top:7px;white-space:pre-line;overflow-wrap:anywhere}
+.summary-bullets{font-size:14px;line-height:1.65;color:#304f3c;margin:8px 0 0;padding-left:19px;overflow-wrap:anywhere}.summary-bullets>li+li{margin-top:8px}.summary-bullets>li::marker{color:var(--green)}
+.section-month-picker{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0;color:#3c5c47;font-size:13px}.section-month-picker>span{display:flex;align-items:center;gap:7px;flex-shrink:0}.section-month-picker .icon{height:18px;width:18px}.section-month-picker select{min-width:0;max-width:220px;min-height:44px;padding:9px 27px 9px 10px;border:1px solid #b7ccbe;border-radius:8px;background:#fff;color:#214c34;font:inherit;font-weight:500}.section-month-picker select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.chat-message .summary-bullets{color:inherit;margin:8px 0 0}.chat-message .summary-bullets>li::marker{color:inherit}
+#recap-teaser{margin-top:18px}
 .summary-pending{display:flex;align-items:flex-start;gap:10px}.summary-pending .insights-pulse{margin-top:5px}
 .topic-followup{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;width:100%;padding:12px 0;margin:3px 0 14px;text-align:left;font-size:14px;font-weight:600;color:var(--green)}
 .topic-followup>.icon{width:18px;height:18px}.topic-followup:hover{text-decoration:underline}

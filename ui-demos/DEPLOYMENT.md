@@ -2,9 +2,11 @@
 
 This folder is the deployment root for the **UI demo**. One container runs the Node.js web server and a persistent local Python worker with `duckdb==2.0.0`. The worker opens the packaged DuckDB snapshot read-only, caches the three demo customers' chart data and prompt contexts, and exposes seven bounded financial tools over private process pipes. It has no network listener. The separate `../backend/` FastAPI service is not part of this request path.
 
-On customer selection, the browser loads charts independently while Claude generates three insight cards. Validated cards have a one-hour, per-customer/snapshot application cache; concurrent requests share a job. Every chat receives the selected customer's compact context and can query that customer's data through the worker. Shared prompt blocks also use Anthropic ephemeral prompt caching. First generation takes seconds, and process restarts clear application caches. No full transaction history is added to each prompt.
+Key insights and section answers are generated before deployment and packaged in private `server-data/coach-answers.json`. It contains nine insight cards about the three customers' broader histories, spending/saving answers for all 24 recorded months per customer (144 monthly answers), and three weekly answers dated to the snapshot. Startup, page/customer loads and section/month changes read prepared content without model calls. The browser preloads the three default-month topic answers. Spending, saving and transactions have independent month selectors, with transaction category selection preserved; the original Rahavuotesi card remains below the insights.
 
-Deploy from a repository checkout with the Git LFS database available at `../BDA/output/coach.duckdb`. `deploy/deploy.ps1` runs `scripts/prepare-runtime.mjs` to copy the database and minimal `coach_context`/BDA code into private `.runtime/` before building. Source CSVs, the separate FastAPI service and local Python environments are excluded from the upload. No Google Cloud SDK or service-account key is included in the runtime image.
+Every ordinary or follow-up chat remains a live Claude call. It receives the selected customer's compact context and can query that customer's data through the worker. Shared prompt blocks use Anthropic ephemeral prompt caching. No full transaction history is added to each prompt. Restarting restores prepared content from the packaged bundle; it does not generate new text or expire answers after an hour.
+
+Deploy from a repository checkout with the Git LFS database available at `../BDA/output/coach.duckdb` and the corresponding tracked synthetic prepared bundle. `deploy/deploy.ps1` packages the database/minimal context code with `scripts/prepare-runtime.mjs`, validates the prepared answers with `scripts/check-prepared.mjs`, and runs Node checks before uploading. Missing or stale content blocks deployment. Source CSVs, the separate FastAPI service and local Python environments are excluded from the upload. No Google Cloud SDK or service-account key is included in the runtime image.
 
 ## Chat secret and live deployment
 
@@ -13,7 +15,7 @@ The existing service is `oma-talous-ui` in `junctionhackathonspankki`, region `e
 
 | Environment variable | Secret version | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | `money-coach-anthropic-key:1` | Server-side Claude requests |
+| `ANTHROPIC_API_KEY` | `money-coach-anthropic-key:1` | Live server-side Claude chat requests |
 | `DEMO_SESSION_SECRET` | `oma-talous-demo-session:1` | Stable signing secret, at least 32 characters |
 
 These secrets are provisioned for the existing project. For another project, provision equivalent secrets securely and allow the runtime identity to read each one:
@@ -24,11 +26,11 @@ gcloud secrets add-iam-policy-binding oma-talous-demo-session --project=junction
 .\deploy\deploy.ps1 -ProjectId junctionhackathonspankki -Public
 ```
 
-The deployment binds secret versions without reading their values locally. Update `ChatSecretVersion` or `SessionSecretVersion` when rotating, then redeploy. Rotating the signing secret invalidates existing demo sessions. Model calls incur Anthropic usage charges.
+The deployment binds secret versions without reading their values locally. Update `ChatSecretVersion` or `SessionSecretVersion` when rotating, then redeploy. Rotating the signing secret invalidates existing demo sessions. Live chat and explicit content preparation incur Anthropic usage charges; deploying or reading prepared content does not call the model.
 
 The browser sends conversation text and optionally an insight ID. The signed HttpOnly cookie selects the customer, and `X-Demo-Selection` binds requests to the current selection. Chat and tool arguments cannot override customer identity or supply arbitrary SQL. Peers appear only as group aggregates. The public selector deliberately permits any visitor to choose one of three synthetic customers; this is not real-user authentication.
 
-The instance allows four simultaneous provider calls and 30 provider calls/minute. Chat has at most four model rounds, six tool calls and 1,200 output tokens/round. Insight generation has up to two validated attempts with 2,200 output tokens each. A provider call has a 35-second limit within a 75-second overall flow deadline; the browser chat timeout is 90 seconds and Cloud Run's request timeout is 120 seconds. These in-memory controls reset on restart and are not a durable quota.
+The instance allows four simultaneous provider calls and 30 provider calls/minute. Chat has at most four model rounds, six tool calls and 1,200 output tokens/round. A provider call has a 35-second limit within a 75-second overall chat deadline; the browser chat timeout is 90 seconds and Cloud Run's request timeout is 120 seconds. These in-memory controls reset on restart and are not a durable quota.
 
 ## 1. Check locally
 
@@ -40,16 +42,28 @@ py -3.12 -m venv .venv
 .venv\Scripts\python.exe -m pip install -r runtime\requirements.txt
 node scripts/check.mjs
 .venv\Scripts\python.exe -m unittest discover -s runtime -p test_worker.py -v
+node scripts/check-prepared.mjs
 node server.mjs
 ```
 
-Open `http://127.0.0.1:4173/`. Stop the foreground server with Ctrl+C. There are no npm dependencies. Node automatically uses `ui-demos/.venv` when present. For live insights/chat, configure the provider key in a private environment file:
+Open `http://127.0.0.1:4173/`. Stop the foreground server with Ctrl+C. There are no npm dependencies. Node automatically uses `ui-demos/.venv` when present. A matching bundle supports prepared page content without a provider key. For live chat and content regeneration, configure the provider key in a private environment file:
 
 ```powershell
 Copy-Item .env.example .env
 # Set ANTHROPIC_API_KEY in .env; never commit populated secrets.
 node --env-file=.env server.mjs
 ```
+
+After changing the database, prompt version or model, prepare all three approved synthetic customers before deployment:
+
+```powershell
+node --env-file=.env scripts/prepare-coach.mjs --generate
+node --env-file=.env scripts/check-prepared.mjs
+```
+
+`--generate` is required because this step makes billable Claude calls. It prepares all 24 months of spending/saving answers, the weekly answers and the key insights, then writes the complete bundle to tracked `server-data/coach-answers.json`. Include this synthetic derived file with its corresponding code/data change. Do not commit the private `.env`. Interrupted runs resume compatible progress from ignored `.runtime/prepared-coach-progress.json`; changed database hash, prompt version or model invalidates the checkpoint. The script has no model calls on the deployment path itself: preparation is an explicit, separate step.
+
+`scripts/check-prepared.mjs` requires no API call. It validates the database hash, prompt version, model, customer/month coverage, bullet structure and insight IDs against the current contexts. Both deployment and Docker run it. Stale, missing or incomplete prepared content must be corrected before the service can become ready; there is no runtime regeneration or time-based expiry.
 
 `HOST` defaults to `127.0.0.1`, and `PORT` to `4173` for direct Node runs. Development can use a temporary process-local session secret. Production requires `DEMO_SESSION_SECRET` of at least 32 characters. The container sets `HOST=0.0.0.0` and `PORT=8080`. Cloud Run supplies its own `PORT`; do not put it in Cloud Run environment settings. Optional worker path/version overrides are documented in `.env.example` and [runtime/README.md](./runtime/README.md).
 
@@ -59,6 +73,7 @@ Install/start Docker Desktop with Linux containers. Populate `ANTHROPIC_API_KEY`
 
 ```powershell
 node scripts/prepare-runtime.mjs
+node --env-file=.env scripts/check-prepared.mjs
 docker compose up --build -d
 docker compose ps
 Invoke-RestMethod http://127.0.0.1:8080/readyz
@@ -66,7 +81,7 @@ docker compose logs ui
 docker compose down
 ```
 
-Open `http://127.0.0.1:8080/`. Compose binds the host port to localhost, runs with a read-only filesystem and drops Linux capabilities. Set `LOCAL_PORT` in `.env` to change the host port. The image runs as the unprivileged `coach` user and starts Node with an exec-form command; Node manages the private worker. Build verification runs Node checks and warms the real database without model calls. The final Debian Bookworm-based image contains Node 24, Python 3.12, DuckDB 2, minimal context code, the private database/recap bundle and public assets. Rebuild for base-image patches; pin reviewed digests if reproducible image bytes are required.
+Open `http://127.0.0.1:8080/`. Compose binds the host port to localhost, runs with a read-only filesystem and drops Linux capabilities. Set `LOCAL_PORT` in `.env` to change the host port. The image runs as the unprivileged `coach` user and starts Node with an exec-form command; Node manages the private worker. Build verification runs Node checks and validates prepared content against the real packaged database without model calls or provider credentials. The final Debian Bookworm-based image contains Node 24, Python 3.12, DuckDB 2, minimal context code, the private database/recap/prepared-answer bundles and public assets. Rebuild for base-image patches; pin reviewed digests if reproducible image bytes are required.
 
 ## 3. Choose cloud settings
 
@@ -91,7 +106,7 @@ Edit `deploy/cloud-run.psd1`, or copy it to the git-ignored `deploy/cloud-run.lo
 | Access | Cloud Run IAM authentication; add `-Public` for an open demo |
 | Startup / liveness probe | HTTP `/readyz` / `/healthz` |
 
-Scaling to zero reduces idle compute use but adds cold-start latency and discards in-memory customer/insight caches. The worker warms all three customer contexts and bootstrap records before readiness; Claude generation starts only when requested by the page. Maximum instances are a scaling setting, not a spending cap; builds, image storage and network use can incur charges. Set a billing budget/alert appropriate to your hackathon credits.
+Scaling to zero reduces idle compute use but adds cold-start latency and discards in-memory customer caches. Before readiness, the worker warms all three customer contexts and bootstrap records, and the server validates/loads the packaged prepared answers without Claude calls. Maximum instances are a scaling setting, not a spending cap; builds, image storage and network use can incur charges. Set a billing budget/alert appropriate to your hackathon credits.
 
 ## 4. Preview, then deploy
 
@@ -113,7 +128,7 @@ For an intentionally public hackathon demo, use:
 .\deploy\deploy.ps1 -ProjectId YOUR_PROJECT_ID -Setup -Public
 ```
 
-Static files in `public/` are downloadable. The database and multi-customer recap bundle remain outside that root. `/demo-data.json`, `/wrapped-data.json`, `/api/insights` and `/api/chat` require the signed selection and its matching nonce. The first three return only the selected customer's data. `/api/insights?retry=1` explicitly retries a failed generation; other data query parameters are rejected. `PUBLIC_DEMO_CUSTOMER_ID` defaults to `CUST00207` and controls only the initial selection. The selector also permits `CUST00127` and `CUST00103`. No offline insight preparation is required.
+Static files in `public/` are downloadable. The database and multi-customer recap/prepared-answer bundles remain outside that root. `/demo-data.json`, `/wrapped-data.json`, `/api/insights`, `/api/summaries` and `/api/chat` require the signed selection and matching nonce. Responses contain only the selected customer's data. `GET /api/summaries` accepts `topic=spending|saving&month=YYYY-MM` or `topic=week`; extra fields, duplicate parameters and customer overrides are rejected. Insight and summary retries only reread prepared content. `PUBLIC_DEMO_CUSTOMER_ID` defaults to `CUST00207` and controls the initial selection; the selector also permits `CUST00127` and `CUST00103`.
 
 `-Setup` enables the Cloud Run, Cloud Build, Artifact Registry and IAM APIs; creates the two identities if missing; and grants only the build identity `roles/run.builder`. It grants no project roles to the runtime identity and does not provision secrets or their access grants. The deploy script prepares `.runtime/`, validates locally, uploads allowlisted UI/runtime sources, and calls `gcloud run deploy --source=.` with the bundled Dockerfile. Cloud Build builds the image, so **local Docker is not required for cloud deployment**. The regional `cloud-run-source-deploy` image repository is created by the source-deployment flow if needed. See Google's [source deployment guide](https://docs.cloud.google.com/run/docs/deploying-source-code).
 
@@ -139,7 +154,7 @@ For an IAM-protected service, use a local authenticated proxy, then open `http:/
 gcloud run services proxy oma-talous-ui --project YOUR_PROJECT_ID --region europe-north1 --port 8080
 ```
 
-Your account needs Cloud Run Invoker access for the protected service. In the UI, select each demo customer and confirm charts load while insights generate. Click a card, ask an ordinary chat question about a dated spending period, then switch customers and confirm the old conversation/cards clear. Inspect the rings, Menohistoria, transactions, savings slider and Rahavuotesi. These live insight/chat checks make billable model calls. The standalone analytics example is at `/finance-analytics/example.html`.
+Your account needs Cloud Run Invoker access for the protected service. Select each demo customer and confirm charts, prepared insights and the default-month topic answers load. Expand each topic, change spending/saving months independently, and change transaction month while keeping its category. Those checks make no model calls. Click a card or use a topic follow-up, ask an ordinary chat question about a dated spending period, then switch customers and confirm the old conversation/cards clear; these live chat checks are billable. Inspect the rings, Menohistoria, savings slider and the original Rahavuotesi card below the insights. The standalone analytics example is at `/finance-analytics/example.html`.
 
 View logs:
 
@@ -147,11 +162,11 @@ View logs:
 gcloud run services logs read oma-talous-ui --project YOUR_PROJECT_ID --region europe-north1 --limit 50
 ```
 
-Cloud Run provides HTTPS and request logs. Startup/error/shutdown messages are JSON on stdout. `/healthz` checks the process; `/readyz` checks the worker, private recap bundle and core UI assets. Health checks never call Claude. Provider usage logs record input/output/cache token counts without logging financial prompts. Cloud Run probes are configured explicitly because Docker HEALTHCHECK alone does not configure Cloud Run health checks. See the [container contract](https://docs.cloud.google.com/run/docs/container-contract) and [health-check guide](https://docs.cloud.google.com/run/docs/configuring/healthchecks).
+Cloud Run provides HTTPS and request logs. Startup/error/shutdown messages are JSON on stdout. `/healthz` checks the process; `/readyz` checks the worker, validated prepared answers, private recap bundle and core UI assets. Health checks never call Claude. Provider usage logs record input/output/cache token counts without logging financial prompts. Cloud Run probes are configured explicitly because Docker HEALTHCHECK alone does not configure Cloud Run health checks. See the [container contract](https://docs.cloud.google.com/run/docs/container-contract) and [health-check guide](https://docs.cloud.google.com/run/docs/configuring/healthchecks).
 
 ## 6. Update, roll back or stop
 
-Redeploy with the same command after editing. To roll back, find the previous revision and send traffic to it:
+Redeploy with the same command after editing. Regenerate and validate prepared content first when the database, prompts or model change. A code-only or visual change that leaves those inputs intact can reuse the matching bundle. To roll back, find the previous revision and send traffic to it:
 
 ```powershell
 gcloud run revisions list --service oma-talous-ui --project YOUR_PROJECT_ID --region europe-north1
@@ -168,4 +183,4 @@ Deletion of the service does not delete stored images/build artifacts or the ser
 
 ## Before connecting real customers
 
-`public/adapters/project-finance.js` maps the selected customer's data to the analytics contract in `INTEGRATION.md`. The current signed session protects demo selection and rejects stale responses, but does not establish who a person is. Replace public persona selection with authenticated user sessions and map each identity to its permitted customer on the server for every data, insight, recap and chat endpoint. Preserve worker scoping and group-only peer comparisons. The Content Security Policy permits same-origin scripts and API calls; a future cross-origin API needs corresponding CSP and backend CORS changes.
+`public/adapters/project-finance.js` maps the selected customer's data to the analytics contract in `INTEGRATION.md`. The current signed session protects demo selection and rejects stale responses, but does not establish who a person is. Replace public persona selection with authenticated user sessions and map each identity to its permitted customer on the server for every data, insight, summary, recap and chat endpoint. Preserve worker scoping and group-only peer comparisons. The Content Security Policy permits same-origin scripts and API calls; a future cross-origin API needs corresponding CSP and backend CORS changes.

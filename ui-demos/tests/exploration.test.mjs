@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createExplorationSummaries, explorationQuestion } from '../public/exploration.js';
 
-const selection = { selection_id: 'selected-a', as_of: '2026-09-30' };
+const selection = { customer_id: 'CUST00207', selection_id: 'selected-a', as_of: '2026-09-30' };
 const input = { topic: 'spending', month: '2026-09', selection };
 const response = (answer = 'Kuukauden yhteenveto.', selectionId = selection.selection_id) => ({
-  ok: true, status: 200, json: async () => ({ answer, selection_id: selectionId }),
+  ok: true, status: 200, json: async () => ({ bullets: [answer, 'Katso menosi.'], customer_id: selection.customer_id, selection_id: selectionId }),
 });
 
 test('opened topics share pending/completed summaries, scoped by selection and month', async () => {
@@ -14,14 +14,14 @@ test('opened topics share pending/completed summaries, scoped by selection and m
     calls.push({ url, options });
     return response('Yhteenveto.', options.headers['X-Demo-Selection']);
   } });
-  assert.equal(calls.length, 0, 'no model requests on the collapsed overview');
+  assert.equal(calls.length, 0);
   const first = store.load(input), again = store.load(input);
   assert.equal(first, again);
   const result = await first;
-  assert.equal(result.answer, 'Yhteenveto.');
+  assert.equal(result.answer, '• Yhteenveto.\n• Katso menosi.');
   assert.equal(result.displayQuestion, 'Mihin rahani menivät? Tarkasteltava kuukausi: 2026-09.');
-  assert.equal(calls[0].url, '/api/chat');
-  assert.deepEqual(JSON.parse(calls[0].options.body), { messages: [{ role: 'user', content: result.question }] });
+  assert.equal(calls[0].url, '/api/summaries?topic=spending&month=2026-09');
+  assert.equal(calls[0].options.body, undefined);
   assert.equal(await store.load(input), result);
   assert.equal(calls.length, 1);
   await store.load({ ...input, month: '2026-08' });
@@ -36,7 +36,7 @@ test('mismatched selections never become a cached financial summary', async () =
   let calls = 0;
   const store = createExplorationSummaries({ fetchImpl: async () => ++calls === 1 ? response('Wrong customer', 'selected-b') : response() });
   await assert.rejects(store.load(input), error => error.staleSelection === true);
-  assert.equal((await store.load(input)).answer, 'Kuukauden yhteenveto.');
+  assert.equal((await store.load(input)).answer, '• Kuukauden yhteenveto.\n• Katso menosi.');
   assert.equal(calls, 2);
   for (const status of [401, 409]) {
     const expired = createExplorationSummaries({ fetchImpl: async () => ({ ok: false, status, json: async () => ({}) }) });
@@ -49,7 +49,7 @@ test('failed or empty replies can be retried and are never replaced with a fake 
     let calls = 0;
     const store = createExplorationSummaries({ fetchImpl: async () => ++calls === 1 ? failure : response() });
     await assert.rejects(store.load(input));
-    assert.equal((await store.load(input)).answer, 'Kuukauden yhteenveto.');
+    assert.equal((await store.load(input)).answer, '• Kuukauden yhteenveto.\n• Katso menosi.');
     assert.equal(calls, 2);
   }
 });
@@ -71,9 +71,20 @@ test('customer reset aborts pending requests and discards successful summaries',
   assert.equal(calls, 2);
 });
 
-test('affordability and savings questions request authoritative tools and historical periods', () => {
-  assert.match(explorationQuestion('week', '2026-08', selection.as_of), /2026-09-30.*safe_to_spend/);
+test('questions retain their own period without exposing implementation instructions', () => {
+  assert.match(explorationQuestion('week', '2026-08', selection.as_of), /2026-09-30/);
   assert.doesNotMatch(explorationQuestion('week', '2026-08', selection.as_of), /2026-08/);
-  assert.match(explorationQuestion('saving', '2026-08', selection.as_of), /2026-08.*what_if/);
+  assert.match(explorationQuestion('saving', '2026-08', selection.as_of), /2026-08/);
+  assert.doesNotMatch(explorationQuestion('saving', '2026-08', selection.as_of), /what_if|malli|tietokanta/);
   assert.throws(() => explorationQuestion('unknown', input.month, selection.as_of));
+});
+
+test('customer preload fetches all three prepared answers and opening them needs no new request', async () => {
+  const urls = [];
+  const store = createExplorationSummaries({ fetchImpl: async url => { urls.push(url); return response(); } });
+  assert((await store.warm(selection, '2026-09')).every(result => result.status === 'fulfilled'));
+  assert.equal(urls.length, 3);
+  assert(urls.includes('/api/summaries?topic=week'));
+  await store.load(input);
+  assert.equal(urls.length, 3);
 });

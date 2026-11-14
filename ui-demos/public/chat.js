@@ -10,7 +10,7 @@ const GAP = /\[(?:tuote|hinta)\]/;
 const ready = draft => Boolean(draft.trim()) && !GAP.test(draft);
 
 export function createChatDialog({ modal, detail, icon, getSelection = () => null, onSelectionStale = () => {} }) {
-  const fresh = () => ({ messages: [], draft: '', pending: false, error: '', insight: null, exploration: null, controller: null, selection: getSelection() });
+  const fresh = () => ({ messages: [], draft: '', pending: false, error: '', insight: null, exploration: null, explorationBullets: null, controller: null, selection: getSelection() });
   let session = fresh();
 
   function reset() { session.controller?.abort(); session = fresh(); }
@@ -18,7 +18,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
   function update() {
     const log = detail.querySelector('#chat-messages');
     if (!log) return;
-    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span><p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p></div>`).join('');
+    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${escape(bullet)}</li>`).join('')}</ul>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}</div>`).join('');
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending ? 'Valmentaja vastaa…' : '';
     const alert = detail.querySelector('#chat-error');
@@ -113,10 +113,11 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (autoSend && question) void send();
   }
   showChat.reset = reset;
-  showChat.openExploration = ({ question, displayQuestion, answer, selectionId }) => {
+  showChat.openExploration = ({ question, displayQuestion, answer, bullets, selectionId }) => {
     if (selectionId !== getSelection()?.selection_id) { onSelectionStale(); return; }
     reset();
     session.exploration = displayQuestion;
+    session.explorationBullets = Array.isArray(bullets) && bullets.length >= 2 && bullets.length <= 3 && bullets.every(bullet=>typeof bullet === 'string') ? bullets : null;
     session.messages = [{ role: 'user', content: question }, { role: 'assistant', content: answer }];
     showChat();
     detail.querySelector('#chat-question').focus();

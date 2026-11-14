@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createCoach, CoachError } from '../coach.mjs';
 
 const cards = () => ({ insights: [
-  { title: 'Ravintolakäynnit', headline_number: '250 € kuukaudessa', explanation: 'Mallin arvio on 250 € kuukaudessa. Ryhmän luku on 95 €.', action: 'Vertaa hintoja ennen tilaamista.' },
+  { title: 'Ravintolakäynnit', headline_number: '250 € kuukaudessa', explanation: 'Arvio on 250 € kuukaudessa. Ryhmän luku on 95 €.', action: 'Vertaa hintoja ennen tilaamista.' },
   { title: 'Puskuri', headline_number: '1,250 €', explanation: 'Aineiston puskuritavoite on 1,250 €.', action: 'Pidä puskuri erillään arjen menoista.' },
   { title: 'Säästäminen', headline_number: '130 € kuukaudessa', explanation: 'Historiallinen ylijäämä on noin 130 € kuukaudessa.', action: 'Tarkista kuukausibudjettisi.' },
 ] });
@@ -84,7 +84,7 @@ test('failed numeric validation retries once and then stays failed until explici
 test('insight grounding accepts localized snapshot dates and numbers supplied only in the trusted profile', async () => {
   for (const date of ['30.9.2026', '30.09.2026', '30. 9. 2026', '2026-09-30']) {
     const output = cards();
-    output.insights[2].explanation = `Tilanne ${date}: historiallinen saldo on 6 890 €. Mallin palkkaennuste oli 15.10.2026.`;
+    output.insights[2].explanation = `Tilanne ${date}: saldo oli 6 890 €. Arvio palkkapäivästä oli 15.10.2026.`;
     const { coach, requests } = fixture({
       source: { context: async () => ({ profile: 'Recorded balance EUR 6,890. Next payday forecast 2026-10-15.',
         insight_context: 'restaurants 250, peers 95, buffer 1,250, savings 130', as_of: '2026-09-30', version: 'v1' }) },
@@ -241,4 +241,119 @@ test('customer identifiers in a supplied snapshot fail closed before sending dat
     version: 'v1', as_of: '2026-09-30' }) } });
   await assert.rejects(coach.insights('A'), error => error.status === 503);
   assert.equal(requests.length, 0);
+});
+
+function summaryFixture(options = {}) {
+  const calls = [];
+  const source = {
+    execute: async (customer, name, args) => {
+      calls.push({ customer, name, args });
+      const meta = { as_of: '2026-09-30', data_version: 'v1', outside_observed_range: false };
+      if (name === 'safe_to_spend') return { ...meta, eur_week: 0, recorded_balance_eur: -152,
+        safe_to_save_eur_month: 0, limited_by: 'cash_until_payday' };
+      const september = args.start_date === '2026-09-01';
+      if (name === 'get_cash_flow') return { ...meta, income_eur: september ? '3000.00' : '1000.00',
+        spending_eur: september ? '2434.56' : '800.00', remaining_income_eur: september ? '565.44' : '200.00',
+        investment_out_eur: september ? '300.00' : '0.00', investment_in_eur: september ? '25.00' : '0.00' };
+      if (name === 'get_spending') return { ...meta, total_eur: september ? '2434.56' : '800.00', categories: september ? [
+        { category: 'Travel', total_eur: '134.57' }, { category: 'Housing', total_eur: '900.00' },
+        { category: 'Restaurants', total_eur: '199.99' }, { category: 'Home & Tech', total_eur: '1200.00' },
+      ] : [{ category: 'Housing', total_eur: '700.00' }, { category: 'Restaurants', total_eur: '100.00' }] };
+      throw new Error('Unexpected tool');
+    },
+    ...options.source,
+  };
+  return { calls, ...fixture({ ...options, source }) };
+}
+
+const summaryCards = () => ({ months: {
+  '2026-08': { spending: ['Menosi olivat 800 €.', 'Asumiseen meni 700 €.'],
+    saving: ['Tuloista jäi menojen jälkeen 200 €.', '20 % pienemmistä ravintolamenoista olisi jäänyt 20 € lisää.'] },
+  '2026-09': { spending: ['Menosi olivat 2 434,56 €.', 'Eniten meni kotiin ja tekniikkaan: 1 200 €.'],
+    saving: ['Tuloista jäi menojen jälkeen 565,44 €.', 'Säästösiirtojen jälkeen jäi 290,44 €.',
+      '20 % pienemmistä ravintolamenoista olisi jäänyt 40 € lisää.'] },
+}, week: ['Arvio lisäostoihin: 0 €.', 'Varaa ensin rahat välttämättömiin menoihin.'] });
+
+test('summary batch uses exact selected-month cents and optional-category ranking without mixing saving transfers into expenses', async () => {
+  const { coach, requests, calls } = summaryFixture({ provider: () => textResult(JSON.stringify(summaryCards())) });
+  const result = await coach.summaryBatch('A', { months: ['2026-09', '2026-08'], includeWeek: true });
+  assert.equal(requests.length, 1);
+  assert.equal(calls.length, 5);
+  assert.ok(calls.every(call => call.customer === 'A'));
+  assert.deepEqual(calls.find(call => call.args.start_date === '2026-09-01').args,
+    { start_date: '2026-09-01', end_date: '2026-10-01' });
+  const facts = JSON.parse(requests[0].body.messages[0].content.split('\n\nWrite prepared')[0].replace('EXACT TOPIC FACTS:\n', ''));
+  assert.deepEqual(facts.months['2026-09'].largest_spending_category, { category: 'Koti ja tekniikka', amount_eur: '1200.00' });
+  assert.deepEqual(facts.months['2026-09'].cut_example, { category: 'Ravintolat', percent: 20, before_eur: '199.99',
+    saving_eur: '40.00', after_eur: '159.99', remaining_after_expenses_if_cut_eur: '605.44' });
+  assert.equal(facts.months['2026-09'].remaining_before_savings_eur, '565.44');
+  assert.equal(facts.months['2026-09'].remaining_after_savings_eur, '290.44');
+  assert.equal(facts.week.as_of, '2026-09-30');
+  assert.equal(result.months['2026-09'].saving.answer, summaryCards().months['2026-09'].saving.map(bullet => `• ${bullet}`).join('\n'));
+  assert.equal(result.data_version, 'v1');
+  assert.deepEqual(Object.keys(result.months), ['2026-08', '2026-09']);
+  assert.doesNotMatch(JSON.stringify(requests[0].body), /PRIVATE_B/);
+});
+
+test('summary validation rejects another month’s figures, jargon, long bullets and missing topics', async () => {
+  for (const change of [
+    output => { output.months['2026-09'].spending[0] = 'Menosi olivat 800 €.'; },
+    output => { output.week[1] = 'Mallin mediaani kuvaa likviditeettiä.'; },
+    output => { output.months['2026-09'].saving[1] = 'x'.repeat(141); },
+    output => { delete output.months['2026-08'].saving; },
+  ]) {
+    const { coach, requests } = summaryFixture({ provider: () => {
+      const output = summaryCards(); change(output); return textResult(JSON.stringify(output));
+    } });
+    await assert.rejects(coach.summaryBatch('A', { months: ['2026-08', '2026-09'], includeWeek: true }), error => error.status === 502);
+    assert.equal(requests.length, 2);
+    assert.match(requests[1].body.messages[0].content, /Previous response failed validation:/);
+  }
+});
+
+test('summary bounds and inconsistent or out-of-coverage database facts fail before model access', async () => {
+  const fixture = summaryFixture();
+  for (const params of [{ months: [] }, { months: ['2026-13'] }, { months: ['2026-09', '2026-09'] },
+    { months: ['2026-09'], includeWeek: 'true' }, { months: ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07'] }]) {
+    await assert.rejects(fixture.coach.summaryBatch('A', params), error => error.status === 400);
+  }
+  assert.equal(fixture.requests.length, 0);
+  assert.equal(fixture.calls.length, 0);
+  for (const mutation of [value => ({ ...value, outside_observed_range: true }),
+    value => ({ ...value, data_version: 'another-snapshot' }), value => ({ ...value, total_eur: '99999.99' })]) {
+    const good = summaryFixture();
+    const bad = summaryFixture({ source: { execute: async (customer, name, args) => {
+      const value = await good.source.execute(customer, name, args);
+      return name === 'get_spending' ? mutation(value) : value;
+    } } });
+    await assert.rejects(bad.coach.summaryBatch('A', { months: ['2026-09'] }), error => [400, 503].includes(error.status));
+    assert.equal(bad.requests.length, 0);
+  }
+});
+
+test('week-only preparation uses only the dated allowance and no monthly database requests', async () => {
+  const { coach, requests, calls } = summaryFixture({ provider: () => textResult(JSON.stringify({ months: {}, week: summaryCards().week })) });
+  const result = await coach.summaryBatch('B', { includeWeek: true });
+  assert.deepEqual(calls.map(call => [call.customer, call.name]), [['B', 'safe_to_spend']]);
+  assert.deepEqual(result.months, {});
+  assert.equal(result.week.bullets.length, 2);
+  assert.equal(requests.length, 1);
+});
+
+test('prepared insight cards seed the current customer cache and open card chat without regenerating', async () => {
+  const generated = await fixture().coach.insights('A');
+  const { coach, requests } = fixture({ provider: () => textResult('• Katsotaan menojasi.\n• Voit kysyä tarkemmin.') });
+  assert.deepEqual(await coach.primeInsights('A', generated), generated);
+  assert.deepEqual(await coach.insights('A'), generated);
+  assert.equal(requests.length, 0);
+  await coach.chat('A', { messages: [{ role: 'user', content: 'Kerro tästä.' }], insightId: generated.insights[0].id });
+  assert.equal(requests.length, 1);
+  assert.match(JSON.stringify(requests[0].body.system), /Ravintolakäynnit/);
+  for (const value of [
+    { ...generated, customer_id: 'B' }, { ...generated, data_version: 'old' }, { ...generated, model: 'different' },
+    { ...generated, insights: generated.insights.map(row => ({ ...row, id: 'forged' })) },
+    { ...generated, insights: generated.insights.map(row => ({ ...row, explanation: 'Mallin mediaani on 250 €.' })) },
+  ]) await assert.rejects(coach.primeInsights('A', value), error => error.status === 503);
+  await assert.rejects(coach.primeInsights('B', { ...generated, customer_id: 'B' }), error => error.status === 503);
+  assert.equal(requests.length, 1);
 });
