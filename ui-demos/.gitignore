@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+server.pid
+node_modules/
+coverage/
+artifacts/
+deploy/cloud-run.local.psd1

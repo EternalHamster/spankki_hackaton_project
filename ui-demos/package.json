@@ -1,0 +1,12 @@
+{
+  "name": "oma-talous-ui-demos",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24 <25" },
+  "scripts": {
+    "start": "node server.mjs",
+    "prepare-data": "node scripts/prepare-data.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}

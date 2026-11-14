@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="fi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Financial analytics · isolated integration example</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="./styles.css">
+<style>body{margin:0;background:#eaf6ec;font:15px Arial,sans-serif;color:#173e27}main{max-width:430px;margin:0 auto;padding:24px 18px}h1{font-size:22px}p{line-height:1.6}#controls{display:flex;flex-wrap:wrap;gap:8px}#controls button{padding:12px;border:1px solid #b7cebf;border-radius:7px;background:#fff;color:#007e43;cursor:pointer}#status{font-size:12px}</style>
+<main><h1>Standalone integration example</h1><p>Only the reusable module and its stylesheet are loaded. These small fixtures are invented for integration checks.</p><div id="controls"><button id="update">Update month</button><button id="destroy">Destroy</button><button id="mount">Mount again</button></div><p id="status" role="status">Mounted: September 2026</p><div id="analytics"></div></main>
+<script type="module" src="./example.js"></script>
+</html>

@@ -1,0 +1,16 @@
+{
+  "table": "transactions",
+  "customer_id": "customer_id",
+  "date": "tx_date",
+  "category": "category",
+  "amount": "tx_amount_eur",
+  "amount_convention": "negative_debits",
+  "currency": "EUR",
+  "expense_categories": ["Housing", "Utilities", "Groceries", "Health", "Home & Tech", "Transportation", "Restaurants", "Lifestyle", "Entertainment", "Travel"],
+  "income_categories": ["Salary", "Other Income"],
+  "baskets": {
+    "Housing": "regular_needs", "Utilities": "regular_needs", "Groceries": "regular_needs", "Transportation": "regular_needs",
+    "Health": "irregular_needs", "Home & Tech": "irregular_needs",
+    "Restaurants": "everyday_choices", "Lifestyle": "everyday_choices", "Entertainment": "everyday_choices", "Travel": "everyday_choices"
+  }
+}
