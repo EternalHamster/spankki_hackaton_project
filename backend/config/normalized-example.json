@@ -1,0 +1,11 @@
+{
+  "table": "analytics.customer_expenses",
+  "customer_id": "owner_id",
+  "date": "booked_on",
+  "category": "spending_group",
+  "amount": "expense_eur",
+  "amount_convention": "expense_only",
+  "currency": "EUR",
+  "expense_categories": ["Food", "Rent"],
+  "baskets": {"Food": "regular_needs", "Rent": "regular_needs"}
+}

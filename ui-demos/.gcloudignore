@@ -1,0 +1,17 @@
+# Source deployment runs from ui-demos/, never the repository root.
+**
+!.gcloudignore
+!.dockerignore
+!Dockerfile
+!package.json
+!server.mjs
+!public/
+!public/**
+!scripts/
+!scripts/check.mjs
+!tests/
+!tests/**
+**/.env*
+**/*.pem
+**/*.key
+**/node_modules/

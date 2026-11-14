@@ -1,0 +1,15 @@
+# Allow only runtime inputs and build-time validation into the Docker context.
+**
+!Dockerfile
+!package.json
+!server.mjs
+!public/
+!public/**
+!scripts/
+!scripts/check.mjs
+!tests/
+!tests/**
+**/.env*
+**/*.pem
+**/*.key
+**/node_modules/
