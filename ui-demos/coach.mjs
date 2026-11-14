@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
+import { insightPeriod } from './public/insights.js';
 
-export const PROMPT_VERSION = 'duckdb-coach-v6';
+export const PROMPT_VERSION = 'duckdb-coach-v7';
 const CACHE_CONTROL = { type: 'ephemeral' };
 // Both entry points share these blocks and tool definitions so the customer's cached prefix is reusable.
 const SYSTEM = `You are a concise, kind financial coach in the Finnish Oma talous synthetic demo.
@@ -36,14 +37,22 @@ If the recorded balance is negative or available cash is constrained, do not rec
 saving transfers unchanged or increasing them. Suggest reviewing their timing and amount so necessary
 payments have enough cash; distinguish a saving habit from sufficient liquidity.
 For normal chat default to two or three brief bullet points in easy Finnish, unless the user asks for more
-detail. Avoid technical
+detail. Use **bold** sparingly for a key amount or next step, and standard Markdown bullet lists.
+Avoid technical
 explanations and financial jargon. Say "arvio", "rahaa jäi" or "rahaa varalle" instead of model mechanics,
 median, liquidity or cash-flow terminology. Keep uncertainty, but explain it in ordinary words.
 When the application requests JSON insight cards or summaries, obey that exact output format without tools.`;
 
 const INSIGHT_REQUEST = `Write exactly three distinct key-insight cards in Finnish, ordered by usefulness.
-Consider the customer's entire supplied history. These home-page insights are independent of any month
-selected in the app. Use very short everyday Finnish: one idea per sentence, no technical or financial
+Write one weekly, one monthly and one yearly card. Each needs a period field: weekly, monthly or yearly.
+These home-page insights are independent of any month selected in the app. Their periods are anchored to
+the historical as_of date, never today's date. Weekly: the weekly allowance estimate at as_of, not actual
+spending in a calendar week. Monthly: the latest recorded calendar month, using explicitly marked
+"last month" figures; usual-month estimates may appear only as a clearly labeled comparison. Yearly:
+the last 12 recorded months, using the explicitly marked "Last 12 months (actual)" figures, including
+their monthly average if clearly described as an average over that year. Do not relabel the entire
+two-year history, usual-month estimates, or a hypothetical yearly saving as a recorded monthly/yearly total.
+Use very short everyday Finnish: one idea per sentence, no technical or financial
 jargon. Do not explain the model, snapshot, data processing or calculations. Say "noin" or "arvio" when
 needed. The app displays the historical date separately; do not repeat dates in every card.
 Use the supplied ranked model insights and their explanations as the factual starting point. Prioritize a
@@ -56,19 +65,23 @@ Do not claim that spending is rising without explicit trend evidence. Do not inv
 frequency target, percentage, purchase threshold or time limit. Every numerical figure must already be in
 the supplied context, including in titles and actions. Keep numeric strings in the source format. Explain
 group comparisons as typical group figures, never individual people. Explain the stated reason for a gap
-(frequency versus price), without calculating a new reason. Suggest one gentle, practical next step.
+(frequency versus price), without calculating a new reason.
+Lead each title with a practical action, not a statistic or observation. In explanation, connect the
+period's evidence to why the action helps. In action, give a concrete first step the user can take:
+what to check, compare, choose or change, and for what purpose. Avoid vague advice such as "follow your
+spending", "consider saving" or "this could help". Do not repeat the same action on multiple cards.
 Keep action suggestions qualitative unless the context explicitly documents that exact action target.
 An observed frequency or a number elsewhere in the context does not justify a new target such as one fewer
 visit per week, a weekly review schedule or a deadline. This applies to written-out numbers as well.
 Do not call tools: the detailed context already contains the figures for these cards.
 Return ONLY valid JSON with this shape and no extra fields:
 {"insights":[
-{"title":"...","headline_number":"...","explanation":"...","action":"..."},
-{"title":"...","headline_number":"...","explanation":"...","action":"..."},
-{"title":"...","headline_number":"...","explanation":"...","action":"..."}
+{"period":"weekly","title":"...","headline_number":"...","explanation":"...","action":"..."},
+{"period":"monthly","title":"...","headline_number":"...","explanation":"...","action":"..."},
+{"period":"yearly","title":"...","headline_number":"...","explanation":"...","action":"..."}
 ]}
 Exactly three objects. Each title at most 60 characters; headline_number 60; explanation 240 (1-2 short
-sentences); action 120. Count the objects before answering: three cards are required, not two.
+sentences); action 160. Count the objects before answering: three cards are required, not two.
 Use plain text in every field. Never include a customer identifier.`;
 
 const SUMMARY_REQUEST = `Write prepared topic summaries in very easy Finnish for the supplied facts only.
@@ -144,15 +157,16 @@ function validateInsights(text, context, idPrefix) {
     return { error: 'The outer JSON must contain only an insights array.' };
   }
   if (body.insights.length !== 3) return { error: `Exactly three complete insight objects are required; the previous response had ${body.insights.length}.` };
-  const limits = { title: 60, headline_number: 60, explanation: 240, action: 120 };
+  const limits = { title: 60, headline_number: 60, explanation: 240, action: 160 };
   const allowed = numbers(context);
   // Small grammatical counts are allowed, matching the existing Python insight validator.
   for (let i = 0; i <= 12; i++) allowed.add(String(i));
   const rows = [];
   for (const row of body.insights) {
-    if (!row || typeof row !== 'object' || Array.isArray(row) || Object.keys(row).length !== 4 ||
+    if (!row || typeof row !== 'object' || Array.isArray(row) || Object.keys(row).length !== 5 ||
+        !['weekly', 'monthly', 'yearly'].includes(row.period) ||
         Object.entries(limits).some(([key, max]) => typeof row[key] !== 'string' || !row[key].trim() || row[key].trim().length > max)) {
-      return { error: `Card ${rows.length + 1} must have only four nonempty text fields within their character limits: title 60, headline_number 60, explanation 240, action 120.` };
+      return { error: `Card ${rows.length + 1} must have period (weekly, monthly or yearly) and only four nonempty text fields within their character limits: title 60, headline_number 60, explanation 240, action 160.` };
     }
     const clean = Object.fromEntries(Object.keys(limits).map(key => [key, row[key].trim()]));
     const combined = Object.values(clean).join(' ');
@@ -160,8 +174,9 @@ function validateInsights(text, context, idPrefix) {
     if (COMPLEX_WORDS.test(combined)) return { error: 'Use easy Finnish without technical or financial jargon. Replace model explanations with a short phrase such as arvio or noin.' };
     const unsupported = [...numbers(combined)].find(number => !allowed.has(number));
     if (unsupported) return { error: `Card ${rows.length + 1} contains an unsupported number or date (${unsupported}). Use only figures and exact dates in the supplied customer context.` };
-    rows.push({ id: `${idPrefix}-${rows.length + 1}`, ...clean });
+    rows.push({ id: `${idPrefix}-${rows.length + 1}`, period: row.period, ...clean });
   }
+  if (new Set(rows.map(row => row.period)).size !== 3) return { error: 'Include one weekly, one monthly and one yearly card.' };
   return new Set(rows.map(row => row.title.toLocaleLowerCase('fi'))).size === 3
     ? { insights: rows } : { error: 'Use three distinct titles for three distinct insights.' };
 }
@@ -404,7 +419,7 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
     const snapshot = await context(customerId), key = cacheKey(customerId, snapshot);
     if (!value || value.status !== 'ready' || value.customer_id !== customerId || value.as_of !== snapshot.as_of ||
         value.data_version !== snapshot.version || value.model !== model || !Array.isArray(value.insights) ||
-        value.insights.some(row => !row || typeof row !== 'object' || Object.keys(row).sort().join(',') !== 'action,explanation,headline_number,id,title')) {
+        value.insights.some(row => !row || typeof row !== 'object' || Object.keys(row).sort().join(',') !== 'action,explanation,headline_number,id,period,title')) {
       throw new CoachError(503, 'Valmiit havainnot eivät vastaa asiakkaan tietoja.');
     }
     const idPrefix = `insight-${createHash('sha256').update(key).digest('hex').slice(0, 16)}`;
@@ -492,7 +507,7 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
       const current = cache.get(cacheKey(customerId, snapshot));
       const selected = current?.status === 'ready' && current.value.insights.find(row => row.id === insightId);
       if (!selected) throw new CoachError(409, 'Havainto on vanhentunut. Valitse havainto uudelleen etusivulta.');
-      prompt.push({ type: 'text', text: `Selected insight from this customer's snapshot:\n${JSON.stringify(selected)}` });
+      prompt.push({ type: 'text', text: `Selected insight from this customer's snapshot:\n${JSON.stringify(selected)}\nEvidence period: ${JSON.stringify(insightPeriod(selected.period, snapshot.as_of))}\nHelp the user turn the card's action into a short practical plan. Keep this historical period distinct from current finances.` });
     }
     const tools = await definitions();
     const permitted = new Map(tools.map(tool => [tool.name, tool.input_schema]));

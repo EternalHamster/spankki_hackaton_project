@@ -11,7 +11,7 @@ export const stubDataSource = () => ({
 });
 export const stubCoach = (overrides = {}) => ({
   insights: async customer => ({ status: 'ready', as_of: '2026-09-30', insights: [1, 2, 3].map(n => ({
-    id: `${customer}-${n}`, title: `Havainto ${n}`, headline_number: '250 €', explanation: 'Testihavainto.', action: 'Tutustu menoihisi.',
+    id: `${customer}-${n}`, period: ['weekly', 'monthly', 'yearly'][n - 1], title: `Havainto ${n}`, headline_number: '250 €', explanation: 'Testihavainto.', action: 'Tutustu menoihisi.',
   })) }),
   summary: async (customer, { topic, month } = {}) => {
     const bullets = ['Valitun asiakkaan historialliset luvut.', 'Tutustu menoihisi valmentajan kanssa.'];

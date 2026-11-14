@@ -1,3 +1,6 @@
+import { formatCoachText, formatInline } from './coach-text.js';
+import { insightPeriod } from './insights.js';
+
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
 // Suggested questions. A template's [gaps] must be filled in by the user before it can be sent.
@@ -18,7 +21,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
   function update() {
     const log = detail.querySelector('#chat-messages');
     if (!log) return;
-    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${escape(bullet)}</li>`).join('')}</ul>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}</div>`).join('');
+    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}</div>`).join('');
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending ? 'Valmentaja vastaa…' : '';
     const alert = detail.querySelector('#chat-error');
@@ -82,10 +85,11 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (session.selection?.selection_id !== customer.selection_id) reset();
     if (question) { reset(); session.draft = question; }
     const selected = session.insight;
+    const period = selected ? insightPeriod(selected.card.period, selected.asOf) : null;
     const date = customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' }) : '';
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${escape(customer.label || 'Demoasiakas')}${date ? ' · aineisto ' + escape(date) : ''}</span></div></div>
-      ${selected ? `<div class="chat-insight"><span>Valittu havainto</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${escape(selected.card.explanation)}</p></div><p class="chat-context-note">Voit kysyä tästä havainnosta tai muusta valitun demoasiakkaan taloudesta. Tiedot ovat historiallisia.</p>` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.</p></div>`}
+      ${selected ? `<div class="chat-insight"><span>${escape(period.label)} · ${escape(period.detail)}</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div><p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.</p></div>`}
       <div id="chat-messages" class="chat-messages" role="log" aria-label="Keskustelu" aria-live="polite" aria-relevant="additions text"></div>
       <div class="chat-suggestions">${SUGGESTIONS.map(q => `<button type="button" data-chat-question="${escape(q.text)}"><span>${escape(q.label || q.text)}${q.hint ? `<small>✎ ${escape(q.hint)}</small>` : ''}</span>${icon('arrow')}</button>`).join('')}</div>
       <p id="chat-progress" class="chat-progress" role="status"></p>
@@ -126,7 +130,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (customerId !== getSelection()?.customer_id) { onSelectionStale(); return; }
     reset();
     session.insight = { customerId, card, asOf };
-    session.draft = `Auta minua ymmärtämään havainto ”${card.title}” ja kerro, mikä olisi hyvä seuraava askel.`;
+    session.draft = `Auta minua toteuttamaan tämä askel: ${card.action} Anna lyhyt käytännön suunnitelma havaintoon ”${card.title}”.`;
     showChat();
     void send();
   };

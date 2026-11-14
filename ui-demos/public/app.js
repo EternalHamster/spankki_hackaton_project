@@ -5,6 +5,8 @@ import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
 import { explorationTopics, createExplorationSummaries } from './exploration.js';
+import { formatInline } from './coach-text.js';
+import { insightPeriod } from './insights.js';
 
 // Appearance follows the user's references; all money data is synthetic.
 const paths={
@@ -134,7 +136,7 @@ function render(){
   analytics?.destroy(); analytics = null; m=metrics(profile,topicMonth(activeTopic));
   root.innerHTML=`<div class="app-shell"><header class="topbar"><span class="demo-pill">DEMO</span><h1>Oma talous</h1><button class="icon-button" data-action="about" aria-label="Tietoa demoaineistosta">${icon('info')}</button></header>
     <main id="main-content" class="mint-content"><label class="customer-picker" for="customer-selector"><span>${icon('person')}Valittu demoasiakas</span><select id="customer-selector">${customerSession.customers.map(customer=>`<option value="${esc(customer.id)}" ${customer.id===customerSession.customer_id?'selected':''}>${esc(customer.label)}</option>`).join('')}</select></label>
-    <section class="trainer-intro" aria-labelledby="trainer-heading"><span class="trainer-label">${icon('chat')} Oma talousvalmentajasi</span><h2 id="trainer-heading">Mitä haluaisit tietää<br>taloudestasi?</h2><p>Aloita omasta kysymyksestäsi tai tutki yhtä aihetta kerrallaan.</p><form id="explore-form" class="explore-composer"><label class="sr-only" for="explore-question">Kysy omasta taloudestasi</label><input id="explore-question" type="text" placeholder="Kysy omasta taloudestasi…" maxlength="2000" required><button type="submit" aria-label="Lähetä kysymys valmentajalle">${icon('arrow')}</button></form><span class="trainer-note">AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin</span></section>
+    <section class="trainer-intro" aria-label="Kysy talousvalmentajalta"><form id="explore-form" class="explore-composer"><label class="sr-only" for="explore-question">Kysy omasta taloudestasi</label><input id="explore-question" type="text" placeholder="Kysy omasta taloudestasi…" maxlength="2000" required><button type="submit" aria-label="Lähetä kysymys valmentajalle">${icon('arrow')}</button></form><span class="trainer-note">AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin</span></section>
     <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3><div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
     <div class="section-title insights-title"><h2>Tärkeimmät havainnot</h2><span class="ai-label">AI:n tuottama</span></div><section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät AI-havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
     <div id="recap-teaser">${recapTeaser()}</div>
@@ -189,7 +191,7 @@ async function loadTopicSummary(target, topic) {
     if (!Array.isArray(result.bullets) || result.bullets.length < 2 || result.bullets.length > 3 ||
         result.bullets.some(bullet=>typeof bullet !== 'string' || !bullet.trim())) throw new Error('Yhteenveto puuttuu.');
     activeTopicResult = result;
-    target.innerHTML = `<span class="ai-label">AI:n tuottama yhteenveto</span><ul class="summary-bullets">${result.bullets.map(bullet=>`<li>${esc(bullet)}</li>`).join('')}</ul>`;
+    target.innerHTML = `<span class="ai-label">AI:n tuottama yhteenveto</span><ul class="summary-bullets">${result.bullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>`;
   } catch (error) {
     if (!target.isConnected || epoch !== customerEpoch) return;
     if (error.staleSelection) { void loadCustomer(); return; }
@@ -215,7 +217,10 @@ async function loadInsights(retry = false) {
     if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
     activeInsights = result;
     const date = new Date(result.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
-    target.innerHTML = `<p class="insights-caption">Kokonaistilanteesi · ${esc(date)}</p>${result.insights.map(card => `<button class="insight-card" data-insight="${esc(card.id)}" aria-label="Keskustele havainnosta: ${esc(card.title)}"><span class="insight-copy"><strong>${esc(card.title)}</strong><span class="insight-action">${esc(card.action)}</span></span><span class="insight-value">${esc(card.headline_number)}</span>${icon('chevron')}</button>`).join('')}<p class="insights-footnote">Havainnot perustuvat kaikkiin tietoihisi. Avaa havainto ja kysy lisää.</p>`;
+    target.innerHTML = `<p class="insights-caption">Seuraavat askeleesi · tiedot ${esc(date)} asti</p>${result.insights.map(card => {
+      const period = insightPeriod(card.period, result.as_of);
+      return `<button class="insight-card" data-insight="${esc(card.id)}" aria-label="${esc(period.label)}: ${esc(card.title)}. Suunnittele seuraava askel"><span class="insight-period"><span>${esc(period.label)}</span><small>${esc(period.detail)}</small></span><span class="insight-copy"><strong>${esc(card.title)}</strong><span class="insight-evidence">${formatInline(card.explanation)}</span></span><span class="insight-value">${esc(card.headline_number)}</span><span class="insight-action"><b>Kokeile tätä</b>${formatInline(card.action)}</span><span class="insight-cta">Suunnittele valmentajan kanssa ${icon('arrow')}</span></button>`;
+    }).join('')}<p class="insights-footnote">Viikkoarvio perustuu yllä olevaan tilanteeseen. Kuukausinosto koskee viimeisintä kuukautta ja vuosinosto viimeistä 12 kuukautta.</p>`;
   } catch (error) {
     if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
     if (error instanceof StaleSelectionError) { void loadCustomer(); return; }

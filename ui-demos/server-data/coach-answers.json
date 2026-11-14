@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "content_version": "duckdb-coach-v6",
+  "content_version": "duckdb-coach-v7",
   "model": "claude-haiku-5-5",
   "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
   "coverage_from": "2024-10-01",
   "as_of": "2026-09-30",
-  "generated_at": "2026-11-14T13:10:34.169Z",
+  "generated_at": "2026-11-14T13:52:33.554Z",
   "customers": {
     "CUST00207": {
       "months": {
@@ -402,25 +402,28 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-eef09545f90c4ae2-1",
-            "title": "Ravintola- ja kahvilakulut ovat korkeat",
-            "headline_number": "250 €/kk",
-            "explanation": "Käytät ravintoloihin ja kahviloihin noin 250 € kuukaudessa, kun vertailuryhmän tyypillinen summa on 95 €. Syy on se, että käyt yhtä usein, mutta jokainen käynti maksaa enemmän.",
-            "action": "Pienempi summa per käynti voisi auttaa säästämään rahaa varalle."
+            "id": "insight-d8922a86c866a7ac-1",
+            "period": "monthly",
+            "title": "Valitse edullisempi tapa viettää vapaa-aikaa",
+            "headline_number": "260 € syyskuussa",
+            "explanation": "Vapaa-aikaan kului syyskuussa noin 260 €, kun tavallinen tasosi oli noin 170 €/kk. Valinnaisista menoista voi löytyä tilaa säästölle.",
+            "action": "Katso syyskuun vapaa-ajan ostokset ja valitse, minkä voisit korvata maksuttomalla tekemisellä."
           },
           {
-            "id": "insight-eef09545f90c4ae2-2",
-            "title": "Pikaruoka ja noutoruoka vievät rahaa",
-            "headline_number": "130 €/kk",
-            "explanation": "Pikaruokaan ja noutoruokaan menee arviolta 130 € kuukaudessa, kun tyypillinen summa samassa ryhmässä on 50 €. Ero syntyy pääosin siitä, että yksi ostos maksaa enemmän.",
-            "action": "Valitse edullisempi annos tai pienennä yksittäisen ostoksen hintaa."
+            "id": "insight-d8922a86c866a7ac-2",
+            "period": "weekly",
+            "title": "Suunnittele lisäostokset ennen ostamista",
+            "headline_number": "Arvio 260 €/vko",
+            "explanation": "Viikoittaisiin lisäostoihin arvioitiin olevan noin 260 €. Tämä oli arvio aineiston tilanteesta, ei nykyinen tilin saldo.",
+            "action": "Listaa suunnittelemasi lisäostokset ja vertaa niiden yhteissummaa arvioon. Tarkista nykyinen saldo ja laskut ennen ostamista."
           },
           {
-            "id": "insight-eef09545f90c4ae2-3",
-            "title": "Rahaa on varalla yllättäviin menoihin",
-            "headline_number": "1 250 €",
-            "explanation": "Tilin saldo kattoi 1 250 euron vararahaston. Yllättäviä menoja tulee arviolta kerran parissa vuodessa, tyypillisesti noin 790 €.",
-            "action": "Pidä vähintään 1 250 € koskemattomana yllättäviä menoja varten."
+            "id": "insight-d8922a86c866a7ac-3",
+            "period": "yearly",
+            "title": "Valitse säästötavoite ja etsi sille tilaa",
+            "headline_number": "Noin 130 €/kk jäi",
+            "explanation": "Viimeisen 12 kuukauden tuloista jäi menojen jälkeen keskimäärin noin 130 €/kk. Säästösiirtoja ei ollut, eikä summa kerro nykyisestä käyttövarasta.",
+            "action": "Nimeä säästötavoite ja etsi valinnaisista menoista joustoa sitä varten. Varaa ensin rahat laskuihin."
           }
         ]
       },
@@ -827,25 +830,28 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-04b73a4dbb3b860c-1",
-            "title": "Pikaruoka nousi esiin syyskuussa",
+            "id": "insight-ffd4915e68a82cae-1",
+            "period": "monthly",
+            "title": "Vaihda noutoruoka edullisempaan vaihtoehtoon",
             "headline_number": "340 € syyskuussa",
-            "explanation": "Syyskuussa pikaruokaan ja noutoruokaan kului noin 340 €, kun tavallinen kuukausi oli noin 75 €. Yksi kuukausi ei vielä kerro pysyvästä muutoksesta.",
-            "action": "Vertaa tulevia kuukausia tavalliseen tasoosi."
+            "explanation": "Pikaruokaan ja noutoruokaan kului syyskuussa noin 340 €, kun tavallinen tasosi oli noin 75 €/kk. Yksi kallis kuukausi ei vielä tarkoita pysyvää muutosta.",
+            "action": "Katso syyskuun noutoruokaostokset ja valitse tilaus, jonka voisit korvata kotona tehdyllä aterialla."
           },
           {
-            "id": "insight-04b73a4dbb3b860c-2",
-            "title": "Varaudu yllättäviin menoihin",
-            "headline_number": "950 €",
-            "explanation": "Tilin saldo kattoi 950 euron vararahaston. Yllättävään laskuun voi kulua noin 930 €.",
-            "action": "Pidä vähintään 950 € erillään yllättäviä menoja varten."
+            "id": "insight-ffd4915e68a82cae-2",
+            "period": "weekly",
+            "title": "Valitse tärkeimmät lisäostokset etukäteen",
+            "headline_number": "Arvio 120 €/vko",
+            "explanation": "Viikoittaisiin lisäostoihin arvioitiin olevan noin 120 €. Rajaa määräsi tavallinen kuukausibudjetti, ei pelkkä tilin saldo.",
+            "action": "Laita suunnittelemasi lisäostokset tärkeysjärjestykseen. Tarkista nykyiset laskut ja käyttöraha ennen ostamista."
           },
           {
-            "id": "insight-04b73a4dbb3b860c-3",
-            "title": "Matkailu näkyy menoissasi",
-            "headline_number": "40 €/kk",
-            "explanation": "Matkailuun menee arviolta 40 € kuukaudessa, kun vertailuryhmän tyypillinen summa on 30 €. Ero liittyy enemmän matkojen määrään kuin niiden hintaan.",
-            "action": "Mieti, mitkä matkamenot ovat sinulle tärkeitä ja mitkä voisivat jäädä vähemmälle."
+            "id": "insight-ffd4915e68a82cae-3",
+            "period": "yearly",
+            "title": "Varaa joustoa yllättäville laskuille",
+            "headline_number": "Noin 25 €/kk jäi",
+            "explanation": "Viimeisen 12 kuukauden tuloista jäi menojen jälkeen keskimäärin noin 25 €/kk. Pieni liikkumavara voi kulua yllättävään laskuun.",
+            "action": "Listaa valinnaiset menot ja merkitse, mistä voisit joustaa yllättävän laskun osuessa kohdalle."
           }
         ]
       },
@@ -1276,25 +1282,28 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-b36e03dbff98964c-1",
-            "title": "Menot ja säästösiirrot ylittivät tulot",
-            "headline_number": "−152 € tilillä",
-            "explanation": "Tilin saldo oli −152 €. Viimeisen vuoden aikana menot ja säästösiirrot ylittivät tulot keskimäärin noin 15 € kuukaudessa.",
-            "action": "Tarkista säästösiirtojen ajoitus ja summa, jotta välttämättömät maksut ovat katettuja."
+            "id": "insight-c2009d67bd726a0a-1",
+            "period": "weekly",
+            "title": "Varaa rahat välttämättömiin maksuihin",
+            "headline_number": "Arvio 0 €/vko",
+            "explanation": "Viikoittaisiin lisäostoihin ei arvioitu jäävän rahaa, ja tilin saldo oli −152 €. Käyttöraha oli aineiston tilanteessa tiukalla.",
+            "action": "Tarkista erääntyvät laskut ja nykyinen saldo. Siirrä valinnaisia ostoksia, kunnes välttämättömiin maksuihin on rahaa."
           },
           {
-            "id": "insight-b36e03dbff98964c-2",
-            "title": "Kerää rahaa yllättäviä menoja varten",
-            "headline_number": "800 € varalle",
-            "explanation": "Yllättävään laskuun voi kulua noin 750 €. Vararahaston tavoite on 800 €, mutta tilin saldo oli miinuksella.",
-            "action": "Huolehdi ensin laskuista ja kerää vararahastoa vasta, kun käyttöraha riittää."
+            "id": "insight-c2009d67bd726a0a-2",
+            "period": "yearly",
+            "title": "Sovita säästösiirrot arjen maksuihin",
+            "headline_number": "35 350 € säästöön",
+            "explanation": "Viimeisen 12 kuukauden säästösiirrot olivat noin 35 350 €. Menot ja säästösiirrot ylittivät tulot keskimäärin noin 15 €/kk.",
+            "action": "Tarkista automaattisen säästösiirron summa ja ajoitus. Pienennä siirtoa tarvittaessa, jotta laskurahat jäävät käyttötilille."
           },
           {
-            "id": "insight-b36e03dbff98964c-3",
-            "title": "Tarkista säästösiirtojen määrä",
-            "headline_number": "2 800 €/kk",
-            "explanation": "Siirrät säästöön arviolta 2 800 € kuukaudessa, noin 89 % tuloista. Suuri säästösumma voi jättää arjen maksuihin liian vähän rahaa.",
-            "action": "Jätä käyttötilille riittävästi rahaa laskuihin ennen säästösiirtoa."
+            "id": "insight-c2009d67bd726a0a-3",
+            "period": "monthly",
+            "title": "Etsi vapaa-ajan menoista kevennettävää",
+            "headline_number": "120 € syyskuussa",
+            "explanation": "Vapaa-aikaan kului syyskuussa noin 120 €, kun tavallinen tasosi oli noin 30 €/kk. Tästä voi löytyä joustoa arjen maksuihin.",
+            "action": "Käy syyskuun vapaa-ajan ostokset läpi ja valitse maksuton vaihtoehto sellaiselle menolle, jonka voisit jättää pois."
           }
         ]
       },

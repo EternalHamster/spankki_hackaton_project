@@ -6,7 +6,7 @@ const cards = () => ({ insights: [
   { title: 'Ravintolakäynnit', headline_number: '250 € kuukaudessa', explanation: 'Arvio on 250 € kuukaudessa. Ryhmän luku on 95 €.', action: 'Vertaa hintoja ennen tilaamista.' },
   { title: 'Puskuri', headline_number: '1,250 €', explanation: 'Aineiston puskuritavoite on 1,250 €.', action: 'Pidä puskuri erillään arjen menoista.' },
   { title: 'Säästäminen', headline_number: '130 € kuukaudessa', explanation: 'Historiallinen ylijäämä on noin 130 € kuukaudessa.', action: 'Tarkista kuukausibudjettisi.' },
-] });
+].map((card, index) => ({ ...card, period: ['monthly', 'weekly', 'yearly'][index] })) });
 const usage = { input_tokens: 50, output_tokens: 20, cache_creation_input_tokens: 1000, cache_read_input_tokens: 2000 };
 const textResult = (text, extra = {}) => Response.json({ stop_reason: 'end_turn', content: [{ type: 'text', text }], usage, ...extra });
 const toolResult = (name, input = {}, id = 'tool-1') => Response.json({ stop_reason: 'tool_use', content: [{ type: 'tool_use', id, name, input }], usage });
@@ -127,6 +127,22 @@ test('malformed or truncated model insight JSON is never displayed', async () =>
     const { coach, requests } = fixture({ provider: response });
     await assert.rejects(coach.insights('A'), error => error.status === 502);
     assert.equal(requests.length, 2);
+  }
+});
+
+test('insights reject missing, unknown and duplicate evidence periods, including prepared cards', async () => {
+  for (const change of [
+    cards => { delete cards[0].period; },
+    cards => { cards[0].period = 'daily'; },
+    cards => { cards[0].period = cards[1].period; },
+  ]) {
+    const value = cards(); change(value.insights);
+    const { coach, requests } = fixture({ provider: () => textResult(JSON.stringify(value)) });
+    await assert.rejects(coach.insights('A'), error => error.status === 502);
+    assert.equal(requests.length, 2);
+    const prepared = await fixture().coach.insights('A');
+    change(prepared.insights);
+    await assert.rejects(coach.primeInsights('A', prepared), error => error.status === 503);
   }
 });
 
@@ -349,6 +365,7 @@ test('prepared insight cards seed the current customer cache and open card chat 
   await coach.chat('A', { messages: [{ role: 'user', content: 'Kerro tästä.' }], insightId: generated.insights[0].id });
   assert.equal(requests.length, 1);
   assert.match(JSON.stringify(requests[0].body.system), /Ravintolakäynnit/);
+  assert.match(JSON.stringify(requests[0].body.system), /1\.9\.2026–30\.9\.2026/);
   for (const value of [
     { ...generated, customer_id: 'B' }, { ...generated, data_version: 'old' }, { ...generated, model: 'different' },
     { ...generated, insights: generated.insights.map(row => ({ ...row, id: 'forged' })) },

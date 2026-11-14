@@ -8,7 +8,7 @@ import { createCoach } from './coach.mjs';
 import { createPreparedCoach } from './prepared.mjs';
 import { createSessions, DEMO_CUSTOMERS, isDemoCustomer, sameOrigin } from './customers.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
-const requiredFiles = ['index.html', 'app.js', 'chat.js', 'exploration.js', 'model.js', 'styles.css',
+const requiredFiles = ['index.html', 'app.js', 'chat.js', 'coach-text.js', 'insights.js', 'exploration.js', 'model.js', 'styles.css',
   'wrapped.js', 'wrapped.css',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',

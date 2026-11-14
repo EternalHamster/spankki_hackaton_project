@@ -1,6 +1,6 @@
 # Oma talous — S-mobiili-style data tab
 
-A mobile-first UI demo for the S-Pankki Personal Economic Trainer challenge. The **Oma talous** tab starts with an open question field and three expandable topics: spending, weekly affordability and saving. Charts appear inside the selected topic, alongside a short Finnish summary prepared by Claude before deployment and a button for live follow-up chat. Compact key-insight rows are explicitly labeled as AI-generated. The original Rahavuotesi card sits below the insights. Pale mint surfaces, consistent typography and fixed bottom navigation retain the banking app's identity. The other navigation tabs illustrate where the feature fits; they are not rebuilt banking screens. This is an independent hackathon prototype using synthetic data, not an official S-Pankki service.
+A mobile-first UI demo for the S-Pankki Personal Economic Trainer challenge. The **Oma talous** tab starts with an open question field and three expandable topics: spending, weekly affordability and saving. Charts appear inside the selected topic, alongside a short Finnish summary prepared by Claude before deployment and a button for live follow-up chat. Actionable insight cards show a dated weekly estimate, a monthly observation and a last-12-month observation. Each includes supporting evidence, a concrete first step and a planning chat, and is explicitly labeled as AI-generated. The original Rahavuotesi card sits below the insights. Pale mint surfaces, consistent typography and fixed bottom navigation retain the banking app's identity. The other navigation tabs illustrate where the feature fits; they are not rebuilt banking screens. This is an independent hackathon prototype using synthetic data, not an official S-Pankki service.
 
 ## Run locally
 
@@ -26,7 +26,7 @@ The same service runs on Google Cloud Run. See [DEPLOYMENT.md](./DEPLOYMENT.md) 
 - Select one of three synthetic demo customers from the front-page selector.
 - Ask your own question in the opening field, or expand **Mihin rahani menivät?**, **Paljonko voin käyttää tällä viikolla?** or **Miten voisin säästää enemmän?**. The browser preloads all three default-month answers through the read-only `/api/summaries` endpoint. Opening a section or changing its month retrieves prepared text and makes no model call. Weekly estimates use the snapshot date instead of the selected month. Switching customers aborts and clears old requests; read errors offer a retry while charts remain usable.
 - Continue a topic with **Kysy tästä valmentajalta**; its prepared answer becomes conversation context for live chat. Weekly affordability is explicitly dated to the snapshot, while spending and savings summaries use exact selected-month figures.
-- Read the three Claude-generated insights about the customer's broader history, then click a card to start a live chat about it. These insights do not change with a section's month selector.
+- Read the three AI insights labeled **Viikkonosto**, **Kuukausinosto** and **Vuosinosto**, then select **Suunnittele valmentajan kanssa** to turn the suggested action into a practical plan. These insights do not change with a section's month selector.
 - Ask about the selected customer's finances, including exact spending periods, transactions and affordability scenarios. **Jatka keskustelua** reopens the latest conversation. Both ordinary chat and insight chat have customer context.
 - Inspect income, spending, remaining income and historical account balances across October 2024–September 2026. Spending, saving and transactions have independent month selectors; there is no global calendar. Transaction month changes preserve the selected category.
 - Open spending categories and their transactions, or switch income/spending breakdown rings.
@@ -35,6 +35,8 @@ The same service runs on Google Cloud Run. See [DEPLOYMENT.md](./DEPLOYMENT.md) 
 - Compare weekday/weekend spending with the customer's own previous month and explore the three illustrative spending baskets.
 - Adjust the restaurant-spending reduction slider to calculate a historical savings scenario.
 - Open **Rahavuotesi** for the last 12 months' swipeable recap; `#rahavuosi` opens it directly. See [../wrapped/README.md](../wrapped/README.md).
+
+Assistant messages render a safe subset of Markdown: bold, emphasis, inline code, paragraphs and lists. HTML and links remain escaped; user messages remain plain text.
 
 Chat history lives in page memory and resets on reload, customer switch or **Uusi keskustelu**. Only the last five exchanges, within a 14,000-character budget, are sent as conversation history. Enter sends; Shift+Enter adds a line break.
 
@@ -70,7 +72,7 @@ The source covers **3,626,755 transactions**, **5,100 synthetic customers**, **2
 - The restaurant slider uses the selected month's spending × the chosen reduction. It is a historical scenario, not a forecast or money transfer.
 - Prepared saving summaries illustrate a 20% reduction in the selected month's largest discretionary category among Restaurants, Lifestyle, Entertainment and Travel. The reduction uses exact selected-month totals; the modeled `what_if` tool describes a separate scenario at usual spending levels.
 
-Charts calculate from the selected bootstrap in the browser. Model tools calculate exact totals and scenarios on the server; prompt context distinguishes smoothed model estimates from historical amounts. The raw snapshot contains 24 calendar months; BDA fits the 23 complete months from November 2024 through September 2026. Key-insight evidence covers this broader history, including last-12-month figures and recent trends, rather than the chosen section month. Peer comparisons contain group aggregates only.
+Charts calculate from the selected bootstrap in the browser. Model tools calculate exact totals and scenarios on the server; prompt context distinguishes smoothed model estimates from historical amounts. The raw snapshot contains 24 calendar months; BDA fits the 23 complete months from November 2024 through September 2026. Insight cards use a required `period` field: `weekly` is the allowance estimate at the snapshot date, `monthly` uses explicitly recorded last-month figures (with usual spending only as a labeled comparison), and `yearly` uses the last 12 calendar months. Dates come from the snapshot, independently of topic month selectors. Titles lead with actions; evidence explains why, and an untruncated action gives the first step. Peer comparisons contain group aggregates only.
 
 ## Prepare and check
 
