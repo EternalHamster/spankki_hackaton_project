@@ -265,3 +265,71 @@ test('depth failures are retryable without wrong-level fallback, and cache evict
   release(); assert.equal((await replaced).level, 'detailed');
   assert.equal(calls, 3);
 });
+
+test('saving horizons adapt standard Finnish and cache separately from legacy text and other horizons', async t => {
+  const calls = [];
+  const { prepared, body } = await fixture(t, bundle(), { coach: {
+    async adaptPrepared(id, options) {
+      calls.push({ id, ...options });
+      return summary(`Action: ${options.source.horizon}.`, 'Cover bills first.');
+    },
+  } });
+  const request = { topic: 'saving', month: months[1], horizon: 'weekly' };
+  const parallel = await Promise.all(Array.from({ length: 4 }, () => prepared.summary(ids[0], request)));
+  assert.equal(calls.length, 1);
+  assert.ok(parallel.every(result => result === parallel[0]));
+  assert.equal(parallel[0].horizon, 'weekly');
+  assert.equal(parallel[0].month, months[1]);
+  assert.equal(parallel[0].level, 'standard');
+  assert.equal(parallel[0].language, 'fi');
+  assert.equal(parallel[0].source, 'adapted');
+  assert.deepEqual(calls[0].source.bullets, body.customers[ids[0]].months[months[1]].saving.bullets);
+  for (const horizon of ['monthly', 'yearly']) {
+    const result = await prepared.summary(ids[0], { ...request, horizon });
+    assert.equal(result.horizon, horizon);
+    assert.match(result.answer, new RegExp(horizon));
+  }
+  await prepared.summary(ids[0], request);
+  assert.equal(calls.length, 3);
+  await prepared.summary(ids[0], { ...request, level: 'simple' });
+  await prepared.summary(ids[0], { ...request, language: 'en' });
+  await prepared.summary(ids[1], request);
+  await prepared.summary(ids[0], { ...request, month: months[0] });
+  assert.equal(calls.length, 7);
+  const legacy = await prepared.summary(ids[0], { topic: 'saving', month: months[1] });
+  assert.equal(legacy.source, 'prepared');
+  assert.equal(legacy.horizon, undefined);
+  assert.equal(calls.length, 7);
+  for (const invalid of [{ horizon: '' }, { horizon: 'daily' }, { horizon: null }, { horizon: '__proto__' },
+    { topic: 'spending' }, { topic: 'week', month: undefined }]) {
+    await assert.rejects(prepared.summary(ids[0], { ...request, ...invalid }), error => error.status === 400);
+  }
+  assert.equal(calls.length, 7);
+});
+
+test('HTTP forwards saving horizons within the signed customer scope and rejects invalid horizon requests', async t => {
+  const calls = [];
+  const setup = await fixture(t, bundle(), { coach: {
+    async adaptPrepared(id, options) { calls.push({ id, ...options }); return summary('Try a small change.', 'Cover bills first.'); },
+  } });
+  const { session } = await serve(t, { dataSource: setup.dataSource, coach: setup.prepared });
+  const selected = await session();
+  for (const horizon of ['weekly', 'monthly', 'yearly']) {
+    const response = await selected.get(`/api/summaries?topic=saving&month=2026-09&horizon=${horizon}&language=en`);
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.horizon, horizon);
+    assert.equal(result.language, 'en');
+    assert.equal(result.customer_id, selected.customer_id);
+    assert.equal(result.selection_id, selected.selection_id);
+    assert.equal(calls.at(-1).id, selected.customer_id);
+    assert.equal(calls.at(-1).source.horizon, horizon);
+  }
+  for (const query of [
+    'topic=saving&month=2026-09&horizon=', 'topic=saving&month=2026-09&horizon=daily',
+    'topic=saving&month=2026-09&horizon=__proto__', 'topic=saving&month=2026-09&horizon=weekly&horizon=yearly',
+    'topic=spending&month=2026-09&horizon=monthly', 'topic=week&horizon=weekly',
+    'topic=saving&month=2026-09&horizon=weekly&customer_id=CUST00127',
+  ]) assert.equal((await selected.get('/api/summaries?' + query)).status, 400, query);
+  assert.equal(calls.length, 3);
+});

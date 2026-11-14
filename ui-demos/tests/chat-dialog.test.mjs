@@ -31,7 +31,8 @@ function dialogFixture(t, preference = 'standard', { proposal, projects = [], be
   // A minimal dialog surface exercises the real event handlers and rendered controls.
   const node = selector => {
     if (!nodes.has(selector)) nodes.set(selector, { innerHTML: '', textContent: '', value: '', dataset: {},
-      listeners: new Map(), classList: { toggle() {} }, setAttribute() {}, focus() {},
+      listeners: new Map(), classList: { toggle() {} }, setAttribute() {},
+      focusCalls: [], focus(options) { this.focusCalls.push(options); },
       querySelector: node, querySelectorAll: () => [],
       addEventListener(type, callback) { this.listeners.set(type, callback); } });
     return nodes.get(selector);
@@ -72,6 +73,42 @@ const savedGoal = changes => ({ ...goalProposal(), saved_eur: 0, created_at: '20
   memory_revision: '', ...changes });
 const savingsRows = html => Object.fromEntries([...html.matchAll(/<div[^>]*><dt>([^<]+)<\/dt><dd>([^<]+)<\/dd><\/div>/g)]
   .map(([, label, value]) => [label, value.replace(/\s+/g, ' ')]));
+
+test('opening a prepared answer leaves the question field unfocused for reading', t => {
+  const view = dialogFixture(t);
+  view.open('standard');
+  assert.match(view.node('#chat-messages').innerHTML, /Ensimmäinen havainto/);
+  assert.deepEqual(view.node('#chat-question').focusCalls, []);
+});
+
+test('chat completion never pulls focus back to the question field', async t => {
+  for (const outcome of ['reply', 'error', 'automatic question', 'boundary follow-up']) {
+    await t.test(outcome, async subtest => {
+      const view = dialogFixture(subtest, 'standard', outcome === 'error' ? {
+        respond: () => ({ ok: false, status: 503, json: async () => ({ error: 'Try again.' }) }),
+      } : {});
+      if (outcome === 'automatic question') {
+        view.show('Miten voisin säästää?', { autoSend: true });
+        await new Promise(resolve => setImmediate(resolve));
+      } else if (outcome === 'boundary follow-up') {
+        view.open('simple');
+        await view.rewrite('simpler');
+      } else {
+        view.show();
+        await view.send('Miten voisin säästää?');
+      }
+      assert.equal(view.requests.length, 1);
+      assert.equal(view.node('#chat-question').disabled, false);
+      assert.deepEqual(view.node('#chat-question').focusCalls, []);
+      if (outcome === 'error') {
+        assert.equal(view.node('#chat-error').textContent, 'Try again.');
+        assert.equal(view.node('#chat-question').value, 'Miten voisin säästää?');
+      } else {
+        assert.match(view.node('#chat-messages').innerHTML, /Muokattu vastaus/);
+      }
+    });
+  }
+});
 
 test('goal card separates existing savings, the extra amount and the total using the calculated project snapshot', async t => {
   const proposal = goalProposal();

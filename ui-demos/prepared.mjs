@@ -3,6 +3,7 @@ import { DEMO_CUSTOMERS, isDemoCustomer } from './customers.mjs';
 import { CoachError, PROMPT_VERSION, LEVELS, DEFAULT_LEVEL } from './coach.mjs';
 import { summaryLimits } from './public/summary-depth.js';
 import { isLanguage } from './public/language.js';
+import { isSavingHorizon } from './public/saving-horizon.js';
 
 // Spending analysis can change without invalidating unrelated insight IDs or saved summaries.
 export const SPENDING_VERSION = 'spending-patterns-v2';
@@ -67,7 +68,7 @@ export function createPreparedCoach({ dataSource, coach,
     if (!Object.hasOwn(LEVELS, level)) throw new CoachError(400, 'Valitse vastausten taso.');
   }
   function depth(id, kind, level, source, language) {
-    const key = JSON.stringify([id, language, level, kind, source.topic || null, source.month || null]);
+    const key = JSON.stringify([id, language, level, kind, source.topic || null, source.month || null, source.horizon || null]);
     const existing = depths.get(key);
     if (existing) { depths.delete(key); depths.set(key, existing); return existing.promise; }
     while (depths.size >= maxDepthEntries) {
@@ -95,18 +96,21 @@ export function createPreparedCoach({ dataSource, coach,
       const source = { ...selected.insights, level, generated_at: bundle.generated_at, source: 'prepared' };
       return level === DEFAULT_LEVEL && language === 'fi' ? { ...source, language } : depth(id, 'insights', level, source, language);
     },
-    async summary(id, { topic, month, level = DEFAULT_LEVEL, language = 'fi' } = {}) {
+    async summary(id, { topic, month, horizon, level = DEFAULT_LEVEL, language = 'fi' } = {}) {
       checkLevel(level);
       if (!isLanguage(language)) throw new CoachError(400, 'Valitse kieli.');
+      if (horizon !== undefined && (topic !== 'saving' || !isSavingHorizon(horizon))) {
+        throw new CoachError(400, 'Valitse säästömuutosten aikaväli.');
+      }
       if (!['spending', 'saving', 'week'].includes(topic) || (topic === 'week' ? month !== undefined : !/^\d{4}-\d{2}$/.test(month || ''))) {
         throw new CoachError(400, 'Valitse aihe ja sopiva kuukausi.');
       }
       const { bundle, selected } = await customer(id);
       const answer = topic === 'week' ? selected.week : selected.months[month]?.[topic];
       if (!answer) throw new CoachError(400, 'Valitulta kuukaudelta ei ole tietoja.');
-      const source = { ...answer, topic, ...(month ? { month } : {}), level, as_of: bundle.as_of,
+      const source = { ...answer, topic, ...(month ? { month } : {}), ...(horizon !== undefined ? { horizon } : {}), level, as_of: bundle.as_of,
         generated_at: bundle.generated_at, data_version: bundle.data_version, source: 'prepared' };
-      return level === DEFAULT_LEVEL && language === 'fi' ? { ...source, language } : depth(id, 'summary', level, source, language);
+      return level === DEFAULT_LEVEL && language === 'fi' && horizon === undefined ? { ...source, language } : depth(id, 'summary', level, source, language);
     },
     async chat(id, options) { await customer(id); return coach.chat(id, options); },
   };

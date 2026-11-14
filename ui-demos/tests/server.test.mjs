@@ -25,7 +25,7 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
     ['/coach-text.js', 'text/javascript'], ['/insights.js', 'text/javascript'], ['/disclosure.js', 'text/javascript'],
     ['/customer-memory.js', 'text/javascript'], ['/answer-depth.js', 'text/javascript'], ['/summary-depth.js', 'text/javascript'], ['/weekly-plan.js', 'text/javascript'],
     ['/purchase-projects.js', 'text/javascript'], ['/project-ui.js', 'text/javascript'],
-    ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'], ['/month-picker.js', 'text/javascript'],
+    ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'], ['/month-picker.js', 'text/javascript'], ['/saving-horizon.js', 'text/javascript'],
     ['/finance-analytics/index.js', 'text/javascript'], ['/finance-analytics/model.js', 'text/javascript'],
     ['/finance-analytics/styles.css', 'text/css'], ['/finance-analytics/example.js', 'text/javascript'],
     ['/finance-analytics/example.html', 'text/html'],

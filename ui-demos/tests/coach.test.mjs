@@ -132,6 +132,47 @@ test('adaptation rejects invalid levels and stale source before any model call a
   assert.equal(limited.requests.length, 1);
 });
 
+test('saving horizons produce distinct action prompts without changing the historical evidence or accessing tools', async () => {
+  const bullets = ['Varaa ensin rahaa välttämättömiin menoihin.', 'Tarkista, mitä jäi oikeasti säästöön.'];
+  const { coach, requests, execution } = fixture({ provider: () => textResult(JSON.stringify({ bullets })) });
+  for (const [horizon, specific] of [
+    ['weekly', /small optional-purchase experiment for the coming week/],
+    ['monthly', /repeatable monthly budget or payday review/],
+    ['yearly', /sustainable habit for the coming year/],
+  ]) {
+    const result = await coach.adaptPrepared('A', { kind: 'summary', level: 'standard', source: { ...preparedSummary(), horizon } });
+    assert.equal(result.horizon, horizon);
+    assert.equal(result.level, 'standard');
+    assert.equal(result.language, 'fi');
+    assert.deepEqual(result.bullets, bullets);
+    const payload = requests.at(-1).body, prompt = payload.system[0].text;
+    assert.match(prompt, specific);
+    assert.match(prompt, /timeframe for making changes, never the period of the source evidence/);
+    assert.match(prompt, /Do not convert historical monthly figures into weekly or annual amounts/);
+    assert.match(prompt, /only the amount|actually available/);
+    assert.equal(payload.tools, undefined);
+    const evidence = JSON.parse(payload.messages[0].content.split('PREPARED SOURCE:\n')[1]);
+    assert.equal(evidence.horizon, horizon);
+    assert.equal(evidence.month, '2026-09');
+    assert.deepEqual(evidence.bullets, preparedSummary().bullets);
+    assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_A|remember_customer_fact|propose_purchase_project/);
+  }
+  assert.deepEqual(execution, []);
+});
+
+test('saving horizon validation rejects invalid scopes and invented yearly savings', async () => {
+  const { coach, requests } = fixture();
+  for (const changes of [{ horizon: 'daily' }, { horizon: null }, { horizon: '__proto__' },
+    { topic: 'spending', horizon: 'weekly' }]) {
+    await assert.rejects(coach.adaptPrepared('A', { kind: 'summary', level: 'simple', source: { ...preparedSummary(), ...changes } }), error => error.status === 400);
+  }
+  await assert.rejects(coach.adaptPrepared('A', { kind: 'insights', level: 'simple', source: { ...preparedCards(), horizon: 'yearly' } }), error => error.status === 400);
+  assert.equal(requests.length, 0);
+  const invented = fixture({ provider: () => textResult(JSON.stringify({ bullets: ['Säästät vuodessa 1560 €.', 'Varaa ensin rahaa laskuihin.'] })) });
+  await assert.rejects(invented.coach.adaptPrepared('A', { kind: 'summary', level: 'standard', source: { ...preparedSummary(), horizon: 'yearly' } }), error => error.status === 502);
+  assert.equal(invented.requests.length, 2);
+});
+
 test('answer rewrites target the supplied original answer without changing later answer depth or the cached prefix', async () => {
   const { coach, requests } = fixture({ provider: () => textResult('Aineistossa säästövara oli 130 € kuukaudessa.') });
   const messages = [{ role: 'user', content: 'Miten voisin säästää?' }];

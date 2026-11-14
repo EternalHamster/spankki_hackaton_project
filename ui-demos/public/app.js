@@ -8,13 +8,14 @@ import { metrics, basketTotals, scenarioSavings, transactionKind } from './model
 import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
-import { explorationTopics, createExplorationSummaries } from './exploration.js';
+import { explorationTopics, explorationQuestion, createExplorationSummaries } from './exploration.js';
 import { formatInline, roundEuroText } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { setDisclosure } from './disclosure.js';
 import { renderMonthPicker, installMonthPickers } from './month-picker.js';
 import { createProjectUI } from './project-ui.js';
 import { weeklyPlan } from './weekly-plan.js';
+import { SAVING_HORIZONS, DEFAULT_SAVING_HORIZON, isSavingHorizon, renderSavingHorizon } from './saving-horizon.js';
 import { LEVELS, LEVEL_KEY, levelIndex, getAnswerLevel, setAnswerLevel } from './answer-depth.js';
 
 // Appearance follows the user's references; all money data is synthetic.
@@ -49,7 +50,8 @@ const names={Housing:'Asuminen',Utilities:'Laskut ja palvelut',Groceries:'Ruokao
 const categoryIcon=c=>({Housing:'home',Utilities:'bolt',Groceries:'bag',Transportation:'train',Restaurants:'coffee',Health:'shield',Salary:'plus'}[c]||'receipt');
 const root=document.querySelector('#root'),detail=document.querySelector('#detail');
 let data,profile,m,lastFocus,analytics;
-const selectedMonths = { spending: null, saving: null, transactions: null };
+const selectedMonths = { spending: null, transactions: null };
+let savingHorizon = DEFAULT_SAVING_HORIZON;
 let transactionFilter = 'all';
 const months=[];
 let insightsPromise = null, activeInsights = null, insightController = null;
@@ -76,6 +78,7 @@ async function loadCustomer(customerId) {
   customerController?.abort(); insightController?.abort();
   explorationSummaries.reset(); activeTopic = null; activeTopicResult = null;
   for (const scope of Object.keys(selectedMonths)) selectedMonths[scope] = null;
+  savingHorizon = DEFAULT_SAVING_HORIZON;
   transactionFilter = 'all';
   customerController = new AbortController();
   const signal = customerController.signal;
@@ -180,7 +183,6 @@ function weeklyAllowance() {
   const spent = allowance.spent_eur_week, budget = allowance.weekly_budget_eur;
   const remaining = allowance.remaining_eur_week, over = allowance.over_budget_eur_week;
   const maximum = budget || spent || 1;
-  const markerPosition = Math.min(100, spent / maximum * 100);
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const weekDate = new Date(today + 'T12:00:00Z');
   weekDate.setUTCDate(weekDate.getUTCDate() + 4 - (weekDate.getUTCDay() || 7));
@@ -193,8 +195,8 @@ function weeklyAllowance() {
     <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Viikon lisäostot</span><small data-coach-detail>${esc(period)}</small></div>
     <dl class="weekly-allowance-figures"><div><dt>Käytetty</dt><dd id="weekly-spent">${euro(spent)}</dd></div><div><dt>Viikkorajasta jäljellä</dt><dd id="weekly-remaining">${euro(remaining)}</dd></div></dl>
     <label class="sr-only" for="weekly-allowance-progress">Lisäostoihin käytetty suhteessa arvioituun viikkorajaan</label>
-    <div class="weekly-allowance-track" style="--weekly-spent:${markerPosition}%"><progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(spent, maximum)}" max="${maximum}" aria-valuetext="${esc(accessible)}" aria-describedby="${note ? 'weekly-allowance-note ' : ''}weekly-demo-marker"></progress><span class="weekly-allowance-marker" aria-hidden="true"></span></div>
-    <div class="weekly-allowance-scale"><span id="weekly-demo-marker">Demomerkki</span><span>Viikkoraja (arvio) <strong>${euro(budget, 0)}</strong></span></div>
+    <div class="weekly-allowance-track"><progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(spent, maximum)}" max="${maximum}" aria-valuetext="${esc(accessible)}"${note ? ' aria-describedby="weekly-allowance-note"' : ''}></progress></div>
+    <div class="weekly-allowance-scale"><span>Viikkoraja (arvio) <strong>${euro(budget, 0)}</strong></span></div>
     ${note ? `<p id="weekly-allowance-note" class="weekly-allowance-note">${esc(note)}</p>` : ''}
   </section>`;
 }
@@ -229,7 +231,7 @@ function openTopic(topicId, toggle = true) {
     return;
   }
   const summary = `<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>`;
-  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption" data-coach-simple>Arvio aiempien menojesi pohjalta.</p><p class="topic-caption" data-coach-detail>Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>${weeklyAllowance()}` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
+  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption" data-coach-simple>Arvio aiempien menojesi pohjalta.</p><p class="topic-caption" data-coach-detail>Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>${weeklyAllowance()}` : topicId === 'saving' ? renderSavingHorizon(savingHorizon) : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
   syncCoachPresentation();
   if (topicId === 'spending') {
     const shared = { data: projectFinanceData(profile, data.summary, names), selectedMonth: month,
@@ -248,16 +250,24 @@ function openTopic(topicId, toggle = true) {
   void loadTopicSummary(panel.querySelector('.topic-summary'), topicId);
 }
 function changeTopicMonth(topic, month) {
-  if (!['spending', 'saving'].includes(topic) || !months.includes(month)) return;
+  if (topic !== 'spending' || !months.includes(month)) return;
   selectedMonths[topic] = month;
   if (activeTopic === topic) {
     openTopic(topic, false);
     document.querySelector(`#month-${topic}`)?.focus({preventScroll:true});
   }
 }
+function changeSavingHorizon(horizon) {
+  if (!isSavingHorizon(horizon) || horizon === savingHorizon) return;
+  savingHorizon = horizon;
+  if (activeTopic === 'saving') {
+    void loadTopicSummary(document.querySelector('#panel-saving .topic-summary'), 'saving');
+  }
+}
 async function loadTopicSummary(target, topic) {
   const epoch = customerEpoch, depthEpoch = summaryEpoch, level = summaryLevel;
   const selected = customerSession, month = topicMonth(topic), request = {};
+  activeTopicResult = null;
   topicRequests.set(target, request);
   const current = () => target.isConnected && epoch === customerEpoch && depthEpoch === summaryEpoch &&
     activeTopic === topic && topicRequests.get(target) === request;
@@ -266,7 +276,8 @@ async function loadTopicSummary(target, topic) {
   target.innerHTML = `<span class="ai-label">${label}</span><p class="summary-pending" role="status"><span class="insights-pulse" aria-hidden="true"></span>Yhteenvetoa ladataan…</p>`;
   try {
     const result = topic === 'week' ? weeklyPlan(data.weekly_spending, selected, level)
-      : await explorationSummaries.load({topic, month, selection:selected, level});
+      : await explorationSummaries.load({topic, month, selection:selected, level,
+        ...(topic === 'saving' ? { horizon: savingHorizon } : {})});
     if (!current()) return;
     if (result.selectionId !== selected.selection_id) throw Object.assign(new Error('Demoasiakas vaihtui.'), {staleSelection:true});
     if (result.level !== level || !Array.isArray(result.bullets) || result.bullets.length < 2 || result.bullets.length > 3 ||
@@ -389,7 +400,8 @@ function refreshSummaryDepth() {
     const target = activeTopic && document.querySelector(`#panel-${activeTopic} .topic-summary`);
     if (target) void loadTopicSummary(target, activeTopic);
     void Promise.allSettled(['spending', 'saving'].map(topic =>
-      explorationSummaries.load({ topic, month: topicMonth(topic), selection: selected, level })));
+      explorationSummaries.load({ topic, month: topicMonth(topic), selection: selected, level,
+        ...(topic === 'saving' ? { horizon: savingHorizon } : {}) })));
   }, 200);
 }
 function showSettings() {
@@ -463,8 +475,13 @@ document.addEventListener('click', event=>{
     else {
       const topic = explorationTopics.find(item=>item.id === button.dataset.topicChat);
       const period = topic.id === 'week' ? `Tiedot ${customerSession.as_of} asti.` : `Tarkasteltava kuukausi: ${topicMonth(topic.id)}.`;
-      showChat(`${translate(topic.title, getLanguage())} ${translate(period, getLanguage())}`, {
-        autoSend: true, displayQuestion: summaryLevel === 'simple' ? translate(topic.title, getLanguage()) : undefined,
+      const question = topic.id === 'saving'
+        ? translate(explorationQuestion(topic.id, topicMonth(topic.id), customerSession.as_of, savingHorizon), getLanguage())
+        : `${translate(topic.title, getLanguage())} ${translate(period, getLanguage())}`;
+      const title = translate(topic.title, getLanguage()) + (topic.id === 'saving'
+        ? ` · ${translate(SAVING_HORIZONS.find(option => option.id === savingHorizon).label, getLanguage())}` : '');
+      showChat(question, {
+        autoSend: true, displayQuestion: summaryLevel === 'simple' ? title : undefined,
       });
     }
   }
@@ -488,6 +505,7 @@ document.addEventListener('submit', event=>{
 });
 document.addEventListener('change',event=>{
   if(event.target.id==='customer-selector'){void loadCustomer(event.target.value);return;}
+  if(event.target.matches('[data-saving-horizon]') && event.target.checked) changeSavingHorizon(event.target.value);
 });
 installMonthPickers({ onSelect(scope, month) {
   if (scope === 'transactions') {

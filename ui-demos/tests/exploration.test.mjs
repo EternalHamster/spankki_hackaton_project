@@ -16,8 +16,8 @@ test('purchase planning is first and carries the entered item, price and deadlin
     assert.throws(() => affordQuestion({ purchase: 'pyörä', price: 500, months: 6, ...changes }));
   }
 });
-const response = (answer = 'Kuukauden yhteenveto.', selectionId = selection.selection_id, level = 'standard') => ({
-  ok: true, status: 200, json: async () => ({ bullets: [answer, 'Katso menosi.'], customer_id: selection.customer_id, selection_id: selectionId, level }),
+const response = (answer = 'Kuukauden yhteenveto.', selectionId = selection.selection_id, level = 'standard', details = {}) => ({
+  ok: true, status: 200, json: async () => ({ bullets: [answer, 'Katso menosi.'], customer_id: selection.customer_id, selection_id: selectionId, level, ...details }),
 });
 
 test('opened topics share pending/completed summaries, scoped by selection and month', async () => {
@@ -92,22 +92,30 @@ test('questions retain their own period without exposing implementation instruct
   assert.throws(() => explorationQuestion('unknown', input.month, selection.as_of));
 });
 
-test('customer preload fetches the two prepared monthly answers; the weekly plan needs no request', async () => {
+test('customer preload fetches spending and the selected saving horizon; the weekly plan needs no request', async () => {
   const urls = [];
-  const store = createExplorationSummaries({ fetchImpl: async url => { urls.push(url); return response(); } });
+  const store = createExplorationSummaries({ fetchImpl: async url => {
+    urls.push(url);
+    return response(undefined, undefined, undefined, { horizon: new URL(url, 'http://local').searchParams.get('horizon') });
+  } });
   assert((await store.warm(selection, '2026-09')).every(result => result.status === 'fulfilled'));
   assert.equal(urls.length, 2);
   assert.ok(urls.every(url => !url.includes('topic=week')));
   await store.load(input);
   assert.equal(urls.length, 2);
+  assert.ok(urls.find(url => url.includes('topic=saving')).includes('horizon=weekly'));
+  await store.warm(selection, '2026-09', 'standard', 'yearly');
+  assert.equal(urls.length, 3);
+  assert.ok(urls.at(-1).includes('horizon=yearly'));
 });
 
 test('summary caches and preloading follow depth without mixing answers across levels', async () => {
   const urls = [];
   const store = createExplorationSummaries({ fetchImpl: async url => {
     urls.push(url);
-    const level = new URL(url, 'http://local').searchParams.get('level');
-    return response(`Vastaus: ${level}.`, selection.selection_id, level);
+    const query = new URL(url, 'http://local').searchParams;
+    const level = query.get('level');
+    return response(`Vastaus: ${level}.`, selection.selection_id, level, { horizon: query.get('horizon') });
   } });
   const standard = await store.load(input);
   const simple = await store.load({ ...input, level: 'simple' });
@@ -160,4 +168,53 @@ test('late transport results after a depth reset cannot escape or evict the fres
   assert.equal((await store.load({ ...input, level: 'simple' })), result);
   assert.match(result.answer, /Uusi/);
   assert.equal(pending.length, 2);
+});
+
+test('saving horizons are distinct cached answers with their timeframe retained in coach context', async () => {
+  const calls = [];
+  const store = createExplorationSummaries({ fetchImpl: async url => {
+    const query = new URL(url, 'http://local').searchParams;
+    calls.push(query);
+    return response(`Vinkki: ${query.get('horizon')}.`, undefined, query.get('level'), {
+      horizon: query.get('horizon'), language: query.get('language'),
+    });
+  } });
+  for (const [horizon, word] of [['weekly', 'viikoittaisilla'], ['monthly', 'kuukausittaisilla'], ['yearly', 'vuosittaisilla']]) {
+    const request = { ...input, topic: 'saving', horizon, level: 'simple' };
+    const pending = store.load(request);
+    assert.equal(store.load(request), pending, 'duplicate in-flight requests are shared');
+    const answer = await pending;
+    assert.equal(answer.horizon, horizon);
+    assert.match(answer.question, new RegExp(word));
+    assert.match(answer.question, /2026-09/);
+    assert.match(answer.displayQuestion, new RegExp(word));
+    assert.doesNotMatch(answer.displayQuestion, /2026-09/);
+    assert.equal(await store.load(request), answer);
+    assert.equal(calls.at(-1).get('horizon'), horizon);
+  }
+  assert.equal(calls.length, 3);
+  await store.load({ ...input, topic: 'saving', horizon: 'weekly', level: 'detailed' });
+  const english = await store.load({ ...input, topic: 'saving', horizon: 'weekly', language: 'en' });
+  assert.equal(english.question, 'What weekly changes could help me save more? Tips are based on data from 2026-09.');
+  assert.equal(english.displayQuestion, english.question);
+  assert.equal(calls.length, 5, 'depth and language keep separate versions of each horizon');
+});
+
+test('a missing or wrong saving horizon cannot be displayed or retained in the cache', async () => {
+  for (const wrong of [undefined, 'monthly']) {
+    let calls = 0;
+    const store = createExplorationSummaries({ fetchImpl: async () => response('Vinkki.', undefined, undefined,
+      { horizon: ++calls === 1 ? wrong : 'weekly' }) });
+    const request = { ...input, topic: 'saving', horizon: 'weekly' };
+    await assert.rejects(store.load(request));
+    assert.equal((await store.load(request)).horizon, 'weekly');
+    assert.equal(calls, 2);
+  }
+  let calls = 0;
+  const store = createExplorationSummaries({ fetchImpl: async () => { calls++; return response(); } });
+  for (const request of [{ ...input, horizon: 'weekly' }, { ...input, topic: 'saving', horizon: 'daily' },
+    { ...input, topic: 'saving', horizon: null }, { ...input, topic: 'week', horizon: 'weekly' }]) {
+    assert.throws(() => store.load(request), TypeError);
+  }
+  assert.equal(calls, 0);
 });

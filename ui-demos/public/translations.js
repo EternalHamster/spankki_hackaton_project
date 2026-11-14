@@ -26,6 +26,13 @@ Kysy menoista, säästämisestä tai omasta tavoitteestasi.|Ask about spending, 
 Tietoa keskustelusta|About this chat
 Miten voisin säästää enemmän?|How could I save more?
 Löydä arkeesi sopiva pieni muutos|Find a small change that works for you
+Valitse muutoksen aikaväli|Choose a timeframe for changes
+Viikoittaiset muutokset|Weekly changes
+Kuukausittaiset muutokset|Monthly changes
+Vuosittaiset muutokset|Yearly changes
+Millaisilla viikoittaisilla muutoksilla voisin säästää enemmän?|What weekly changes could help me save more?
+Millaisilla kuukausittaisilla muutoksilla voisin säästää enemmän?|What monthly changes could help me save more?
+Millaisilla vuosittaisilla muutoksilla voisin säästää enemmän?|What yearly changes could help me save more?
 Omat hankintatavoitteet|My savings goals
 Tärkeimmät havainnot|Key insights
 AI:n tuottama yhteenveto|AI summary
@@ -588,6 +595,7 @@ for (const [source, target] of [...ENGLISH_COPY]) {
 const phrases = [...ENGLISH_COPY.keys()].sort((a, b) => b.length - a.length);
 const phrasePattern = new RegExp(`(?<![\\p{L}])(?:${phrases.map(escapePattern).join('|')})(?![\\p{L}])`, 'gu');
 export const ENGLISH_PATTERNS = [
+  [/^(.+\?) Vinkkien pohjana ovat kuukauden (\d{4}-\d{2}) tiedot\.$/, '$1 Tips are based on data from $2.'],
   [/^Paljonko voin käyttää viikossa tilanteen (.+?) mukaan\?$/, 'How much can I spend per week based on the situation as of $1?'],
   [/^Menojen( ja säästöjen)? jälkeen jäi (.+?)\.$/, (_, saving, value) => `${value} left after spending${saving ? ' and savings' : ''}.`],
   [/^Menot( ja säästöt)? ylittivät tulot (.+?)\.$/, (_, saving, value) => `Spending${saving ? ' and savings' : ''} exceeded income by ${value}.`],

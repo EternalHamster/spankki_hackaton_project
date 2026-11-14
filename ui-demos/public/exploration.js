@@ -2,6 +2,7 @@ import { locale } from './language.js';
 import { getLanguage } from './language.js';
 import { translate } from './translations.js';
 import { SUMMARY_LIMITS, summaryLimits } from './summary-depth.js';
+import { DEFAULT_SAVING_HORIZON, isSavingHorizon } from './saving-horizon.js';
 
 export const explorationTopics = [
   { id: 'afford', title: 'Onko minulla varaa tähän?', hint: 'Kerro haaveestasi – tehdään siitä suunnitelma', icon: 'bag' },
@@ -22,30 +23,39 @@ export function affordQuestion({ purchase, price, months }) {
   return `Onko minulla varaa ostaa ${item}, joka maksaa ${euros} €, ${duration} kuukauden kuluttua? Mitä se vaatisi kuukaudessa?`;
 }
 
-export function explorationQuestion(topic, month, asOf) {
+export function explorationQuestion(topic, month, asOf, horizon) {
+  if (horizon !== undefined && (topic !== 'saving' || !isSavingHorizon(horizon))) throw new TypeError('Unknown saving horizon');
   if (topic === 'spending') return `Mihin rahani menivät? Tarkasteltava kuukausi: ${month}.`;
   if (topic === 'week') return `Paljonko voin käyttää viikossa tilanteen ${asOf} mukaan?`;
+  if (topic === 'saving' && horizon !== undefined) return `${savingQuestion(horizon)} Vinkkien pohjana ovat kuukauden ${month} tiedot.`;
   if (topic === 'saving') return `Miten voisin säästää enemmän? Tarkasteltava kuukausi: ${month}.`;
   throw new TypeError('Unknown exploration topic');
 }
+
+const savingQuestion = horizon => ({
+  weekly: 'Millaisilla viikoittaisilla muutoksilla voisin säästää enemmän?',
+  monthly: 'Millaisilla kuukausittaisilla muutoksilla voisin säästää enemmän?',
+  yearly: 'Millaisilla vuosittaisilla muutoksilla voisin säästää enemmän?',
+})[horizon];
 
 // Cache each presentation depth separately. The server adapts prepared text when
 // the selected depth has no cached version, without changing the underlying facts.
 export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
   const entries = new Map();
   const store = {
-    load({ topic, month, selection, level = 'standard', language = getLanguage() }) {
+    load({ topic, month, selection, horizon, level = 'standard', language = getLanguage() }) {
       if (!Object.hasOwn(SUMMARY_LIMITS, level)) throw new TypeError('Unknown summary depth');
+      if (horizon !== undefined && (topic !== 'saving' || !isSavingHorizon(horizon))) throw new TypeError('Unknown saving horizon');
       const limits = summaryLimits(level, topic);
-      const key = JSON.stringify([selection.selection_id, selection.as_of, language, level, topic, topic === 'week' ? null : month]);
+      const key = JSON.stringify([selection.selection_id, selection.as_of, language, level, topic, topic === 'week' ? null : month, horizon ?? null]);
       if (entries.has(key)) return entries.get(key).promise;
       const controller = new AbortController();
-      const question = translate(explorationQuestion(topic, month, selection.as_of), language);
+      const question = translate(explorationQuestion(topic, month, selection.as_of, horizon), language);
       const displayQuestion = level === 'simple'
-        ? translate(explorationTopics.find(item => item.id === topic).title, language) : question;
+        ? translate(horizon !== undefined ? savingQuestion(horizon) : explorationTopics.find(item => item.id === topic).title, language) : question;
       const entry = { controller };
       entry.promise = (async () => {
-        const query = new URLSearchParams({ topic, ...(topic === 'week' ? {} : { month }), level, language });
+        const query = new URLSearchParams({ topic, ...(topic === 'week' ? {} : { month }), ...(horizon !== undefined ? { horizon } : {}), level, language });
         const response = await fetchImpl('/api/summaries?' + query, {
           headers: { 'X-Demo-Selection': selection.selection_id },
           signal: AbortSignal.any([controller.signal, AbortSignal.timeout(90000)]),
@@ -58,13 +68,15 @@ export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
             (result.selection_id !== selection.selection_id || result.customer_id !== selection.customer_id))) {
           throw Object.assign(new Error('Demoasiakas vaihtui.'), { staleSelection: true });
         }
-        if (!response.ok || (result.language ?? 'fi') !== language || result.level !== level || !Array.isArray(result.bullets) ||
+        if (!response.ok || (result.language ?? 'fi') !== language || result.level !== level ||
+            (horizon !== undefined && result.horizon !== horizon) || !Array.isArray(result.bullets) ||
             result.bullets.length < limits.minBullets || result.bullets.length > limits.maxBullets ||
             result.bullets.some(text => typeof text !== 'string' || !text.trim() || text.length > limits.maxChars)) {
           throw new Error('Yhteenvetoa ei saatu. Yritä uudelleen.');
         }
         const bullets = result.bullets.map(text => text.trim());
-        return { question, displayQuestion, bullets, answer: bullets.map(text => `• ${text}`).join('\n'), selectionId: selection.selection_id, level, language };
+        return { question, displayQuestion, bullets, answer: bullets.map(text => `• ${text}`).join('\n'), selectionId: selection.selection_id,
+          ...(horizon !== undefined ? { horizon } : {}), level, language };
       })().catch(error => {
         if (entries.get(key) === entry) entries.delete(key);
         throw error;
@@ -72,10 +84,10 @@ export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
       entries.set(key, entry);
       return entry.promise;
     },
-    warm(selection, month, level = 'standard') {
+    warm(selection, month, level = 'standard', horizon = DEFAULT_SAVING_HORIZON) {
       // The weekly plan is calculated from bootstrap facts, so it needs no prepared-text request.
       return Promise.allSettled(explorationTopics.filter(({ id }) => id === 'spending' || id === 'saving')
-        .map(({ id: topic }) => store.load({ topic, month, selection, level })));
+        .map(({ id: topic }) => store.load({ topic, month, selection, level, ...(topic === 'saving' ? { horizon } : {}) })));
     },
     reset() {
       for (const entry of entries.values()) entry.controller.abort();

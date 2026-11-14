@@ -203,7 +203,8 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       if (current === session && current.selection.selection_id === getSelection()?.selection_id) {
         current.pending = false;
         const input = detail.querySelector('#chat-question');
-        if (input) { input.value = current.draft; update(); input.focus(); }
+        // Leave focus alone so the reply can be read without reopening the mobile keyboard.
+        if (input) { input.value = current.draft; update(); }
       }
     }
   }
@@ -421,7 +422,6 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     session.presentationLevel = depth;
     session.messages = [{ role: 'user', content: question }, { role: 'assistant', content: answer, level: depth }];
     showChat();
-    detail.querySelector('#chat-question').focus();
   };
   showChat.openInsight = ({ customerId, card, asOf, level = getAnswerLevel() }) => {
     if (customerId !== getSelection()?.customer_id) { onSelectionStale(); return; }

@@ -6,11 +6,12 @@ import { createChatHandler } from './chat.mjs';
 import { createDataSource } from './data-source.mjs';
 import { createCoach, DEFAULT_LEVEL, LEVELS } from './coach.mjs';
 import { isLanguage } from './public/language.js';
+import { isSavingHorizon } from './public/saving-horizon.js';
 import { createPreparedCoach } from './prepared.mjs';
 import { createSessions, DEMO_CUSTOMERS, isDemoCustomer, sameOrigin } from './customers.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
 const requiredFiles = ['index.html', 'app.js', 'chat.js', 'answer-depth.js', 'summary-depth.js', 'weekly-plan.js', 'coach-text.js', 'customer-memory.js', 'purchase-projects.js', 'project-ui.js', 'insights.js', 'disclosure.js', 'exploration.js', 'model.js', 'styles.css',
-  'wrapped.js', 'wrapped.css', 'month-picker.js', 'language.js', 'ui-language.js', 'translations.js', 'language.css',
+  'wrapped.js', 'wrapped.css', 'month-picker.js', 'saving-horizon.js', 'language.js', 'ui-language.js', 'translations.js', 'language.css',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -107,12 +108,16 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
         const keys = [...url.searchParams.keys()];
         const level = url.searchParams.get('level') ?? DEFAULT_LEVEL;
         const language = url.searchParams.get('language') ?? 'fi';
-        if (keys.some(key => !['topic', 'month', 'level', 'language'].includes(key)) || new Set(keys).size !== keys.length || !Object.hasOwn(LEVELS, level) || !isLanguage(language)) {
+        const topic = url.searchParams.get('topic');
+        const horizon = url.searchParams.has('horizon') ? url.searchParams.get('horizon') : undefined;
+        if (keys.some(key => !['topic', 'month', 'level', 'language', 'horizon'].includes(key)) || new Set(keys).size !== keys.length || !Object.hasOwn(LEVELS, level) || !isLanguage(language) ||
+            (horizon !== undefined && (topic !== 'saving' || !isSavingHorizon(horizon)))) {
           json(400, { error: 'Virheellinen pyyntö.' }); return;
         }
         const selected = req.demoSession;
-        const result = await model.summary(selected.customer_id, { topic: url.searchParams.get('topic'),
-          month: url.searchParams.has('month') ? url.searchParams.get('month') : undefined, level, language });
+        const result = await model.summary(selected.customer_id, { topic,
+          month: url.searchParams.has('month') ? url.searchParams.get('month') : undefined, level, language,
+          ...(horizon !== undefined ? { horizon } : {}) });
         json(200, { ...result, customer_id: selected.customer_id, selection_id: selected.selection_id });
       } catch (error) { json(error.status || 503, { error: error.status ? error.message : 'Vastaus ei latautunut. Yritä uudelleen.' }); }
       return;
