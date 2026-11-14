@@ -3,9 +3,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createChatHandler } from './chat.mjs';
+import { createInsightStore, DEMO_CUSTOMERS } from './insights.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
-const requiredFiles = ['index.html', 'app.js', 'chat.js', 'model.js', 'styles.css', 'demo-data.json',
-  'wrapped.js', 'wrapped.css', 'wrapped-data.json',
+const requiredFiles = ['index.html', 'app.js', 'chat.js', 'model.js', 'styles.css',
+  'wrapped.js', 'wrapped.css',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -23,10 +24,34 @@ function within(root, file) {
   return relative !== '' && !relative.startsWith('..' + path.sep) && relative !== '..' && !path.isAbsolute(relative);
 }
 
-export function createAppServer({ publicRoot = defaultRoot, chatOptions } = {}) {
+export function createAppServer({ publicRoot = defaultRoot, chatOptions, insightStore = createInsightStore(),
+  customerId = process.env.PUBLIC_DEMO_CUSTOMER_ID || 'CUST00207' } = {}) {
+  if (!DEMO_CUSTOMERS.includes(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
-  const chat = createChatHandler(chatOptions);
+  const chat = createChatHandler({ ...chatOptions, insightContext: id => insightStore.context(customerId, id) });
+  let customerData;
+  async function scopedData() {
+    if (!customerData) customerData = fs.readFile(new URL('./server-data/demo-data.json', import.meta.url), 'utf8').then(JSON.parse).then(data => {
+      const selected = data.profiles.find(profile => profile.customer_id === customerId);
+      if (!selected) throw new Error('Configured demo customer not found');
+      // Do not include the other profiles, mortgage or negotiation records from the source bundle.
+      return { summary: data.summary, profiles: [selected] };
+    }).catch(error => { customerData = undefined; throw error; });
+    return customerData;
+  }
+  let wrappedData;
+  async function scopedWrapped() {
+    if (!wrappedData) wrappedData = fs.readFile(new URL('./server-data/wrapped-data.json', import.meta.url), 'utf8').then(JSON.parse).then(data => {
+      const selected = data.recaps[customerId];
+      if (!selected?.length) throw new Error('Configured demo recap not found');
+      return { period: data.period, recaps: { [customerId]: selected } };
+    }).catch(error => { wrappedData = undefined; throw error; });
+    return wrappedData;
+  }
   async function ready() {
+    if (!await insightStore.cards(customerId)) throw new Error('Configured demo insights missing');
+    await scopedData();
+    await scopedWrapped();
     await Promise.all(requiredFiles.map(async file => {
       const stat = await fs.stat(path.join(root, file));
       if (!stat.isFile()) throw new Error('Missing runtime file');
@@ -48,6 +73,18 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions } = {}) 
     if (!['GET', 'HEAD'].includes(req.method)) {
       req.resume();
       send(405, 'Method not allowed', undefined, { Allow: 'GET, HEAD' });
+      return;
+    }
+    if (route === '/api/insights' || route === '/demo-data.json' || route === '/wrapped-data.json') {
+      const query = new URL(req.url, 'http://localhost').searchParams;
+      try {
+        if (query.size !== 0) {
+          send(400, JSON.stringify({ error: 'Asiakasta ei voi vaihtaa pyynnössä.' }), 'application/json'); return;
+        }
+        const cards = route === '/demo-data.json' ? await scopedData() :
+          route === '/wrapped-data.json' ? await scopedWrapped() : await insightStore.cards(customerId);
+        send(cards ? 200 : 404, JSON.stringify(cards || { error: 'Demoasiakasta ei löydy.' }), 'application/json', { 'Cache-Control': 'no-store' });
+      } catch { send(503, JSON.stringify({ error: 'Havainnot eivät latautuneet. Yritä uudelleen.' }), 'application/json'); }
       return;
     }
     if (route.includes('\\') || route.includes('\0') || route.split('/').some(part => part.startsWith('.'))) {

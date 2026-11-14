@@ -42,6 +42,6 @@ await read('tx_junction_transactions.csv', r => {
 const profiles = [...selected.values()];
 for (const p of profiles) p.transactions.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 const summary = { count, customerCount: customers.length, from, to, categories, types, mortgageCount: mortgages.length, mortgageEventCount: history.length };
-fs.mkdirSync(path.join(root, 'public'), { recursive: true });
-fs.writeFileSync(path.join(root, 'public/demo-data.json'), JSON.stringify({ summary, profiles, mortgage: mortgages.find(m => m.customer_id === 'CUST04457'), history: history.filter(e => e.mortgage_customer_id === 'C0004') }));
+fs.mkdirSync(path.join(root, 'server-data'), { recursive: true });
+fs.writeFileSync(path.join(root, 'server-data/demo-data.json'), JSON.stringify({ summary, profiles, mortgage: mortgages.find(m => m.customer_id === 'CUST04457'), history: history.filter(e => e.mortgage_customer_id === 'C0004') }));
 console.log(JSON.stringify({ summary, profiles: profiles.map(p => ({ id: p.customer_id, rows: p.transactions.length })) }, null, 2));

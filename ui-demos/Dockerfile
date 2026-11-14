@@ -1,7 +1,8 @@
 # Both stages use Node 24 LTS. Rebuild regularly to receive base-image updates.
 FROM node:24-alpine AS verify
 WORKDIR /app
-COPY package.json server.mjs chat.mjs ./
+COPY package.json server.mjs chat.mjs insights.mjs ./
+COPY server-data/ ./server-data/
 COPY public/ ./public/
 COPY scripts/check.mjs ./scripts/check.mjs
 COPY tests/ ./tests/
@@ -10,7 +11,8 @@ RUN node scripts/check.mjs
 FROM node:24-alpine AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=8080
 WORKDIR /app
-COPY --from=verify --chown=node:node /app/package.json /app/server.mjs /app/chat.mjs ./
+COPY --from=verify --chown=node:node /app/package.json /app/server.mjs /app/chat.mjs /app/insights.mjs ./
+COPY --from=verify --chown=node:node /app/server-data/ ./server-data/
 COPY --from=verify --chown=node:node /app/public/ ./public/
 USER node
 EXPOSE 8080

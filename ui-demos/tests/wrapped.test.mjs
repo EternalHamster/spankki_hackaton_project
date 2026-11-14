@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { renderSlide, formatCount } from '../public/wrapped.js';
 
-const wrapped = JSON.parse(fs.readFileSync(new URL('../public/wrapped-data.json', import.meta.url)));
-const demo = JSON.parse(fs.readFileSync(new URL('../public/demo-data.json', import.meta.url)));
+const wrapped = JSON.parse(fs.readFileSync(new URL('../server-data/wrapped-data.json', import.meta.url)));
+const demo = JSON.parse(fs.readFileSync(new URL('../server-data/demo-data.json', import.meta.url)));
 const layouts = new Set(['intro', 'hero', 'split', 'list', 'outro']);
 
 test('every demo customer has a recap that starts with the intro and ends with the tip', () => {

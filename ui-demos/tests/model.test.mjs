@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { metrics, basketTotals, defaultBaskets, scenarioSavings, mortgagePayment, weeklyBudget } from '../public/model.js';
-const data = JSON.parse(fs.readFileSync(new URL('../public/demo-data.json', import.meta.url)));
+const data = JSON.parse(fs.readFileSync(new URL('../server-data/demo-data.json', import.meta.url)));
 const near = (actual, expected) => assert.ok(Math.abs(actual - expected) < .00001, `${actual} ≠ ${expected}`);
 
 test('September example reconciles to source transaction totals', () => {
