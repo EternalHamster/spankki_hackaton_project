@@ -53,3 +53,15 @@ test('concurrency limit releases its slot and unexpected errors do not reveal in
   const failed = await fixture(t, {}, async () => { throw new Error('secret upstream details'); });
   const response = await failed.post(); assert.equal(response.status, 502); assert.doesNotMatch(await response.text(), /secret/);
 });
+
+test('the chosen answer level reaches the coach, and unknown levels stop before it', async t => {
+  const { post, calls } = await fixture(t);
+  for (const level of ['simple', 'standard', 'detailed']) assert.equal((await post({ messages: [{ role: 'user', content: 'Hi' }], level })).status, 200);
+  assert.deepEqual(calls.map(call => call.request.level), ['simple', 'standard', 'detailed']);
+  assert.equal((await post()).status, 200);
+  assert.equal(calls.at(-1).request.level, undefined); // the coach applies its default
+  for (const level of ['expert', '', 2, null, ['simple'], 'constructor']) {
+    assert.equal((await post({ messages: [{ role: 'user', content: 'Hi' }], level })).status, 400, String(level));
+  }
+  assert.equal(calls.length, 4);
+});

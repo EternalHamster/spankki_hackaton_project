@@ -32,8 +32,8 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   if (!isDemoCustomer(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
   const model = coach || createPreparedCoach({ dataSource, coach: createCoach({ dataSource, ...chatOptions }) });
-  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight) =>
-    model.chat(session.customer_id, { messages, insightId: insight?.insight_id }) });
+  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level) =>
+    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level }) });
   let wrappedData;
   async function scopedWrapped(id) {
     if (!wrappedData) wrappedData = fs.readFile(new URL('./server-data/wrapped-data.json', import.meta.url), 'utf8').then(JSON.parse)

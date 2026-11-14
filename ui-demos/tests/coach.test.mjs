@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createCoach, CoachError } from '../coach.mjs';
+import { createCoach, CoachError, LEVELS, DEFAULT_LEVEL } from '../coach.mjs';
 
 const cards = () => ({ insights: [
   { title: 'Ravintolakäynnit', headline_number: '250 € kuukaudessa', explanation: 'Arvio on 250 € kuukaudessa. Ryhmän luku on 95 €.', action: 'Vertaa hintoja ennen tilaamista.' },
@@ -373,4 +373,32 @@ test('prepared insight cards seed the current customer cache and open card chat 
   ]) await assert.rejects(coach.primeInsights('A', value), error => error.status === 503);
   await assert.rejects(coach.primeInsights('B', { ...generated, customer_id: 'B' }), error => error.status === 503);
   assert.equal(requests.length, 1);
+});
+
+test('answer levels change only the last prompt block and the output limit, so the cached prefix is shared', async () => {
+  const { coach, requests } = fixture({ provider: () => textResult('Hei!') });
+  const ask = level => coach.chat('A', { messages: [{ role: 'user', content: 'Miksi rahat loppuvat?' }], level });
+  for (const level of Object.keys(LEVELS)) assert.equal((await ask(level)).level, level);
+  assert.equal((await coach.chat('A', { messages: [{ role: 'user', content: 'Hei' }] })).level, DEFAULT_LEVEL);
+  const [simple, standard, detailed] = requests.map(request => request.body);
+  for (const body of [standard, detailed]) {
+    assert.deepEqual(body.system.slice(0, -1), simple.system.slice(0, -1));
+    assert.deepEqual(body.tools, simple.tools);
+  }
+  assert.deepEqual([simple, standard, detailed].map(body => body.system.at(-1).text.match(/Depth: (\w+)/)[1]), ['SIMPLE', 'STANDARD', 'DETAILED']);
+  assert.deepEqual([simple, standard, detailed].map(body => body.max_tokens), [600, 900, 1500]);
+  assert.equal(simple.system.at(-1).cache_control, undefined);
+  assert.ok(simple.system.at(-1).text.length < 1200, 'the level block stays small');
+  await assert.rejects(ask('expert'), error => error.status === 400);
+  await assert.rejects(ask('toString'), error => error.status === 400);
+  assert.equal(requests.length, 4);
+});
+
+test('the level block comes after a selected insight so the chosen depth takes precedence', async () => {
+  const { coach, requests } = fixture({ provider: (_, count) => count === 1 ? textResult(JSON.stringify(cards())) : textResult('Hei!') });
+  const insights = await coach.insights('A');
+  await coach.chat('A', { messages: [{ role: 'user', content: 'Kerro' }], insightId: insights.insights[0].id, level: 'simple' });
+  const system = requests[1].body.system;
+  assert.match(system.at(-2).text, /Selected insight/);
+  assert.match(system.at(-1).text, /Depth: SIMPLE/);
 });

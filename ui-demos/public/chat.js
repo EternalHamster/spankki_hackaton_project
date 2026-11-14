@@ -10,18 +10,35 @@ const SUGGESTIONS = [
   { text: 'Anna kolme säästövinkkiä arkeen.' },
 ];
 const GAP = /\[(?:tuote|hinta)\]/;
+
+// How deep the coach explains things. Ids match LEVELS in coach.mjs; the choice is remembered in this browser.
+export const LEVELS = [
+  { id: 'simple', label: 'Selkeä', description: 'Lyhyesti ja arkikielellä, ilman lukujen pyörittelyä.' },
+  { id: 'standard', label: 'Perus', description: 'Tärkeimmät luvut, yksi vertailu ja syy lyhyesti.' },
+  { id: 'detailed', label: 'Syvällinen', description: 'Luvut, vertailut ja miten arviot muodostuvat.' },
+];
+const LEVEL_KEY = 'oma-talous-vastaustaso';
+const levelIndex = id => LEVELS.findIndex(level => level.id === id);
+const FOLLOW_UPS = { simpler: 'Selitä edellinen vastaus yksinkertaisemmin.', deeper: 'Kerro edellisestä vastauksesta tarkemmin.' };
 const ready = draft => Boolean(draft.trim()) && !GAP.test(draft);
 
 export function createChatDialog({ modal, detail, icon, getSelection = () => null, onSelectionStale = () => {} }) {
   const fresh = () => ({ messages: [], draft: '', pending: false, error: '', insight: null, exploration: null, explorationBullets: null, controller: null, selection: getSelection() });
   let session = fresh();
+  let level = (() => { try { const saved = localStorage.getItem(LEVEL_KEY); return levelIndex(saved) >= 0 ? saved : 'standard'; } catch { return 'standard'; } })();
 
   function reset() { session.controller?.abort(); session = fresh(); }
 
   function update() {
     const log = detail.querySelector('#chat-messages');
     if (!log) return;
-    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}</div>`).join('');
+    const last = session.messages.at(-1);
+    // Prepared summaries have no level: they are written in simple language.
+    const lastLevel = levelIndex(last?.level ?? 'simple');
+    const followUps = last?.role === 'assistant' && !session.pending ? `<div class="chat-depth-actions">${
+      lastLevel > 0 ? `<button type="button" data-depth="simpler">Selitä yksinkertaisemmin</button>` : ''}${
+      lastLevel < LEVELS.length - 1 ? `<button type="button" data-depth="deeper">Kerro tarkemmin</button>` : ''}</div>` : '';
+    log.innerHTML = session.messages.map((m, i) => `<div class="chat-message ${m.role}"><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}</div>`).join('') + followUps;
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending ? 'Valmentaja vastaa…' : '';
     const alert = detail.querySelector('#chat-error');
@@ -34,16 +51,17 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     log.scrollTop = log.scrollHeight;
   }
 
-  async function send() {
+  // depth: a one-off level for this question (the follow-up buttons); otherwise the chosen level.
+  async function send(depth = level) {
     const current = session;
     if (current.pending || !ready(current.draft)) return;
     if (!current.selection?.selection_id || current.selection.selection_id !== getSelection()?.selection_id) {
       reset(); onSelectionStale(); return;
     }
     const content = current.draft.trim();
-    let history = current.messages.slice(-10);
+    let history = current.messages.slice(-10).map(({ role, content }) => ({ role, content }));
     while (history.reduce((n, m) => n + m.content.length, 0) + content.length > 14000) history = history.slice(2);
-    const body = { messages: [...history, { role: 'user', content }] };
+    const body = { messages: [...history, { role: 'user', content }], level: depth };
     if (current.insight) body.insight = { insight_id: current.insight.card.id };
     current.messages.push({ role: 'user', content });
     current.draft = ''; current.error = ''; current.pending = true;
@@ -62,7 +80,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       if (!response.ok) throw new Error(result.error || 'Vastausta ei saatu. Yritä uudelleen.');
       if (typeof result.answer !== 'string' || !result.answer.trim()) throw new Error('Vastausta ei saatu. Yritä uudelleen.');
-      current.messages.push({ role: 'assistant', content: result.answer });
+      current.messages.push({ role: 'assistant', content: result.answer, level: depth });
     } catch (failure) {
       if (current !== session) return;
       current.messages.pop(); current.draft = content;
@@ -90,6 +108,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${escape(customer.label || 'Demoasiakas')}${date ? ' · aineisto ' + escape(date) : ''}</span></div></div>
       ${selected ? `<div class="chat-insight"><span>${escape(period.label)} · ${escape(period.detail)}</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div><p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.</p></div>`}
+      <div class="chat-level" role="group" aria-labelledby="chat-level-title"><span id="chat-level-title">Vastausten taso</span><div class="chat-level-options">${LEVELS.map(option => `<button type="button" data-level="${option.id}" aria-pressed="${option.id === level}">${option.label}</button>`).join('')}</div><small id="chat-level-description">${escape(LEVELS[levelIndex(level)].description)}</small></div>
       <div id="chat-messages" class="chat-messages" role="log" aria-label="Keskustelu" aria-live="polite" aria-relevant="additions text"></div>
       <div class="chat-suggestions">${SUGGESTIONS.map(q => `<button type="button" data-chat-question="${escape(q.text)}"><span>${escape(q.label || q.text)}${q.hint ? `<small>✎ ${escape(q.hint)}</small>` : ''}</span>${icon('arrow')}</button>`).join('')}</div>
       <p id="chat-progress" class="chat-progress" role="status"></p>
@@ -112,6 +131,20 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       input.value = session.draft = button.dataset.chatQuestion;
       update(); input.focus(); selectGap();
     }));
+    detail.querySelectorAll('[data-level]').forEach(button => button.addEventListener('click', () => {
+      level = button.dataset.level;
+      try { localStorage.setItem(LEVEL_KEY, level); } catch { /* the choice still applies to this visit */ }
+      detail.querySelectorAll('[data-level]').forEach(option => option.setAttribute('aria-pressed', String(option.dataset.level === level)));
+      detail.querySelector('#chat-level-description').textContent = LEVELS[levelIndex(level)].description;
+    }));
+    detail.querySelector('#chat-messages').addEventListener('click', event => {
+      const direction = event.target.closest('[data-depth]')?.dataset.depth;
+      if (!direction || session.pending) return;
+      const from = levelIndex(session.messages.at(-1)?.level ?? 'simple');
+      const to = LEVELS[Math.max(0, Math.min(LEVELS.length - 1, from + (direction === 'deeper' ? 1 : -1)))].id;
+      session.draft = FOLLOW_UPS[direction];
+      void send(to);
+    });
     detail.querySelector('#chat-reset').addEventListener('click', () => { reset(); showChat(); detail.querySelector('#chat-question').focus(); });
     update();
     if (autoSend && question) void send();
