@@ -1,0 +1,274 @@
+{
+  "about": "Demo personas for the Personal Economic Trainer. Names are fictional; customer IDs and all numbers come from the synthetic dataset as of 2026-09-30 (BDA model run of 14 Nov 2026). Selected with scripts/select_personas.py; see demo/PERSONAS.md for the method and stories.",
+  "as_of": "2026-09-30",
+  "personas": [
+    {
+      "key": "tight_young_adult",
+      "customer_id": "CUST03673",
+      "name": "Aino",
+      "age": 22,
+      "area": "Espoo",
+      "postal_code": "02760",
+      "headline": "Money runs out before payday",
+      "story": "Aino earns about €1,240 a month and spends a little more than that. The account goes negative most months, and September brought the biggest home & tech bill in two years. The coach shows where the money goes, why the month runs out, and one small change that breaks the cycle.",
+      "shows": [
+        "safe_to_spend (honest 'nothing spare')",
+        "overspending explained",
+        "everyday basket",
+        "biggest-month fact",
+        "what-if",
+        "financial literacy for young adults"
+      ],
+      "facts": {
+        "income_eur_month": 1240,
+        "spend_eur_month": 1370,
+        "overspend_eur_month_last_12m": 120,
+        "days_overdrawn_2y": 221,
+        "overdraft_episodes_2y": 15,
+        "longest_overdraft_days": 29,
+        "lowest_balance_eur": -423,
+        "balance_eur": 330,
+        "safe_to_spend_week_eur": 0,
+        "next_payday": "2026-10-15",
+        "restaurants_share_of_purchases": 0.23,
+        "evening_share_of_purchases": 0.48,
+        "savings_eur_month": 0,
+        "surprise_fund_target_eur": 950,
+        "surprise_fund_gap_eur": 720,
+        "safe_to_save_eur_month": 0,
+        "overspend_last_12m": {
+          "in_eur_month": 1320,
+          "out_eur_month": 1440
+        },
+        "month_high": {
+          "month": "2026-09",
+          "line": "home & tech",
+          "eur": 310,
+          "usual_eur": 65
+        }
+      },
+      "demo_questions": [
+        {
+          "q": "What is safe for me to spend this week?",
+          "expect": "Nothing spare until payday on 15 Oct after rent, bills and essentials."
+        },
+        {
+          "q": "Why does my account keep going into the red?",
+          "expect": "Over the last 12 months about €120/month more went out than came in (€1,320 in, €1,440 out); September was the biggest home & tech month in two years (€310 vs €65 usually)."
+        },
+        {
+          "q": "Mihin rahani menevät?",
+          "expect": "Answer in Finnish: about half fixed bills, half everyday spending; restaurants are the biggest everyday line."
+        },
+        {
+          "q": "How much would I save if I cut entertainment by 20%?",
+          "expect": "Computed by the what-if tool from the current entertainment level (about €100/month)."
+        }
+      ]
+    },
+    {
+      "key": "payday_splurger",
+      "customer_id": "CUST04891",
+      "name": "Mikko",
+      "age": 38,
+      "area": "Helsinki",
+      "postal_code": "00200",
+      "headline": "Doing fine, but money leaks after payday",
+      "story": "Mikko earns about €2,300, invests about €275 a month and has never been overdrawn. But nearly a fifth of all card spending happens in the three days after payday, restaurants and takeaways cost more than twice what peers pay per visit, and big one-off buys happen about three times a year. The coach makes the leaks visible without lecturing.",
+      "shows": [
+        "spender type",
+        "peer comparison with the 'how often vs how much' split",
+        "what-if on dining out",
+        "payday effect",
+        "big one-off purchases"
+      ],
+      "facts": {
+        "income_eur_month": 2300,
+        "spend_eur_month": 2000,
+        "invests_eur_month": 275,
+        "savings_rate": 0.12,
+        "days_overdrawn_2y": 0,
+        "balance_eur": 6829,
+        "payday_3_day_share_of_purchases": 0.19,
+        "payday_effect_vs_even_pace": 1.9,
+        "big_one_off_purchases_2026": [
+          {
+            "date": "2026-03-27",
+            "category": "Home & Tech",
+            "eur": 1087
+          },
+          {
+            "date": "2026-06-30",
+            "category": "Home & Tech",
+            "eur": 1836
+          },
+          {
+            "date": "2026-09-10",
+            "category": "Lifestyle",
+            "eur": 1026
+          }
+        ],
+        "spending_trend_last6_vs_first6": 1.36,
+        "safe_to_spend_week_eur": 150,
+        "spender_type": "Takeaway lover and Foodie (and a saver)",
+        "surprise_fund_target_eur": 3150,
+        "safe_to_save_eur_month": 50,
+        "restaurants": {
+          "eur_month": 190,
+          "peers_eur_month": 120,
+          "eur_per_visit": 70,
+          "peers_eur_per_visit": 30
+        },
+        "takeaway": {
+          "eur_month": 120,
+          "peers_eur_month": 65,
+          "eur_per_visit": 65,
+          "peers_eur_per_visit": 30
+        },
+        "big_one_off_eur_month": {
+          "you": 120,
+          "peers": 50
+        }
+      },
+      "demo_questions": [
+        {
+          "q": "What kind of spender am I?",
+          "expect": "Takeaway lover and foodie who also saves: eats out about as often as peers but spends about €70 vs €30 per restaurant visit and €65 vs €30 per takeaway."
+        },
+        {
+          "q": "How much could I save if I reduced dining out by 20%?",
+          "expect": "Computed by the what-if tool; matching peers on restaurants alone saves about €70/month (€840/year)."
+        },
+        {
+          "q": "Do I spend more right after payday?",
+          "expect": "Yes: about 19% of card spending lands in the 3 days after payday, ~1.9x an even pace. (No backend tool for this yet.)"
+        }
+      ]
+    },
+    {
+      "key": "saver_home_buyer",
+      "customer_id": "CUST03711",
+      "name": "Sanni",
+      "age": 32,
+      "area": "Espoo",
+      "postal_code": "02780",
+      "headline": "Saving steadily towards a first home",
+      "story": "Sanni earns about €2,300, automatically invests about €400 a month and spends little on extras. The balance grew from €7,700 to €13,500 in a year, and the model says another €350 a month could safely go to savings. The coach praises the habit and answers the big question: how close is a first home?",
+      "shows": [
+        "positive reinforcement",
+        "savings rate",
+        "safe-to-save",
+        "home readiness using the bank's affordability rule (future tool)",
+        "MyData-style exploration"
+      ],
+      "facts": {
+        "income_eur_month": 2310,
+        "spend_eur_month": 1770,
+        "invests_eur_month": 400,
+        "savings_rate": 0.18,
+        "days_overdrawn_2y": 0,
+        "balance_eur_2025_10_31": 7716,
+        "balance_eur": 13518,
+        "fixed_bills_share_of_spending": 0.62,
+        "safe_to_spend_week_eur": 100,
+        "home_affordability": {
+          "rule": "required monthly income = loan x 0.0184 (6% stress rate, 25-year annuity, 35% debt-to-income), derived exactly from the bank's mortgage data",
+          "max_loan_eur": 125400,
+          "home_price_with_10pct_deposit_eur": 139400,
+          "deposit_needed_eur": 13900
+        },
+        "safe_to_save_eur_month": 350,
+        "surprise_fund_target_eur": 850,
+        "surprise_fund_covered": true,
+        "restaurants": {
+          "eur_month": 25,
+          "peers_eur_month": 120
+        }
+      },
+      "demo_questions": [
+        {
+          "q": "How much have I saved this year?",
+          "expect": "About €400/month invested (18% of income) and the balance grew by about €5,800 in 12 months."
+        },
+        {
+          "q": "Could I afford my own home?",
+          "expect": "Illustration only: income supports a loan of about €125k under the bank's stress test, i.e. a ~€139k home with a 10% (~€13.9k) deposit. Suggest the bank's advisor. (Needs a future tool.)"
+        },
+        {
+          "q": "Where could I still save?",
+          "expect": "Already lean: restaurants about €25/month vs €120 for peers. The model says about €350/month more could safely go to savings (€4,200/year)."
+        }
+      ]
+    },
+    {
+      "key": "surprise_cost",
+      "customer_id": "CUST04971",
+      "name": "Pekka",
+      "age": 59,
+      "area": "Helsinki",
+      "postal_code": "00670",
+      "headline": "A surprise bill a week before payday",
+      "story": "Pekka earns well (about €4,350) and invests about €435 a month, yet on 8 Aug 2026 a €1,294 home & tech payment a week before payday left €281 in the account, and groceries pushed it below zero until salary arrived on the 15th. Surprise costs like this hit about four times a year, and right now money is tight again until payday. The coach explains the 'mandatory but irregular' basket and how a surprise fund prevents the next one.",
+      "shows": [
+        "three baskets (especially basket 2)",
+        "surprise fund",
+        "explaining a past event from transactions",
+        "overspending and dining trend"
+      ],
+      "facts": {
+        "income_eur_month": 4350,
+        "spend_eur_month": 3920,
+        "invests_eur_month": 435,
+        "shock_event": {
+          "date": "2026-08-08",
+          "category": "Home & Tech",
+          "eur": 1294,
+          "balance_after_eur": 281,
+          "first_negative_date": "2026-08-10",
+          "lowest_balance_eur": -83,
+          "back_positive_date": "2026-08-15",
+          "reason_back": "salary"
+        },
+        "earlier_shock": {
+          "date": "2026-02-07",
+          "category": "Home & Tech",
+          "eur": 2158
+        },
+        "surprises_per_year": 3.7,
+        "typical_surprise_eur": 1100,
+        "surprise_fund_target_eur": 7200,
+        "surprise_fund_eur_month": 340,
+        "overspend_eur_month_last_12m": 60,
+        "balance_eur_2026_04_30": 5962,
+        "balance_eur": 2944,
+        "baskets_share": {
+          "fixed": 0.48,
+          "surprises": 0.09,
+          "everyday": 0.44
+        },
+        "safe_to_spend_week_eur": 0,
+        "surprise_fund_gap_eur": 4350,
+        "surprise_fund_months": 13,
+        "safe_to_save_eur_month": 0
+      },
+      "demo_questions": [
+        {
+          "q": "Why did my account go negative in August?",
+          "expect": "A €1,294 home & tech payment on 8 Aug, a week before payday; the balance fell to €281 and groceries took it below zero on 10 Aug until salary on 15 Aug."
+        },
+        {
+          "q": "What is safe for me to spend this week?",
+          "expect": "Nothing spare until payday on 15 Oct after rent, bills and essentials."
+        },
+        {
+          "q": "What are my three baskets?",
+          "expect": "About 48% fixed bills, 9% surprises, 44% everyday."
+        },
+        {
+          "q": "How do I prepare for surprise costs?",
+          "expect": "They hit ~4 times a year at ~€1,100; a €7,200 surprise fund covers a bad year and the balance is ~€4,350 short: about €340/month on payday, ready in ~13 months."
+        }
+      ]
+    }
+  ]
+}
