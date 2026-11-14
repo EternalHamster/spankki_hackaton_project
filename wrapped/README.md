@@ -1,7 +1,7 @@
 # Rahavuotesi: Money Wrapped
 
 A Spotify Wrapped-style story of the customer's last 12 months of money (Oct 2025 – Sep 2026), in Finnish.
-Shown in the UI as full-screen swipeable cards: open it from the purple **Rahavuotesi on valmis** card on the
+Shown in the UI as full-screen swipeable cards: open it from the green **Rahavuotesi on valmis** card on the
 home screen of `ui-demos`.
 
 Every number is precomputed from the data: the raw transactions and the BDA spending model's outputs.
