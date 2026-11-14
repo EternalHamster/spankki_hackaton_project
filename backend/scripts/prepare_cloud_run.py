@@ -10,10 +10,21 @@ from money_coach.client import DEFAULT_MODEL
 from money_coach.repository import DuckDBRepository
 
 
+# Only the synthetic model outputs used by the insights endpoint enter its image.
+CONTEXT_FILES = (
+    "coach_context/__init__.py", "coach_context/profile_card.py", "coach_context/insight_context.py",
+    "BDA/engine/config.py", "BDA/output/customer_summary.csv", "BDA/output/customer_line.csv",
+    "BDA/output/insights.csv", "BDA/output/spender_type.csv", "BDA/output/model_hyper.csv",
+)
+
+
 def prepare_source(backend: Path, snapshot: Path) -> Path:
     """Build only the upload directory; credentials/configuration stay in Cloud Run."""
     snapshot = snapshot.resolve()
     DuckDBRepository(snapshot).check()
+    for name in CONTEXT_FILES:
+        if not (backend.parent / name).is_file():
+            raise ValueError(f"Required insight context file is missing: {name}. Update the full repository before deploying.")
     deployment_root = backend / ".deploy"
     deployment_root.mkdir(exist_ok=True)
     destination = Path(tempfile.mkdtemp(prefix="demo-", dir=deployment_root)).resolve()
@@ -26,10 +37,16 @@ def prepare_source(backend: Path, snapshot: Path) -> Path:
         target = source / module.relative_to(backend)
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(module, target)
+    for name in CONTEXT_FILES:
+        target = source / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(backend.parent / name, target)
     (source / "data").mkdir()
     shutil.copyfile(snapshot, source / "data" / "finance.duckdb")
     docker = (backend / "Dockerfile").read_text(encoding="utf-8")
     docker += "\nCOPY --chown=coach:coach data/finance.duckdb /app/data/finance.duckdb\n"
+    docker += "COPY --chown=coach:coach coach_context /app/coach_context\n"
+    docker += "COPY --chown=coach:coach BDA /app/BDA\nENV PYTHONPATH=/app\n"
     (source / "Dockerfile").write_text(docker, encoding="utf-8")
     (source / ".gcloudignore").write_text("**/__pycache__/**\n", encoding="utf-8")
     return destination

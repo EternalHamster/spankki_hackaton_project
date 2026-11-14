@@ -224,7 +224,8 @@ Set `INSIGHTS_LIVE=true` on the server to make the endpoint call the model. A li
 - **Number check:** every number in the answer is compared with the context. An insight that contains a number
   not found there gets `numbers_verified: false`, so the app can hide it.
 - **Size:** about 3,000 input tokens and 700 output tokens per customer.
-- **Deployment:** the endpoint reads `BDA/output/*.csv` and the `coach_context` package from the repository.
-  The current Docker image ships only `backend/src`, so in Cloud Run the endpoint answers 503 until those are
-  added to the image.
+- **Deployment:** `deploy.cmd` packages the `coach_context` modules, BDA configuration and the five synthetic
+  model-output CSVs this endpoint requires. Missing context files stop preparation before upload. The base
+  Dockerfile alone still excludes these inputs; use the prepared demo build for Cloud Run. Insights remain
+  a dry run unless `INSIGHTS_LIVE=true` is explicitly set on the service.
 - Tests (`tests/test_insights.py`) use mocked HTTP and never make a paid request.

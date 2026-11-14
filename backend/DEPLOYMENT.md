@@ -118,6 +118,10 @@ make rotations explicit. See [Cloud Run secrets](https://docs.cloud.google.com/r
 The normal Dockerfile excludes data. The following helper validates the selected snapshot/customer
 and creates a separate demo build containing the snapshot, Python source and dependency files.
 It generates a demo-customer token outside the uploaded source directory. It never reads the API key.
+The prepared image also includes the `coach_context` modules, `BDA/engine/config.py`, and only the five
+synthetic model-output CSVs required by `/v1/insights`. Raw source CSVs, BDA databases, plots, tests and
+credentials are excluded. Keep the full repository available when preparing a deployment; missing
+context files stop the build. The insights endpoint stays in dry-run mode by default and makes no model call.
 
 ```cmd
 "%PYTHON_EXE%" scripts\prepare_cloud_run.py --demo-snapshot data\finance.duckdb --customer CUST00207

@@ -249,13 +249,25 @@ def test_demo_build_excludes_secrets_and_checks_customer(repository, tmp_path):
     (backend / "src" / ".env").write_text("SECRET=do-not-package")
     for name in ("pyproject.toml", "constraints.txt", "Dockerfile"):
         (backend / name).write_text("# fixture")
+    for name in module.CONTEXT_FILES:
+        target = backend.parent / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("# synthetic context fixture")
+    (backend.parent / "coach_context" / ".env").write_text("SECRET=do-not-package")
+    (backend.parent / "BDA" / "output" / "coach.duckdb").write_text("do-not-package")
     with pytest.raises(ValueError, match="no data"):
         module.prepare(backend, repository.path, "absent")
     assert not (backend / ".deploy").exists()
     deployment = module.prepare(backend, repository.path, "A")
     files = {str(f.relative_to(deployment / "source")).replace('\\', '/') for f in (deployment / "source").rglob('*') if f.is_file()}
-    assert files == {"pyproject.toml", "constraints.txt", "Dockerfile", "src/money_coach/api.py", "data/finance.duckdb", ".gcloudignore"}
+    assert files == {"pyproject.toml", "constraints.txt", "Dockerfile", "src/money_coach/api.py", "data/finance.duckdb", ".gcloudignore"} | set(module.CONTEXT_FILES)
+    docker = (deployment / "source" / "Dockerfile").read_text()
+    assert "COPY --chown=coach:coach coach_context /app/coach_context" in docker
+    assert "COPY --chown=coach:coach BDA /app/BDA" in docker
     environment = json.loads((deployment / "runtime-env.yaml").read_text())
     assert "ANTHROPIC_API_KEY" not in environment
     token = (deployment / "demo-token.txt").read_text().strip()
     assert json.loads(environment["DEMO_TOKENS_JSON"]) == {token: "A"}
+    (backend.parent / "BDA" / "output" / "model_hyper.csv").unlink()
+    with pytest.raises(ValueError, match="Required insight context file is missing"):
+        module.prepare_source(backend, repository.path)
