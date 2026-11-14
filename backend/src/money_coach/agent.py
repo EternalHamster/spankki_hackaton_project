@@ -1,5 +1,5 @@
 """Small explicit Messages API loop with no filesystem, SQL or shell tools."""
-from datetime import datetime
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from .tools import FinanceTools, definitions
@@ -22,20 +22,31 @@ class AgentLimitError(RuntimeError):
 
 
 class CoachAgent:
-    def __init__(self, client, model="claude-haiku-5-5", max_rounds=4, max_tokens=900, max_tool_calls=8):
+    def __init__(self, client, model="claude-haiku-5-5", max_rounds=4, max_tokens=900, max_tool_calls=8,
+                 as_of: date | None = None):
         self.client, self.model = client, model
         self.max_rounds, self.max_tokens, self.max_tool_calls = max_rounds, max_tokens, max_tool_calls
+        # Historical snapshots end before the real date; relative dates ("last month") must use the data's end.
+        self.as_of = as_of
+
+    def system_prompt(self) -> str:
+        if self.as_of:
+            return SYSTEM + (f"\nToday is {self.as_of:%A %d %B %Y} ({self.as_of.isoformat()}), the last day of the "
+                             "available data. Resolve relative dates such as 'this month', 'last month' and "
+                             "'this week' from this date.")
+        today = datetime.now(ZoneInfo("Europe/Helsinki")).date().isoformat()
+        return SYSTEM + f"\nToday in Europe/Helsinki is {today}. Historical coverage may end earlier."
 
     def run(self, message: str, tools: FinanceTools) -> dict:
         messages = [{"role": "user", "content": message}]
         usage = {"input_tokens": 0, "output_tokens": 0}
         trace = []
         # Fresh history per request avoids client-forged assistant/tool evidence and cross-user memory.
-        today = datetime.now(ZoneInfo("Europe/Helsinki")).date().isoformat()
+        system = self.system_prompt()
         for _ in range(self.max_rounds):
             response = self.client.messages.create(
                 model=self.model, max_tokens=self.max_tokens,
-                system=SYSTEM + f"\nToday in Europe/Helsinki is {today}. Historical coverage may end earlier.",
+                system=system,
                 messages=messages, tools=definitions(),
             )
             usage["input_tokens"] += response.usage.input_tokens

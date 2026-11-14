@@ -168,6 +168,19 @@ def test_real_sdk_mock_transport_tool_protocol(repository):
     assert "999.00" not in json.dumps(requests)
 
 
+def test_today_is_the_end_of_the_data(repository, monkeypatch):
+    assert repository.latest_date() == date(2026, 11, 1)
+    requests = []
+    with sdk_client([{"stop_reason": "end_turn", "content": [{"type": "text", "text": "ok"}]}], requests) as client:
+        CoachAgent(client, as_of=date(2026, 9, 30)).run("last month?", FinanceTools(repository, "A"))
+    assert "Today is Wednesday 30 September 2026 (2026-09-30)" in requests[0]["system"]
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with TestClient(create_app(Settings(), repository=repository)) as client:
+        assert client.app.state.agent.as_of == date(2026, 11, 1)  # derived from the snapshot
+    with TestClient(create_app(Settings(as_of=date(2026, 9, 30)), repository=repository)) as client:
+        assert client.app.state.agent.as_of == date(2026, 9, 30)  # explicit override wins
+
+
 @pytest.mark.parametrize("response", [
     {"stop_reason": "max_tokens", "content": [{"type": "text", "text": "partial"}]},
     {"stop_reason": "tool_use", "content": [tool_call()]},
