@@ -20,7 +20,6 @@ Ymmärrä menojasi ja niiden muutoksia|Understand your spending and how it chang
 Paljonko voin käyttää tällä viikolla?|How much can I spend this week?
 Arvio käytettävissä olevasta rahasta|Make room for what matters
 Arvio aiempien menojesi pohjalta.|Estimate based on past spending.
-Arvio aiemmista tiedoista. Tavoite ja demosaldo säilyvät selaimessa.|Based on past data. Your goal and demo balance stay in this browser.
 Arvio aiemmista tiedoista. Demotili tallentuu selaimeen; oikeaa tiliä ei avata.|Based on past data. The demo account stays in this browser; no real account is opened.
 Kysy menoista, säästämisestä tai omasta tavoitteestasi.|Ask about spending, saving or your goal.
 Tietoa keskustelusta|About this chat
@@ -514,7 +513,6 @@ S-Pankki|S-Pankki
 Valmentajasi avasi tämän tilin tavoitettasi varten.|Your coach opened this account for your goal.
 Tilillä nyt|Current account balance
 Simuloi kuukausisäästö|Simulate monthly saving
-Simuloitu tili ja saldo. Demo ei ole yhteydessä S-Pankkiin.|Simulated account and balance. The demo is not connected to S-Pankki.
 Kuukausisäästöä ei voitu lisätä. Tarkista suunnitelma valmentajan kanssa.|The monthly saving could not be added. Review the plan with your coach.
 Valitse kieli|Choose language
 Valitse kuukausi ja vuosi|Choose month and year
@@ -643,7 +641,6 @@ export const ENGLISH_PATTERNS = [
   [/^Miksi menoni olivat (.+?) vuoden suurimmat\?$/, (_, month) => `Why was my spending highest in ${translate(month, 'en')}?`],
   [/^(.+?) yhteensä$/, '$1 total'],
   [/^Lisää tilille (.+?) demorahaa\.$/, 'Add $1 in demo money to the account.'],
-  [/^Suunnitelman pohjana (.+?) taloustiedot\. Tavoite ja demosaldo säilyvät tässä selaimessa\.$/, 'Plan based on financial data from $1. The goal and demo balance are saved in this browser.'],
   [/^Viikkoarvio (.+?) tilanteesta$/, 'Weekly estimate as of $1'],
   [/^Kirjaukset (.+?)\.$/, 'Recorded transactions $1.'],
   [/^Viikkoraja ylittynyt (.+?)\. Kirjaukset (.+?)\.$/, 'Weekly limit exceeded by $1. Recorded transactions $2.'],

@@ -1,11 +1,9 @@
 import { locale, getLanguage } from './language.js';
 import { createPurchaseProjects, projectProgress, projectHint } from './purchase-projects.js';
 import { createCustomerMemory } from './customer-memory.js';
-import { getAnswerLevel } from './answer-depth.js';
 
 const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const euro = value => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(value);
-const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
 
 export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExpanded = () => true }) {
   const store = createPurchaseProjects();
@@ -27,7 +25,6 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
   }
 
   function cardHTML(project, remembered) {
-    const simple = getAnswerLevel() === 'simple';
     const progress = projectProgress(project);
     const needsReview = !remembered.available || project.memory_revision !== remembered.revision;
     const done = progress.remaining_eur === 0;
@@ -54,9 +51,7 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExp
           <p>Valmentajasi avasi tämän tilin tavoitettasi varten.</p>
           <dl class="project-account-balance"><dt>Tilillä nyt</dt><dd>${euro(project.saved_eur)}</dd></dl>
           ${!done && !needsReview && project.monthly_eur > 0 ? `<button type="button" data-project-deposit="${esc(project.id)}">Simuloi kuukausisäästö ${icon('plus')}</button><small>Lisää tilille ${euro(Math.min(project.monthly_eur, progress.remaining_eur))} demorahaa.</small>` : ''}
-          <p class="project-footnote">Simuloitu tili ja saldo. Demo ei ole yhteydessä S-Pankkiin.</p>
         </section>
-        <p class="project-footnote">${simple ? 'Arvio aiemmista tiedoista. Tavoite ja demosaldo säilyvät selaimessa.' : `Suunnitelman pohjana ${esc(dateLabel(project.as_of))} taloustiedot. Tavoite ja demosaldo säilyvät tässä selaimessa.`}</p>
         <div class="project-actions"><button type="button" data-project-chat="${esc(project.id)}">Jatka suunnittelua ${icon('arrow')}</button><button type="button" data-project-remove="${esc(project.id)}">Poista tavoite</button></div>
       </details>
     </article>`;
