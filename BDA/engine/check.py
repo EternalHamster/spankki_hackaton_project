@@ -125,6 +125,8 @@ def check_coach(con, s):
                  ("breakdown", {"by": "category", "start": "2026-01-01", "end": "2026-03-31"}),
                  ("history", {}), ("history", {"line": "income", "months": 24}), ("biggest_payments", {"n": 3}),
                  ("spending", {}), ("spending", {"category": "groceries", "month": month})]
+        goals = [(500, 6), (60, 1), (2000, 12), (20000, 36), (999.99, 60)]
+        calls += [("afford", {"price_eur": p, "months": m}) for p, m in goals]
         for line in coach.LINE_NAMES:
             calls += [("spending", {"line": line, "month": month}), ("what_if", {"line": line, "cut_pct": 20}),
                       ("compare_to_peers", {"line": line}), ("history", {"line": line, "months": 6})]
@@ -150,6 +152,33 @@ def check_coach(con, s):
             bad.append((cid, "safe_to_spend mismatch"))
         if get("safe_to_save")["safe_to_save_month"] > row["safe_to_save_month"]:
             bad.append((cid, "safe_to_save above model"))
+        for p, m in goals:
+            f = get("afford", price_eur=p, months=m)
+            v, cuts = f["verdict"], f["cuts"]
+            found = f["can_set_aside_month"] + f["from_current_saving_month"] + f["cuts_total_month"] \
+                - f.get("budget_short_month", 0)
+            good = (f["can_set_aside_month"] <= row["safe_to_save_month"]
+                    and f["from_current_saving_month"] <= f["already_saving_month"] <= max(row["savings_12m"], 0)
+                    and f["cuts_total_month"] == sum(c["cut_month"] for c in cuts) and len(cuts) <= 3
+                    and all(c["line"] in C.DISCRETIONARY and c["cut_month"] >= 5 and c["after_month"] >= c["cut_month"]
+                            and c["now_month"] - c["cut_month"] == c["after_month"] for c in cuts)
+                    and len({c["line"] for c in cuts}) == len(cuts))
+            if v == "already_affordable":
+                good &= f["spare_money_on_account"] >= p and not cuts
+            elif v in ("yes", "yes_with_changes"):
+                good &= (f["set_aside_month"] * m >= p and f["months_needed"] == m and found >= f["set_aside_month"]
+                         and (v == "yes") == (not cuts))
+            elif v == "takes_longer":
+                good &= (m < f["months_needed"] <= 60 and f["set_aside_month"] * f["months_needed"] >= p
+                         and found == f["set_aside_month"] > 0)
+            else:
+                good &= v == "not_now" and f["set_aside_month"] == 0 and f["months_needed"] is None
+            if not good:
+                bad.append((cid, "afford inconsistent", f))
+        small, big = get("afford", price_eur=500, months=6), get("afford", price_eur=20000, months=36)
+        order = ["already_affordable", "yes", "yes_with_changes", "takes_longer", "not_now"]
+        if small["verdict"] == "not_now" and big["verdict"] != "not_now":
+            bad.append((cid, "afford: bigger goal is easier", order.index(big["verdict"])))
         raw = con.sql(f"""select coalesce(sum(spend), 0) from transactions where customer_id = '{cid}' and line = 'taxi'
                           and strftime(tx_date, '%Y-%m') = '{month}'""").fetchall()[0][0]
         if abs(get("spending", line="taxi", month=month)["total_eur"] - raw) > 0.01:
@@ -174,7 +203,12 @@ def check_coach(con, s):
               coach.call("CUST00042", "what_if", {}), coach.call("CUST00042", "what_if", {"line": "taxi", "cut_pct": 500}),
               coach.call("CUST00042", "spending", {"month": "last tuesday"}), coach.call("CUST00042", "fly_to_moon"),
               coach.call("CUST00042", "spending", {"customer_id": "CUST00001"}),
-              coach.call("CUST00042", "breakdown", {"by": "colour"})]
+              coach.call("CUST00042", "breakdown", {"by": "colour"}),
+              coach.call("CUST00042", "afford", {}), coach.call("CUST00042", "afford", {"price_eur": -5}),
+              coach.call("CUST00042", "afford", {"price_eur": "a TV"}),
+              coach.call("CUST00042", "afford", {"price_eur": float("nan")}),
+              coach.call("CUST00042", "afford", {"price_eur": 500, "months": 0}),
+              coach.call("CUST00042", "afford", {"price_eur": 500, "months": 600})]
     ok("bad requests come back as errors, not crashes", all(isinstance(r, dict) and "error" in r for r in polite),
        [r for r in polite if "error" not in r][:1])
     sig_ok = all(set(t["input_schema"]["properties"]) == set(inspect.signature(coach._FUNCS[t["name"]]).parameters) - {"cid"}

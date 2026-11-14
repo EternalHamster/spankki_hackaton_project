@@ -20,6 +20,7 @@ Direct use:
     coach.overview("CUST00042")
     coach.safe_to_spend("CUST00042")
     coach.what_if("CUST00042", "dining_out", cut_pct=20)
+    coach.afford("CUST00042", price_eur=500, months=6)
     coach.spending("CUST00042", line="taxi", month="2026-08")
 
 Requires BDA/output/coach.duckdb (run `python -m engine` from the BDA folder once).
@@ -249,6 +250,124 @@ def what_if(cid, line, cut_pct=20):
     return out
 
 
+def _up5(x):
+    return int(5 * math.ceil(float(x) / 5 - 1e-9))
+
+
+AFFORD_MAX_CUT = 0.5          # never suggest cutting an extra by more than half
+AFFORD_MAX_MONTHS = 60
+
+
+def afford(cid, price_eur, months=6):
+    """Forecast: can the customer put aside price_eur within `months` months, and if not, what has to change?
+
+    Uses the model's cautious monthly surplus (safe-to-save), made a little smaller when the months ahead
+    are more expensive than an average month (season factors). A missing amount is covered first from
+    what the customer already moves to savings each month, then by cutting extras, starting where they
+    spend most above their peers. Essentials are never cut.
+    """
+    try:
+        price, months = float(price_eur), int(months)
+    except (TypeError, ValueError):
+        raise CoachError("price_eur must be an amount in euros and months a whole number") from None
+    if not 0 < price <= 1_000_000:
+        raise CoachError("price_eur must be between 1 and 1,000,000")
+    if not 1 <= months <= AFFORD_MAX_MONTHS:
+        raise CoachError(f"months must be between 1 and {AFFORD_MAX_MONTHS}")
+    s = _summary(cid)
+    cl = _q("select * from customer_line where customer_id = ?", [cid]).set_index("line")
+
+    # the months ahead compared with an average month (e.g. a window with December costs more)
+    first = pd.Timestamp(s["as_of"]).replace(day=1) + pd.offsets.MonthBegin(1)
+    moy = [(first + pd.DateOffset(months=i)).month for i in range(months)]
+    season = _q("select line, month_of_year, factor from model_season").pivot(
+        index="line", columns="month_of_year", values="factor")
+    season_extra = 0.0
+    for line in cl.index:
+        if line in C.LINES and line in season.index:
+            mean_factor = sum(float(season.loc[line].get(m, 1.0)) for m in moy) / len(moy)
+            season_extra += float(cl.loc[line, "expected_month"]) * (mean_factor - 1)
+    season_extra = max(0.0, season_extra)
+
+    need = _up5(price / months)
+    room = nice_down(max(0.0, float(s["safe_to_save_month"]) - season_extra))
+    saving = nice_down(max(0.0, float(s["savings_12m"])))           # already moved to savings each month
+    # income - spending - saving below zero: that much has to be found before anything can be set aside
+    shortfall = _up5(max(0.0, -float(s["surplus_month"])))
+    spare_now = nice_down(max(0.0, float(s["balance"]) - float(s["surprise_fund"]) - C.SAFE_CUSHION_EUR
+                              - float(s["regular_month"])))
+
+    out = {"price_eur": _money(price), "months": months, "needed_month": need, "can_set_aside_month": room,
+           "months_without_changes": math.ceil(price / room) if room > 0 else None,
+           "already_saving_month": saving, "from_current_saving_month": 0, "surprise_fund_short": nice(s["surprise_fund_gap"])}
+    if season_extra >= 5:
+        out["months_ahead_cost_more_month"] = nice(season_extra)
+    if shortfall > 0:
+        out["budget_short_month"] = shortfall
+
+    cuts = []
+    if spare_now >= price:
+        verdict, set_aside, final_months = "already_affordable", 0, 0
+        out["spare_money_on_account"] = spare_now
+    elif room >= need:
+        verdict, set_aside, final_months = "yes", need, months
+    else:
+        missing = need - room + shortfall
+        out["from_current_saving_month"] = redirect = min(missing, saving)
+        missing -= redirect
+        out["missing_month"] = missing
+        cand = cl.loc[[l for l in C.DISCRETIONARY if l in cl.index]].copy()
+        cand["excess"] = (cand["expected_month"] - cand["peer_median"]).fillna(0.0)
+        cand = cand.sort_values(["excess", "expected_month"], ascending=False, kind="stable")
+        left = missing
+        for line, r in cand.iterrows():
+            if left <= 0 or len(cuts) == 3:
+                break
+            cut = min(left, int(5 * math.floor(AFFORD_MAX_CUT * float(r["expected_month"]) / 5 + 1e-9)))
+            if cut < 5:
+                continue
+            now = max(nice(r["expected_month"]), 2 * cut)
+            item = {"line": line, "label": LABEL[line], "now_month": now, "cut_month": cut, "after_month": now - cut,
+                    "more_than_peers": bool(pd.notna(r["peer_ratio"]) and r["peer_ratio"] >= 1.15)}
+            size, lam = r.get("size_eur"), r.get("lam")
+            if pd.notna(size) and pd.notna(lam) and size > 0:
+                fewer = max(1, round(cut / float(size)))
+                if fewer <= lam:
+                    item["fewer_payments_month"] = int(fewer)
+            cuts.append(item)
+            left -= cut
+        freed = sum(c["cut_month"] for c in cuts)
+        possible = room + redirect + freed - shortfall
+        if missing <= 0:
+            verdict, set_aside, final_months = "yes", need, months
+        elif left <= 0:
+            verdict, set_aside, final_months = "yes_with_changes", need, months
+        elif possible > 0 and math.ceil(price / possible) <= AFFORD_MAX_MONTHS:
+            verdict, set_aside, final_months = "takes_longer", possible, math.ceil(price / possible)
+        else:
+            verdict, set_aside, final_months = "not_now", 0, None
+    out.update(verdict=verdict, set_aside_month=set_aside, months_needed=final_months, cuts=cuts,
+               cuts_total_month=sum(c["cut_month"] for c in cuts))
+    out["summary"] = {
+        "already_affordable": "There is already enough spare money on the account for this, beyond next month's "
+                              "bills and the surprise fund.",
+        "yes": f"Reachable with today's habits: set aside €{set_aside} a month for {months} months."
+               + (f" €{out['from_current_saving_month']} a month of that comes out of what already goes to savings."
+                  if out["from_current_saving_month"] else ""),
+        "yes_with_changes": f"Reachable in {months} months by setting aside €{set_aside} a month, if the listed "
+                            f"extras are cut by €{out['cuts_total_month']} a month in total."
+                            + (f" This also uses €{out['from_current_saving_month']} a month of what already goes "
+                               f"to savings." if out["from_current_saving_month"] else ""),
+        "takes_longer": f"Not reachable in {months} months. With the listed cuts, €{set_aside} a month can be set "
+                        f"aside, which takes {final_months} months.",
+        "not_now": "Not reachable right now: there is no room in the monthly budget even after cutting extras. "
+                   "Getting the monthly budget into balance comes first.",
+    }[verdict]
+    if out["surprise_fund_short"] > 0 and verdict != "not_now":
+        out["note"] = "The surprise fund is not full yet. Filling it first is the safer order."
+    return out
+
+
 def spending(cid, line=None, category=None, month=None, start=None, end=None):
     """Facts from the transactions: total, number of payments, biggest payment in a period."""
     a, b = _period(cid, month, start, end)
@@ -438,6 +557,15 @@ TOOLS = [
           "percentage, and what that does to their monthly balance. Use for 'what if I cut dining out by 20 %?'.",
           {"line": _LINE, "cut_pct": {"type": "number", "description": "Percent to cut, 1-100 (default 20)."}},
           required=["line"]),
+    _tool("afford",
+          "Forecast for a purchase or savings goal: can the customer put aside a given amount within a number of "
+          "months, and if not, what has to change? Returns a verdict (already_affordable, yes, yes_with_changes, "
+          "takes_longer, not_now), the amount to set aside each month, which extras to cut and by how much, and "
+          "how many months it realistically takes. Use for 'I want to buy a €500 TV in 6 months, what should I "
+          "do?' or 'can I save €2,000 for a trip by summer?'.",
+          {"price_eur": {"type": "number", "description": "Price of the purchase or size of the goal, in euros."},
+           "months": {"type": "integer", "description": "Months until the money is needed, 1-60 (default 6)."}},
+          required=["price_eur"]),
     _tool("baskets",
           "The customer's usual month split into the three baskets: fixed bills, surprises and everyday spending, "
           "with the lines inside each. Use to explain where the money goes and what they can control."),
@@ -447,7 +575,7 @@ TOOLS = [
 TOOLS_DOC = {t["name"]: t["description"] for t in TOOLS}       # kept for older callers
 _FUNCS = {"overview": overview, "safe_to_spend": safe_to_spend, "safe_to_save": safe_to_save, "spending": spending,
           "breakdown": breakdown, "history": history, "biggest_payments": biggest_payments,
-          "compare_to_peers": compare_to_peers, "what_if": what_if, "baskets": baskets, "spender_type": spender_type}
+          "compare_to_peers": compare_to_peers, "what_if": what_if, "afford": afford, "baskets": baskets, "spender_type": spender_type}
 
 
 def call(cid, name, arguments=None):
@@ -473,7 +601,7 @@ if __name__ == "__main__":
     cid = sys.argv[1] if len(sys.argv) > 1 else "CUST00042"
     demo = [("overview", {}), ("safe_to_spend", {}), ("safe_to_save", {}),
             ("spending", {"line": "taxi"}), ("what_if", {"line": "dining_out", "cut_pct": 20}),
-            ("compare_to_peers", {"line": "restaurants"}), ("breakdown", {"by": "basket"}),
+            ("afford", {"price_eur": 500, "months": 6}), ("compare_to_peers", {"line": "restaurants"}), ("breakdown", {"by": "basket"}),
             ("history", {"line": "dining_out", "months": 6}), ("biggest_payments", {"n": 3}),
             ("baskets", {}), ("spender_type", {})]
     for name, args in demo:

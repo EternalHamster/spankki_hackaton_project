@@ -212,7 +212,7 @@ peers in the data first and uses national figures only as context.
 ```python
 from engine import coach
 
-coach.TOOLS           # 11 tool definitions: {"name", "description", "input_schema"} (JSON Schema)
+coach.TOOLS           # 12 tool definitions: {"name", "description", "input_schema"} (JSON Schema)
 coach.SYSTEM_PROMPT   # how the coach should talk: one number, one action, no uncertainty, three baskets
 coach.call(customer_id, tool_name, arguments)   # runs a tool, always returns a dict ({"error": ...} on bad input)
 ```
@@ -230,6 +230,7 @@ The customer id comes from the logged-in session, never from the model: it is no
 | `biggest_payments` | "What were my biggest purchases?" |
 | `compare_to_peers` | Me vs people my age in my city vs Finland, frequency and size |
 | `what_if` | "How much could I save if I reduced dining out by 20 %?" Per month, per year, effect on the monthly balance |
+| `afford` | "I want a €500 TV in 6 months, what should I do?" A forecast: verdict, the amount to set aside each month, which extras to cut and by how much, or how many months it really takes |
 | `baskets` | The three baskets with the lines inside each |
 | `spender_type` | "What kind of spender am I?" |
 
