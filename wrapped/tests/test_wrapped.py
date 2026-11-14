@@ -55,6 +55,46 @@ class TestWrapped(unittest.TestCase):
             self.assertNotIn('miinuspäivää ', green['suffix'])  # the big number is always the positive one
             self.assertTrue(green['count'] >= 0)
 
+    def test_previous_year_story_and_changes(self):
+        """Every customer also gets the story of the year before; the latest story lists the drastic changes."""
+        src = self.src
+        self.assertEqual(src['previous_period'], {'from': '2024-10-01', 'to': '2025-09-30'})
+        prev_monthly = defaultdict(float)
+        with open(REPO / 'Features' / 'customer_monthly.csv', encoding='utf-8') as fh:
+            for r in csv.DictReader(fh):
+                if '2024-10' <= r['month'] <= '2025-09':
+                    prev_monthly[r['customer_id']] += float(r['spend_total'])
+        with_card = 0
+        for cid in src['facts']:
+            p, f = src['previous'][cid], src['facts'][cid]
+            self.assertAlmostEqual(p['spend'], prev_monthly[cid], delta=0.05)
+            self.assertTrue(340 <= p['green_days'] + p['negative_days'] <= 365, cid)
+            cards = build_cards(cid, src, year='previous')
+            self.assertTrue(6 <= len(cards) <= 12, cid)
+            self.assertEqual((cards[0]['id'], cards[-1]['id']), ('intro', 'outro'))
+            self.assertEqual(cards[0]['title'], 'Lokakuu 2024 – syyskuu 2025')
+            ids = [c['id'] for c in cards]
+            self.assertNotIn('personality', ids)  # the spender type describes the customer today
+            self.assertNotIn('changes', ids)  # the comparison lives in the latest year's story
+            for c in cards:
+                text = ' '.join(str(c[k]) for k in ('kicker', 'title', 'body') if c[k])
+                self.assertNotRegex(text, r'\bNone\b|\bnan\b|\{|\}|Lopussa on vinkki', f'{cid} {c["id"]}')
+            # Only drastic changes are listed: a spending change under 20 % never appears.
+            changes = next((c for c in build_cards(cid, src) if c['id'] == 'changes'), None)
+            rows = {i['label']: i for i in changes['items']} if changes else {}
+            with_card += bool(changes)
+            big_spend = abs(f['spend'] - p['spend']) >= 300 and abs(f['spend'] / p['spend'] - 1) >= 0.20
+            if changes and len(changes['items']) < 4:
+                self.assertEqual('Menot' in rows, big_spend, cid)
+            if 'Menot' in rows:
+                self.assertTrue(big_spend, cid)
+                self.assertEqual(rows['Menot']['value'][0], '+' if f['spend'] > p['spend'] else '−', cid)
+            self.assertTrue(len(rows) <= 4, cid)
+            for item in rows.values():
+                self.assertRegex(item['value'], r'^[+−]')
+                self.assertIn('→', item['detail'])
+        self.assertTrue(0.2 * len(src['facts']) < with_card, with_card)
+
     def test_finnish_compounds(self):
         self.assertEqual(slot_phrase(4, 'ilta'), 'perjantai-iltaisin')
         self.assertEqual(slot_phrase(5, 'aamu'), 'lauantaiaamuisin')

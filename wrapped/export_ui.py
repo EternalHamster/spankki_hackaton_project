@@ -24,7 +24,9 @@ def main(argv=None):
     extra = (argv if argv is not None else sys.argv[1:])
     src = load_sources()
     ids = list(dict.fromkeys(default_ids() + extra))
-    data = {'period': src['period'], 'recaps': {cid: build_recap(cid, src)['cards'] for cid in ids}}
+    data = {'period': src['period'], 'recaps': {cid: build_recap(cid, src)['cards'] for cid in ids},
+            'previous': {'period': src['previous_period'],
+                         'recaps': {cid: build_recap(cid, src, 'previous')['cards'] for cid in ids}}}
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'{len(ids)} recaps -> {OUT} ({OUT.stat().st_size / 1000:.0f} kB)')
 

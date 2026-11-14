@@ -3,6 +3,9 @@
     from wrapped.cards import load_sources, build_cards
     src = load_sources()
     cards = build_cards('CUST04971', src)      # list of card dicts, ready for ui-demos/public/wrapped.js
+    older = build_cards('CUST04971', src, year='previous')   # the story of the year before
+
+The latest year's story carries a "what changed" card with the drastic differences between the two years.
 
 Every number comes from wrapped/output/facts.json (raw transactions) or BDA/output (spending model).
 Tone rules: never shame. Problems are shown as progress ("you got back to green 15 times"), every recap
@@ -90,6 +93,7 @@ def load_sources():
             return {r['customer_id']: r for r in csv.DictReader(fh)}
     facts = json.loads(FACTS.read_text(encoding='utf-8'))
     return {'period': facts['period'], 'facts': facts['customers'],
+            'previous_period': facts['previous']['period'], 'previous': facts['previous']['customers'],
             'summary': read('customer_summary.csv'), 'spender': read('spender_type.csv')}
 
 
@@ -100,14 +104,74 @@ def card(id_, layout, kicker, title='', body='', count=None, suffix='', ask=None
             '_priority': priority}
 
 
-def build_cards(customer_id, src):
-    f = src['facts'][customer_id]
+def period_title(period):
+    """{'from': '2025-10-01', 'to': '2026-09-30'} -> 'Lokakuu 2025 – syyskuu 2026'."""
+    start, end = period['from'], period['to']
+    return f'{month_name(start).capitalize()} {start[:4]} – {month_name(end)} {end[:4]}'
+
+
+def signed(x, unit=''):
+    """+1 234 € / −12 % (a real minus sign, so it lines up with the plus)."""
+    x = round(x)
+    return ('+' if x >= 0 else '−') + num(abs(x)) + (NBSP + unit if unit else '')
+
+
+# A change makes the "what changed" card only when it is big both relatively and in euros:
+# totals by 20 % and 300 €, a purchase category by 50 % and 500 €, days in the green up by 10 points.
+BIG_PCT, BIG_EUR, BIG_CATEGORY_PCT, BIG_CATEGORY_EUR, BIG_GREEN_POINTS, MAX_CHANGES = 0.20, 300, 0.50, 500, 10, 4
+
+
+def changes_card(prev, cur):
+    """The drastic changes from the previous recap year to the latest one, biggest first. Facts only, no
+    judgement. Small shifts (a few per cent) are left out; returns None when nothing changed much."""
+    found = []  # (size in euros for sorting, item)
+
+    def money(label, a, b, min_eur=BIG_EUR, min_pct=BIG_PCT):
+        diff = b - a
+        if abs(diff) < min_eur or (a >= 1 and abs(diff) / a < min_pct):
+            return
+        pct = f'{signed(100 * (b / a - 1), "%")} · ' if a >= 1 else ''
+        found.append((abs(diff), {'label': label, 'value': signed(diff, '€'), 'detail': f'{pct}{eur(a)} → {eur(b)}'}))
+
+    money('Tulot', prev['income'], cur['income'])
+    money('Menot', prev['spend'], cur['spend'])
+    money('Säästöön', max(prev['saved'], 0), max(cur['saved'], 0))
+    for c in sorted({*prev['categories'], *cur['categories']}):
+        a, b = (y['categories'].get(c, {'eur': 0})['eur'] for y in (prev, cur))
+        money(CATEGORY_FI.get(c, c), a, b, BIG_CATEGORY_EUR, BIG_CATEGORY_PCT)
+    found.sort(key=lambda x: -x[0])
+    items = [item for _, item in found]
+
+    n0, n1 = prev['n_purchases'], cur['n_purchases']
+    if n0 and abs(n1 - n0) / n0 >= BIG_PCT and abs(n1 - n0) >= 30:
+        items.append({'label': 'Korttiostoksia', 'value': signed(100 * (n1 / n0 - 1), '%'),
+                      'detail': f'{num(n0)} → {num(n1)} kpl'})
+    share = [round(100 * y['green_days'] / max(1, y['green_days'] + y['negative_days'])) for y in (prev, cur)]
+    if share[1] - share[0] >= BIG_GREEN_POINTS:  # only as progress: a drop is never listed (tone rules)
+        items.append({'label': 'Päivät plussalla', 'value': signed(share[1] - share[0], '%-yks.'),
+                      'detail': f'{share[0]}{NBSP}% → {share[1]}{NBSP}% päivistä'})
+    if not items:
+        return None
+    body = ('Vuoden suurin muutos edellisvuoteen verrattuna.' if len(items) == 1
+            else 'Vuoden suurimmat muutokset edellisvuoteen verrattuna.')
+    return card('changes', 'changes', 'Mikä muuttui', 'Edellisvuodesta tähän vuoteen', body,
+                items=items[:MAX_CHANGES], ask='Mikä taloudessani muuttui edellisvuodesta?', priority=86)
+
+
+def build_cards(customer_id, src, year='current'):
+    """year='current': the latest recap year. year='previous': the story of the year before it."""
+    previous = year == 'previous'
+    prev_f = src.get('previous', {}).get(customer_id)
+    f = prev_f if previous else src['facts'][customer_id]
+    if f is None:
+        return []
     s = src['summary'][customer_id]
     sp = src['spender'].get(customer_id, {})
     cards = []
 
     # 1. Intro
-    cards.append(card('intro', 'intro', 'Rahavuotesi', 'Lokakuu 2025 – syyskuu 2026',
+    cards.append(card('intro', 'intro', 'Edellinen rahavuotesi' if previous else 'Rahavuotesi',
+                      period_title(src['previous_period'] if previous else src['period']),
                       'Yksi vuosi, yksi tarina. Katsotaan, millainen rahavuotesi oli.',
                       count=f['n_purchases'], suffix=' korttiostosta', priority=100))
 
@@ -123,6 +187,8 @@ def build_cards(customer_id, src):
                      'Lopussa on vinkki, jolla tasapaino löytyy.')
     else:
         year_body = 'Tulot ja menot menivät lähes tasan.'
+    if previous:  # the forward-looking tip belongs to the latest year only
+        year_body = year_body.replace(' Lopussa on vinkki, jolla tasapaino löytyy.', '')
     items = [{'label': 'Tulot', 'value': eur(f['income'])}, {'label': 'Menot', 'value': eur(f['spend'])}]
     if f['saved'] > 0:
         items.append({'label': 'Säästöön', 'value': eur(f['saved'])})
@@ -133,11 +199,12 @@ def build_cards(customer_id, src):
     cats = f['categories']
     total = sum(c['eur'] for c in cats.values()) or 1
     top5 = list(cats.items())[:5]
-    cards.append(card('top5', 'list', 'Top 5', 'Mihin korttiostokset menivät',
-                      f"Ykkösenä {CATEGORY_FI[top5[0][0]].lower()}. Korttiostoksia kertyi yhteensä {eur(total)}.",
-                      items=[{'label': CATEGORY_FI[c], 'value': eur(v['eur']), 'share': round(v['eur'] / total, 3)}
-                             for c, v in top5],
-                      ask='Mihin rahani menivät viimeisen vuoden aikana?', priority=90))
+    if top5:
+        cards.append(card('top5', 'list', 'Top 5', 'Mihin korttiostokset menivät',
+                          f"Ykkösenä {CATEGORY_FI[top5[0][0]].lower()}. Korttiostoksia kertyi yhteensä {eur(total)}.",
+                          items=[{'label': CATEGORY_FI[c], 'value': eur(v['eur']), 'share': round(v['eur'] / total, 3)}
+                                 for c, v in top5],
+                          ask='Mihin rahani menivät viimeisen vuoden aikana?', priority=90))
 
     # 4. Favourite (non-essential) category
     fav = next(((c, v) for c, v in cats.items() if c not in ESSENTIAL_CATEGORIES and v['n'] >= 5), None)
@@ -220,20 +287,21 @@ def build_cards(customer_id, src):
         cards.append(card('saving', 'hero', 'Säästäjä', 'siirretty säästöön', every,
                           count=f['saved'], suffix=' €', priority=82))
 
-    # 12. Compared with the year before (same 11 months)
-    if f['cmp_prev_spend'] > 0:
-        change = f['cmp_cur_spend'] / f['cmp_prev_spend'] - 1
-        diff = abs(f['cmp_cur_spend'] - f['cmp_prev_spend'])
-        if change <= -0.03:
-            cards.append(card('vs_last_year', 'hero', 'Edellisvuoteen verrattuna', 'vähemmän menoja',
-                              f'Marras–syyskuussa käytit {eur(diff)} vähemmän kuin vuotta aiemmin.',
-                              count=round(-100 * change), suffix=' %', priority=65))
-        elif change >= 0.03:
-            cards.append(card('vs_last_year', 'hero', 'Edellisvuoteen verrattuna', 'enemmän menoja',
-                              f'Marras–syyskuussa menot kasvoivat {eur(diff)} vuotta aiemmasta. Kasvu ei ole aina '
-                              'huono asia – tärkeintä on, että se on tietoista.',
-                              count=round(100 * change), suffix=' %',
-                              ask='Miksi menoni kasvoivat edellisvuodesta?', priority=55))
+    # 12. What changed drastically since the previous year
+    # Only in the latest year's story, and only when something changed drastically.
+    changes = None if previous or not prev_f else changes_card(prev_f, f)
+    if changes:
+        cards.append(changes)
+
+    if previous:
+        # The spender type and the savings tip describe the customer today, so the older story skips them
+        # and hands over to the latest year instead.
+        outro = card('outro', 'outro', 'Tarina jatkuu', 'Entä sen jälkeen?',
+                     f"Tuorein rahavuotesi ({period_title(src['period']).lower()}) kertoo, miten vuosi jatkui.",
+                     ask='Mikä taloudessani muuttui edellisvuodesta?')
+        for c in cards:  # the coach's ready-made questions are about the latest year
+            c['ask'] = None
+        return finish(cards, outro)
 
     # 13. Spending personality (BDA spender type)
     label = sp.get('label', 'Balanced spender')
@@ -272,10 +340,13 @@ def build_cards(customer_id, src):
         outro = card('outro', 'outro', 'Ensi vuoden tavoite', 'Jatka samaan malliin',
                      'Taloutesi on hyvässä tasapainossa: tulot riittävät menoihin ja puskuri on kunnossa.',
                      ask='Miten voisin kehittää talouttani?')
+    return finish(cards, outro)
+
+
+def finish(cards, outro):
+    """Add the closing card, keep the strongest cards (intro and outro always) in story order, add themes."""
     outro['_priority'] = 100
     cards.append(outro)
-
-    # Keep the strongest cards (intro and outro always), in story order.
     while len(cards) > MAX_CARDS:
         cards.remove(min(cards[1:-1], key=lambda c: c['_priority']))
     for i, c in enumerate(cards):
@@ -284,5 +355,6 @@ def build_cards(customer_id, src):
     return cards
 
 
-def build_recap(customer_id, src):
-    return {'customer_id': customer_id, 'period': src['period'], 'cards': build_cards(customer_id, src)}
+def build_recap(customer_id, src, year='current'):
+    period = src['previous_period'] if year == 'previous' else src['period']
+    return {'customer_id': customer_id, 'period': period, 'cards': build_cards(customer_id, src, year)}

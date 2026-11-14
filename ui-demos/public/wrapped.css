@@ -53,6 +53,13 @@
 .wr-label{display:flex;flex-direction:column;gap:6px}
 .wr-bar{display:block;height:8px;width:0;border-radius:8px;background:var(--fg);opacity:.85}
 .wr-list b{font-size:16px;white-space:nowrap}
+.wr-deltas{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.wr-deltas li{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-bottom:7px;border-bottom:2px solid color-mix(in srgb,var(--fg) 22%,transparent)}
+.wr-deltas .wr-label{font-size:17px;font-weight:800}
+.wr-deltas small{display:block;margin-top:2px;font-size:13px;font-weight:600;opacity:.82}
+.wr-deltas b{font:900 clamp(18px,5.4vw,24px)/1 "Arial Black",Arial,sans-serif;letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums}
+.wr-slide.is-active .wr-deltas li{animation-delay:calc(.32s + var(--d) * .09s)}
+.wr-deltas~.wr-body{font-size:16px}
 .wr-split{margin:8px 0 0;display:flex;flex-direction:column;gap:14px}
 .wr-split div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:10px;border-bottom:2px solid color-mix(in srgb,var(--fg) 22%,transparent)}
 .wr-split dt{font-size:18px;font-weight:700;opacity:.9}

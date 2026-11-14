@@ -40,7 +40,9 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
       .catch(error => { wrappedData = undefined; throw error; });
     const data = await wrappedData, selected = data.recaps[id];
     if (!selected?.length) throw new Error('Configured demo recap not found');
-    return { period: data.period, recaps: { [id]: selected } };
+    const older = data.previous?.recaps?.[id];
+    return { period: data.period, recaps: { [id]: selected },
+      ...(older?.length ? { previous: { period: data.previous.period, recaps: { [id]: older } } } : {}) };
   }
   async function ready() {
     await dataSource.ready();
