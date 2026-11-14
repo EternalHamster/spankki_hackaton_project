@@ -43,10 +43,10 @@ LINES = {
     "home_tech":        (3, False, "home & tech"),
     "big_purchase":     (3, False, "big one-off purchases"),
 }
-# Lines modelled with the hurdle-lognormal "everyday" model (monthly).
+# Lines modelled with the compound frequency x size model (see model.py).
 EVERYDAY_LINES = [k for k, v in LINES.items() if v[0] == 3 and k != "big_purchase"]
-REGULAR_LINES = ["housing", "utilities"]
-# Lines modelled as rare events (Gamma-Poisson count x lognormal size).
+REGULAR_LINES = ["housing", "utilities"]        # modelled as monthly totals
+# Rare, heavy-tailed lines (same compound model; single payments simulated as lognormal).
 EVENT_LINES = ["shock", "big_purchase"]
 DISCRETIONARY = [k for k, v in LINES.items() if v[0] == 3 and not v[1]]
 ESSENTIAL_EVERYDAY = [k for k in EVERYDAY_LINES if LINES[k][1]]
@@ -69,6 +69,18 @@ OVERSPEND_MIN_EUR = 50       # warn when spending exceeds income by more than th
 SAFE_QUANTILE = 0.10         # safe-to-spend is the 10th percentile of simulated outcomes
 SAFE_CUSHION_EUR = 100       # always keep this much on the account
 N_SIM = 2000                 # Monte Carlo draws for safe-to-spend
+SAVE_T_QUANTILE = 0.876      # safe-to-save = 20th percentile of the long-run monthly surplus (t, 11 d.f.)
+MONTH_HIGH_MIN_RATIO = 1.5   # "biggest month" insight: last month >= 1.5x the customer's usual month
+MONTH_HIGH_MIN_EUR = 50      # ... and at least €50 above it
+UNUSUAL_RECENT_DAYS = 45     # only mention unusually large payments from the last 45 days
+UNUSUAL_MAX_HABIT = 3        # ... and only if the customer rarely makes such payments
+
+# Model internals
+DISP_PRIOR_DF = 10.0         # weight (in months) of the line-level burstiness curve vs the customer's own
+DISP_MIN, DISP_MAX = 0.5, 50.0   # allowed range of burstiness (variance / mean of monthly payment counts)
+TREND_PERMUTATIONS = 100     # random month relabelings for the trend null distribution
+LATE_PAYDAY_GAP_DAYS = 5     # salary this many days after the usual day counts as "late"
+MONTH_END_PAYDAY = 26        # usual salary day >= this = "paid at month end" (exact day varies)
 
 # Prior strength of Statistics Finland on peer-group log-means (sd on the log scale; 0.5 ~ ±65 %)
 STATFIN_PRIOR_SD = 0.5
