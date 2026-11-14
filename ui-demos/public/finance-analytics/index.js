@@ -118,7 +118,10 @@ export function createFinanceAnalytics(host, options) {
       <details class="fa-method"><summary>Mihin vertailu perustuu?</summary><p>Vertailu on omiin menoihisi edellisessä kuussa. Osuudet kuvaavat käytettyjä euroja, eivät ostosten määrää. Arkipäiviä on ${current.days[0]} ja viikonlopun päiviä ${current.days[1]}; päiväkohtainen keskiarvo huomioi tämän. Myös laskut sisältyvät maksupäivänsä mukaan. Siirrot ja sijoitukset eivät sisälly menoihin.</p></details>
     </div></section>`;
   }
-  function render() { main.innerHTML=breakdownCard()+annualCard()+historyLauncher()+rhythmCard(); }
+  function render() {
+    const sections = { breakdown: breakdownCard, annual: annualCard, history: historyLauncher, rhythm: rhythmCard };
+    main.innerHTML = (config.sections || Object.keys(sections)).map(name => sections[name]?.() || '').join('');
+  }
   function currentSeries() { return historySeries(dataset,state.anchor,state.view); }
   function selectAnchor(series) {
     let index=series.bins.findIndex(b=>state.anchor>=b.from&&state.anchor<=b.to);

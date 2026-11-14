@@ -37,12 +37,26 @@ export function renderSlide(card, index, total) {
 export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
   let data = null, cards = [], index = 0, paused = false, elapsed = 0, last = 0, frame = 0;
   let dialog = null, opener = null, press = null;
+  let loadVersion = 0;
 
-  async function load() {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Rahavuotta ei voitu ladata.');
-    data = await response.json();
+  async function load({ headers, signal, customerId, selectionId } = {}) {
+    const version = ++loadVersion;
+    const response = await fetch(url, { headers, signal });
+    if (!response.ok) throw Object.assign(new Error('Rahavuotta ei voitu ladata.'), { status: response.status });
+    const result = await response.json();
+    if (version !== loadVersion || signal?.aborted) return null;
+    if ((customerId && Object.keys(result.recaps || {}).some(id => id !== customerId)) ||
+        (selectionId && result.selection_id && result.selection_id !== selectionId)) {
+      throw Object.assign(new Error('Demoasiakas vaihtui.'), { status: 409 });
+    }
+    data = result;
     return data;
+  }
+  function reset() {
+    loadVersion++;
+    close(); cancelAnimationFrame(frame);
+    data = null; cards = []; press = null; opener = null;
+    if (dialog) dialog.innerHTML = '';
   }
   const has = customerId => Boolean(data?.recaps?.[customerId]?.length);
 
@@ -182,5 +196,5 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
     frame = requestAnimationFrame(tick);
   }
 
-  return { load, has, teaser, open, close };
+  return { load, has, teaser, open, close, reset };
 }

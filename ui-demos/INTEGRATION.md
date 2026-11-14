@@ -37,6 +37,8 @@ Copy `public/finance-analytics/` into the future frontend. The runtime is two ES
 
 Without `onSelectCategory`, the module opens its own transaction dialog. Month selection works within the module and optionally notifies the host. Each instance has independent state, dialog IDs and event listeners. `destroy()` removes the instance and its listeners; repeated calls are safe. The host should provide an otherwise-empty mounting element.
 
+Use `sections: ['breakdown', 'annual', 'history']` or any subset of `breakdown`, `annual`, `history`, and `rhythm` to show charts relevant to an opened question. Omit `sections` to keep all four sections. The host can mount the widget only when a question is expanded and destroy it on collapse.
+
 The current app integration is in `public/app.js`. `public/adapters/project-finance.js` is the **only project-specific data mapping**; replace it when connecting the real API. Keep authentication and fetching in the host app or backend.
 
 ## Data contract

@@ -4,6 +4,7 @@ import { metrics, basketTotals, scenarioSavings, transactionKind } from './model
 import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
+import { explorationTopics, createExplorationSummaries } from './exploration.js';
 
 // Appearance follows the user's references; all money data is synthetic.
 const paths={
@@ -38,50 +39,191 @@ const categoryIcon=c=>({Housing:'home',Utilities:'bolt',Groceries:'bag',Transpor
 const root=document.querySelector('#root'),detail=document.querySelector('#detail');
 let data,profile,m,selectedMonth='2026-09',lastFocus,analytics;
 const months=[];
-let insightsPromise = null, activeInsights = null;
+let insightsPromise = null, activeInsights = null, insightController = null;
+let customerSession = null, customerController = null, customerEpoch = 0, synchronizingSession = false;
+const explorationSummaries = createExplorationSummaries();
+let activeTopic = null, activeTopicResult = null;
 const basketInfo=[['Säännölliset tarpeet','Asuminen, ruoka, laskut ja liikkuminen','home'],['Yllättävät tarpeet','Terveys sekä koti ja tekniikka','shield'],['Arjen valinnat','Ravintolat, ostokset ja vapaa-aika','coffee']];
 
-async function init(){try{const res=await fetch('demo-data.json');if(!res.ok)throw new Error('Aineisto ei latautunut.');data=await res.json();await wrapped.load().catch(()=>{});profile=data.profiles[0];selectedMonth=data.summary.to.slice(0,7);for(let month=selectedMonth;month>=data.summary.from.slice(0,7);month=moveMonth(month,-1))months.push(month);render();openFromLink();}catch(error){root.innerHTML=`<div class="load-error"><h1>Demo ei latautunut</h1><p>${esc(error.message)}</p><button data-action="reload">Yritä uudelleen</button></div>`;}}
-function section(title,action='',label='Näytä kaikki'){return `<div class="section-title"><h2>${title}</h2>${action?`<button class="text-button" data-action="${action}">${label}</button>`:''}</div>`;}
+class StaleSelectionError extends Error {}
+const selectionHeaders = selected => ({ 'X-Demo-Selection': selected.selection_id });
+const customerLabel = () => customerSession?.customers.find(customer => customer.id === customerSession.customer_id)?.label || 'Demoasiakas';
+
+async function loadCustomer(customerId) {
+  const epoch = ++customerEpoch;
+  customerController?.abort(); insightController?.abort();
+  explorationSummaries.reset(); activeTopic = null; activeTopicResult = null;
+  customerController = new AbortController();
+  const signal = customerController.signal;
+  customerSession = null;
+  showChat.reset(); wrapped.reset(); analytics?.destroy();
+  if (detail.open) detail.close();
+  detail.innerHTML = '';
+  data = null; profile = null; m = null; analytics = null; activeInsights = null; insightsPromise = null;
+  root.innerHTML = '<div class="loading" role="status"><h1>Avataan omaa taloutta…</h1><p>Haetaan valitun demoasiakkaan tietoja.</p></div>';
+  try {
+    const response = await fetch('/api/session', { method: customerId ? 'POST' : 'GET', signal,
+      ...(customerId ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customer_id: customerId }) } : {}) });
+    if (!response.ok) throw new Error('Demoasiakasta ei voitu avata. Yritä uudelleen.');
+    const selected = await response.json();
+    if (epoch !== customerEpoch) return;
+    if (typeof selected.customer_id !== 'string' || !selected.customer_id || typeof selected.selection_id !== 'string' ||
+        !selected.selection_id || !Array.isArray(selected.customers) ||
+        !selected.customers.some(customer => customer.id === selected.customer_id)) throw new Error('Demoasiakkaan tiedot eivät kelpaa.');
+    customerSession = selected;
+    const headers = selectionHeaders(selected);
+    // Financial charts and the model's insight generation load independently.
+    insightController = new AbortController();
+    insightsPromise = pollInsights(selected, AbortSignal.any([signal, insightController.signal]));
+    // The chart may still be loading when generation fails; its card view will show the error.
+    void insightsPromise.catch(() => {});
+    const recap = wrapped.load({ headers, signal, customerId: selected.customer_id, selectionId: selected.selection_id }).then(result => {
+      if (epoch !== customerEpoch || !result) return;
+      if (result.selection_id && result.selection_id !== selected.selection_id) throw new StaleSelectionError();
+      if (Object.keys(result.recaps || {}).some(id => id !== selected.customer_id)) throw new Error('Virheellinen rahavuosi.');
+      if (profile) { document.querySelector('#recap-link').innerHTML = recapLink(); openFromLink(); }
+    }).catch(error => { if (epoch === customerEpoch && ([401, 409].includes(error.status) || error instanceof StaleSelectionError)) void loadCustomer(); });
+    const finance = await fetch('/demo-data.json', { headers, signal });
+    if ([401, 409].includes(finance.status)) throw new StaleSelectionError();
+    if (!finance.ok) throw new Error('Aineisto ei latautunut.');
+    const loaded = await finance.json();
+    if (epoch !== customerEpoch) return;
+    if (loaded.selection_id !== selected.selection_id || loaded.profiles?.length !== 1 ||
+        loaded.profiles[0].customer_id !== selected.customer_id) throw new StaleSelectionError();
+    data = loaded; profile = loaded.profiles[0];
+    selectedMonth = data.summary.to.slice(0, 7);
+    months.length = 0;
+    for (let month = selectedMonth; month >= data.summary.from.slice(0, 7); month = moveMonth(month, -1)) months.push(month);
+    render(); openFromLink();
+    void recap;
+  } catch (error) {
+    if (epoch !== customerEpoch || signal.aborted) return;
+    if (error instanceof StaleSelectionError) { void loadCustomer(); return; }
+    customerController.abort(); insightController?.abort(); insightsPromise = null;
+    customerSession = null;
+    root.innerHTML = `<div class="load-error"><h1>Demo ei latautunut</h1><p>${esc(error.message)}</p><button data-action="reload">Yritä uudelleen</button></div>`;
+  }
+}
+
+async function synchronizeSession() {
+  if (!profile || !customerSession || synchronizingSession || document.hidden) return;
+  synchronizingSession = true;
+  const epoch = customerEpoch;
+  try {
+    const response = await fetch('/api/session', { signal: AbortSignal.timeout(10000) });
+    if (!response.ok) return;
+    const selected = await response.json();
+    if (epoch === customerEpoch && selected.selection_id !== customerSession?.selection_id) void loadCustomer();
+  } catch { /* The next data/chat request also checks the selection. */ }
+  finally { synchronizingSession = false; }
+}
 function render(){
-  analytics?.destroy();m=metrics(profile,selectedMonth);const baskets=basketTotals(m.categories);
+  analytics?.destroy(); analytics = null; m=metrics(profile,selectedMonth);
   root.innerHTML=`<div class="app-shell"><header class="topbar"><span class="demo-pill">DEMO</span><h1>Oma talous</h1><button class="icon-button" data-action="about" aria-label="Tietoa demoaineistosta">${icon('info')}</button></header>
-    <main id="main-content" class="mint-content"><div class="period-row"><span>${icon('calendar')}<label class="sr-only" for="month">Tarkasteltava kuukausi</label><select id="month">${months.map(d=>`<option value="${d}" ${d===selectedMonth?'selected':''}>${capitalize(monthName(d))}</option>`).join('')}</select></span><span class="sample-button" aria-label="Synteettinen demoasiakas">${icon('person')}<span>Demoasiakas</span></span></div>
-    ${section('Tärkeimmät havainnot')}<section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
-    ${section('Kuukauden yhteenveto')}<section class="white-card month-card"><div class="month-head"><span class="month-symbol">${icon('chart')}</span><div><h3>Tuloista jäljellä</h3><p>Arjen menojen jälkeen</p></div><button class="icon-button" data-action="cashflow" aria-label="Miten summa lasketaan?">${icon('info')}</button></div><strong class="month-amount ${m.margin<0?'negative':''}">${euro(m.margin)}</strong><div class="income-expenses"><button data-action="income"><span>Tulot</span><strong>${euro(m.income)}</strong></button><button data-action="spending"><span>Menot</span><strong>${euro(m.spending)}</strong></button></div><button class="card-footer" data-action="cashflow">Katso yhteenveto ${icon('chevron')}</button></section>
-    ${wrapped.has(profile.customer_id)?wrapped.teaser():''}
-    <button class="account-row white-card" data-action="account"><span class="account-icon">${icon('account')}</span><span><strong>Tilin saldo</strong><small>Viimeisin aineiston saldo</small></span><b>${euro(m.balance)}</b>${icon('chevron')}</button>
-    <div id="financial-analytics"></div>
-    ${section('Kolme menokoria','baskets','Mitä nämä ovat?')}<section class="white-card basket-card">${basketInfo.map(([name,copy,glyph],i)=>`<button class="basket-row" data-basket="${i}"><span class="basket-icon">${icon(glyph)}</span><span><strong>${name}</strong><small>${Math.round(baskets[i]/Math.max(1,m.spending)*100)} % menoista</small></span><b>${euro(baskets[i])}</b>${icon('chevron')}</button>`).join('')}</section>
-    ${section('Pienestä muutoksesta alku')}<section class="white-card saving-card"><div class="saving-intro">${icon('coffee')}<h3>Entä jos käyttäisit ravintoloihin 20 % vähemmän?</h3></div><p>Valitun kuukauden perusteella säästöä voisi kertyä</p><strong>${euro(scenarioSavings(m.categories,{Restaurants:20}))}<span> / kk</span></strong><button class="green-link" data-action="savings">Kokeile omaa muutostasi ${icon('chevron')}</button></section>
-    ${section('Viimeisimmät tapahtumat','account')}<section class="white-card transactions-card">${transactionsHTML([...m.transactions].reverse().slice(0,4))}</section>
+    <main id="main-content" class="mint-content"><label class="customer-picker" for="customer-selector"><span>${icon('person')}Valittu demoasiakas</span><select id="customer-selector">${customerSession.customers.map(customer=>`<option value="${esc(customer.id)}" ${customer.id===customerSession.customer_id?'selected':''}>${esc(customer.label)}</option>`).join('')}</select></label><div class="period-row"><span>${icon('calendar')}<label class="sr-only" for="month">Tarkasteltava kuukausi</label><select id="month">${months.map(d=>`<option value="${d}" ${d===selectedMonth?'selected':''}>${capitalize(monthName(d))}</option>`).join('')}</select></span><span class="sample-button">Synteettinen aineisto</span></div>
+    <section class="trainer-intro" aria-labelledby="trainer-heading"><span class="trainer-label">${icon('chat')} Oma talousvalmentajasi</span><h2 id="trainer-heading">Mitä haluaisit tietää<br>taloudestasi?</h2><p>Aloita omasta kysymyksestäsi tai tutki yhtä aihetta kerrallaan.</p><form id="explore-form" class="explore-composer"><label class="sr-only" for="explore-question">Kysy omasta taloudestasi</label><input id="explore-question" type="text" placeholder="Kysy omasta taloudestasi…" maxlength="2000" required><button type="submit" aria-label="Lähetä kysymys valmentajalle">${icon('arrow')}</button></form><span class="trainer-note">AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin</span></section>
+    <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3><div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
+    <div class="section-title insights-title"><h2>Tärkeimmät havainnot</h2><span class="ai-label">AI:n tuottama</span></div><section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät AI-havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
+    <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small>${capitalize(monthName(selectedMonth))}</small></span>${icon('chevron')}</button><div id="recap-link">${recapLink()}</div></div>
     <p class="demo-note">Synteettinen demoaineisto · ${capitalize(monthName(selectedMonth))}<br>Ei yhteyttä oikeaan pankkitiliin.</p></main>
-    <button class="chat-fab" data-action="chat" aria-label="Avaa talousvalmentaja" title="Kysy taloudestasi">${icon('chat')}<span>Kysy</span></button>
     <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-context="Minä">${icon('person')}<span>Minä</span></button></nav></div>`;
   void loadInsights();
-  analytics=createFinanceAnalytics(document.querySelector('#financial-analytics'),{data:projectFinanceData(profile,data.summary,names),selectedMonth,onSelectCategory:category=>showTransactions(category),onSelectMonth:month=>{selectedMonth=month;render();window.scrollTo({top:0,behavior:'smooth'});}});
+  if (activeTopic) openTopic(activeTopic, false);
+}
+function recapLink() {
+  return wrapped.has(profile.customer_id) ? `<button class="utility-row" data-action="wrapped">${icon('calendar')}<span><strong>Rahavuotesi</strong><small>Katso vuotesi tarinana</small></span>${icon('chevron')}</button>` : '';
+}
+function cashflowChart() {
+  const maximum = Math.max(1, m.income, m.spending);
+  return `<div class="cashflow-chart"><h4>Kuukauden tulot ja menot</h4><p class="topic-caption">${capitalize(monthName(selectedMonth))} · toteutuneet luvut</p>${[['Tulot', m.income, 'income'], ['Menot', m.spending, 'spending']].map(([label, value, action])=>`<button class="cashflow-bar" data-action="${action}"><span>${label}<strong>${euro(value)}</strong></span><span class="cashflow-track" aria-hidden="true"><i style="width:${value / maximum * 100}%"></i></span></button>`).join('')}<button class="text-button" data-action="cashflow">Avaa kuukauden yhteenveto ${icon('chevron')}</button></div>`;
+}
+function openTopic(topicId, toggle = true) {
+  const topic = explorationTopics.find(item=>item.id === topicId);
+  if (!topic) return;
+  const close = toggle && activeTopic === topicId;
+  analytics?.destroy(); analytics = null; activeTopicResult = null;
+  document.querySelectorAll('.topic-panel').forEach(panel=>{ panel.hidden = true; panel.innerHTML = ''; });
+  document.querySelectorAll('[data-topic]').forEach(button=>button.setAttribute('aria-expanded', 'false'));
+  activeTopic = close ? null : topicId;
+  if (close) return;
+  const panel = document.querySelector(`#panel-${topicId}`);
+  document.querySelector(`#topic-${topicId}`).setAttribute('aria-expanded', 'true');
+  panel.hidden = false;
+  panel.innerHTML = `<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>${topicId === 'week' ? `<p class="topic-caption">Käyttövara-arvion tilannepäivä: ${esc(customerSession.as_of)}. Alla valitun kuukauden taustaluvut; ne eivät ole tämän viikon käyttövara.</p>${cashflowChart()}<button class="utility-row" data-action="account">${icon('account')}<span><strong>Historiallinen tilin saldo</strong><small>${esc(m.asOf)}</small></span><b>${euro(m.balance)}</b></button>` : `<div id="financial-analytics"></div>${topicId === 'spending' ? `<button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button>` : `<div class="saving-experiment"><h4>Kokeile omaa muutostasi</h4><p>Katso, miten pienempi ravintolabudjetti olisi vaikuttanut valittuun kuukauteen.</p><label class="savings-label" for="saving-cut">Vähennys <b id="saving-percent">20 %</b></label><input id="saving-cut" type="range" min="0" max="50" step="5" value="20"><div class="saving-inline-result"><span>Laskennallinen säästö / kk</span><strong id="saving-result" aria-live="polite">${euro(scenarioSavings(m.categories,{Restaurants:20}))}</strong></div><p class="topic-caption">Perustuu kuukauden ${selectedMonth} ravintolamenoihin (${euro(m.categories.Restaurants)}). Esimerkki, ei ennuste.</p></div>`}`}`;
+  if (topicId !== 'week') analytics = createFinanceAnalytics(panel.querySelector('#financial-analytics'), {
+    data: projectFinanceData(profile, data.summary, names), selectedMonth,
+    sections: topicId === 'spending' ? ['breakdown', 'annual', 'history'] : ['rhythm'],
+    onSelectCategory: category=>showTransactions(category),
+    onSelectMonth: month=>{ selectedMonth = month; render(); document.querySelector(`#topic-${activeTopic}`)?.focus({preventScroll:true}); },
+  });
+  void loadTopicSummary(panel.querySelector('.topic-summary'), topicId);
+}
+async function loadTopicSummary(target, topic) {
+  const epoch = customerEpoch;
+  target.setAttribute('aria-busy', 'true');
+  target.innerHTML = '<span class="ai-label">AI:n tuottama yhteenveto</span><p class="summary-pending" role="status"><span class="insights-pulse" aria-hidden="true"></span>Valmentaja tutkii kysymystäsi…</p>';
+  try {
+    const result = await explorationSummaries.load({topic, month:selectedMonth, selection:customerSession});
+    if (!target.isConnected || epoch !== customerEpoch) return;
+    activeTopicResult = result;
+    target.innerHTML = `<span class="ai-label">AI:n tuottama yhteenveto</span><p>${esc(result.answer)}</p>`;
+  } catch (error) {
+    if (!target.isConnected || epoch !== customerEpoch) return;
+    if (error.staleSelection) { void loadCustomer(); return; }
+    target.innerHTML = `<span class="ai-label">AI-yhteenveto ei ole saatavilla</span><p>Voit silti tutkia alla olevia lukuja tai kysyä valmentajalta.</p><button class="text-button" data-topic-retry="${topic}">Yritä uudelleen</button>`;
+  } finally {
+    if (target.isConnected) target.setAttribute('aria-busy', 'false');
+  }
 }
 async function loadInsights(retry = false) {
   const target = document.querySelector('#key-insights');
-  if (!target) return;
-  if (retry) { insightsPromise = null; target.innerHTML = '<p class="insights-loading" role="status">Havaintoja ladataan…</p>'; }
-  if (!insightsPromise) insightsPromise = fetch('/api/insights').then(async response => {
-    if (!response.ok) throw new Error('Havaintoja ei voitu ladata.');
-    const result = await response.json();
-    if (result.customer_id !== profile.customer_id || !Array.isArray(result.insights) || result.insights.length !== 3) throw new Error('Havaintoja ei voitu ladata.');
-    return result;
-  }).catch(error => { insightsPromise = null; throw error; });
+  if (!target || !customerSession) return;
+  const epoch = customerEpoch, selected = customerSession;
+  if (retry) { insightController?.abort(); insightsPromise = null; activeInsights = null; }
+  if (!insightsPromise) {
+    insightController = new AbortController();
+    const signal = AbortSignal.any([customerController.signal, insightController.signal]);
+    insightsPromise = pollInsights(selected, signal, retry);
+  }
+  const pending = insightsPromise;
+  if (!activeInsights) target.innerHTML = '<div class="insights-loading" role="status"><span class="insights-pulse" aria-hidden="true"></span><div><strong>Valmentaja muodostaa havaintojasi</strong><p>Voit tutkia talouttasi sillä aikaa. Havainnot ilmestyvät tähän, kun ne ovat valmiit.</p></div></div>';
   try {
-    const result = await insightsPromise;
-    if (!target.isConnected) return;
+    const result = await pending;
+    if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
     activeInsights = result;
     const date = new Date(result.as_of + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
-    target.innerHTML = `<p class="insights-caption">Kokonaistilanteesi · aineisto ${esc(date)}<br>Valitse havainto ja jutellaan siitä.</p>${result.insights.map((card, i) => `<button class="insight-card white-card" data-insight="${esc(card.id)}" aria-label="Keskustele havainnosta: ${esc(card.title)}"><span class="insight-heading"><span class="insight-number">0${i + 1}</span><strong>${esc(card.title)}</strong></span><span class="insight-value">${esc(card.headline_number)}</span><span class="insight-action">${esc(card.action)}</span><span class="insight-link">Keskustele havainnosta ${icon('arrow')}</span></button>`).join('')}<p class="insights-footnote">Havainnot perustuvat mallin arvioihin koko aineistosta, eivät vain yllä valittuun kuukauteen.</p>`;
-  } catch {
-    if (!target.isConnected) return;
+    target.innerHTML = `<p class="insights-caption">Kokonaistilanteesi · ${esc(date)}</p>${result.insights.map(card => `<button class="insight-card" data-insight="${esc(card.id)}" aria-label="Keskustele havainnosta: ${esc(card.title)}"><span class="insight-copy"><strong>${esc(card.title)}</strong><span class="insight-action">${esc(card.action)}</span></span><span class="insight-value">${esc(card.headline_number)}</span>${icon('chevron')}</button>`).join('')}<p class="insights-footnote">Mallin arvioita koko aineistosta. Avaa havainto ja jatka keskustelua.</p>`;
+  } catch (error) {
+    if (!target.isConnected || epoch !== customerEpoch || pending !== insightsPromise) return;
+    if (error instanceof StaleSelectionError) { void loadCustomer(); return; }
+    insightsPromise = null;
     activeInsights = null;
     target.innerHTML = '<div class="insights-error" role="alert"><p>Havaintoja ei voitu ladata.</p><button class="text-button" data-action="retry-insights">Yritä uudelleen</button></div>';
   }
+}
+async function pollInsights(selected, signal, retry = false) {
+  const deadline = Date.now() + 120000;
+  while (!signal.aborted && Date.now() < deadline) {
+    const response = await fetch('/api/insights' + (retry ? '?retry=1' : ''), { headers: selectionHeaders(selected), signal });
+    retry = false;
+    if ([401, 409].includes(response.status)) throw new StaleSelectionError();
+    if (!response.ok) throw new Error('Havaintoja ei voitu ladata.');
+    const result = await response.json();
+    if (result.customer_id !== selected.customer_id || result.selection_id !== selected.selection_id) throw new StaleSelectionError();
+    if (response.status === 202 || result.status === 'generating') {
+      await new Promise((resolve, reject) => {
+        const done = () => { signal.removeEventListener('abort', abort); resolve(); };
+        const timeout = setTimeout(done, Math.max(500, Math.min(3000, Number(result.retry_after_ms) || 1000)));
+        const abort = () => { clearTimeout(timeout); reject(new DOMException('Aborted', 'AbortError')); };
+        signal.addEventListener('abort', abort, { once: true });
+        if (signal.aborted) abort();
+      });
+      continue;
+    }
+    if (!Array.isArray(result.insights) || result.insights.length !== 3) throw new Error('Havaintoja ei voitu ladata.');
+    return result;
+  }
+  throw new Error('Havaintojen muodostaminen viipyy.');
 }
 function categoryRow(category,value){return `<button class="category-row" data-category="${category}"><span class="row-icon">${icon(categoryIcon(category))}</span><span class="category-copy"><strong>${names[category]}</strong><span class="category-track"><i style="width:${value/Math.max(1,m.spending)*100}%"></i></span></span><b>${euro(value)}</b>${icon('chevron','row-chevron')}</button>`;}
 function transactionsHTML(rows){return rows.length?rows.map(t=>`<div class="transaction-row"><span class="row-icon">${icon(categoryIcon(t.category))}</span><span><strong>${names[t.category]||esc(t.category)}</strong><small>${new Date(t.date+'T12:00:00Z').toLocaleDateString('fi-FI',{day:'numeric',month:'numeric',timeZone:'UTC'})}${t.merchant?' · '+esc(t.merchant):''}</small></span><b class="${t.amount>0?'positive':''}">${t.amount>0?'+':''}${euro(t.amount)}</b></div>`).join(''):'<p class="empty-state">Ei tapahtumia valitulla ajanjaksolla.</p>';}
@@ -93,10 +235,13 @@ function modal(title,body,kind=''){
 function showTransactions(kind='all'){
   const rows=kind==='all'?m.transactions:kind==='income'?m.transactions.filter(t=>transactionKind(t)==='income'):kind==='spending'?m.spend:m.transactions.filter(t=>t.category===kind);
   const title=({all:'Tilin tapahtumat',income:'Tulot',spending:'Arjen menot'})[kind]||names[kind];
-  modal(title,`${kind==='all'?`<div class="account-summary"><span>Demoasiakas ${data.profiles.indexOf(profile)+1}</span><strong>${euro(m.balance)}</strong><small>Viimeisin aineiston saldo · ${m.asOf}</small></div>`:''}<p class="period-caption">${capitalize(monthName(selectedMonth))} · ${rows.length} tapahtumaa</p>${transactionsHTML([...rows].reverse())}<p class="fine-print">Kauppiaiden tunnisteet tulevat aineistosta. Kauppiaiden nimiä ei ole saatavilla.</p>`);
+  modal(title,`${kind==='all'?`<div class="account-summary"><span>${esc(customerLabel())}</span><strong>${euro(m.balance)}</strong><small>Viimeisin aineiston saldo · ${m.asOf}</small></div>`:''}<p class="period-caption">${capitalize(monthName(selectedMonth))} · ${rows.length} tapahtumaa</p>${transactionsHTML([...rows].reverse())}<p class="fine-print">Kauppiaiden tunnisteet tulevat aineistosta. Kauppiaiden nimiä ei ole saatavilla.</p>`);
 }
 function showBaskets(selected){const totals=basketTotals(m.categories);modal(selected===undefined?'Kolme menokoria':basketInfo[selected][0],`<p>Menokorit auttavat hahmottamaan, mihin rahat menevät.</p>${basketInfo.map(([title,copy,glyph],i)=>selected!==undefined&&selected!==i?'':`<section class="basket-summary">${icon(glyph)}<div><h3>${title}</h3><p>${copy}.</p><strong>${euro(totals[i])}</strong></div></section>`).join('')}<p class="fine-print">Luokittelu on esimerkki. Aineistosta ei voi päätellä, mitkä yksittäiset ostokset olivat sinulle välttämättömiä. Matkailu sisältyy arjen valintoihin.</p>`);}
-const showChat = createChatDialog({ modal, detail, icon });
+const showChat = createChatDialog({ modal, detail, icon,
+  getSelection: () => customerSession ? { ...customerSession, label: customerLabel() } : null,
+  onSelectionStale: () => { void loadCustomer(); },
+});
 // The year-in-review story; its "ask the coach" buttons open the chat with the question filled in.
 const wrapped = createWrapped({ onAsk: question => showChat(question, { autoSend: true })});
 // Deep link, e.g. from a push notification: #rahavuosi opens the story, #rahavuosi/3 opens card 3.
@@ -114,11 +259,34 @@ function action(name){
   if(name==='baskets'){showBaskets();return;}
   if(name==='savings'){modal('Kokeile pientä muutosta',`<p>Ravintoloihin kului valitussa kuussa yhteensä <strong>${euro(m.categories.Restaurants)}</strong>.</p><label class="savings-label" for="saving-cut">Entä jos käyttäisit vähemmän? <b id="saving-percent">20 %</b></label><input id="saving-cut" type="range" min="0" max="50" step="5" value="20"><div class="savings-result"><span>Laskennallinen säästö kuukaudessa</span><strong id="saving-result">${euro(scenarioSavings(m.categories,{Restaurants:20}))}</strong></div><p class="fine-print">Esimerkkilaskelma perustuu valittuun historialliseen kuukauteen. Se ei siirrä rahaa eikä ennusta tulevia menoja.</p>`);return;}
   if(name==='cashflow'){modal('Kuukauden yhteenveto',`<p>${capitalize(monthName(selectedMonth))}</p><div class="financial-summary">${[['Tulot',m.income],['Arjen menot',-m.spending],['Tuloista jäljellä',m.margin],['Siirrot sijoituksiin',-m.deposits],['Palkkasiirrot',-m.sweeps],['Nostot sijoituksista',m.withdrawals],...(m.otherFlow?[['Muut tilitapahtumat',m.otherFlow]]:[]),['Kaikkien tapahtumien nettomuutos',m.netFlow]].map(([label,value])=>`<span>${label}<strong>${euro(value)}</strong></span>`).join('')}</div><p class="fine-print">Tuloista jäljellä = palkka ja muut tulot − arjen menot. Summa ei ole tilin saldo eikä arvio turvallisesta käyttörahasta. Sijoitus- ja palkkasiirrot esitetään erikseen.</p>`);return;}
-  if(name==='about'){modal('Tietoa demoaineistosta',`<p>Tämä on uusi <strong>Oma talous</strong> -välilehti S-mobiilin kuvakaappausten mukaisessa tyylissä. Muut alapalkin välilehdet havainnollistavat paikan nykyisessä sovelluksessa.</p><h3>Projektin aineisto</h3><p>3 626 755 synteettistä tapahtumaa ja 5 100 asiakasta. Aikaväli 1.10.2024–30.9.2026. Tässä julkisessa demossa näkyy vain palvelimella valittu synteettinen esimerkkiasiakas.</p><h3>Mitä näet?</h3><p>Tuloja, menoja, kategorioita, tapahtumia ja historiallisia saldoja. Menokorit ovat esimerkkiluokittelu. Säästölaskuri käyttää valitun kuukauden menoja.</p><h3>Talousvalmentaja</h3><p>Keskustelu käyttää Claude-tekoälyä. Havainnon avaaminen aloittaa keskustelun siitä. Claudelle lähetetään viestit sekä vain tämän demoasiakkaan havainto ja sen taustaluvut. Muiden asiakkaiden yksilöllisiä tietoja ei lähetetä. Vertailut perustuvat ryhmätason lukuihin.</p><p class="fine-print">Hackathon-demo. Ei S-Pankin virallinen palvelu eikä yhteyttä oikeaan pankkitiliin.</p>`);}
+  if(name==='about'){modal('Tietoa demoaineistosta',`<p>Tämä on uusi <strong>Oma talous</strong> -välilehti S-mobiilin kuvakaappausten mukaisessa tyylissä. Muut alapalkin välilehdet havainnollistavat paikan nykyisessä sovelluksessa.</p><h3>Projektin aineisto</h3><p>3 626 755 synteettistä tapahtumaa ja 5 100 asiakasta. Aikaväli 1.10.2024–30.9.2026. Voit vaihtaa synteettistä esimerkkiasiakasta etusivulta. Näytämme kerrallaan vain valitun asiakkaan tiedot.</p><h3>Mitä näet?</h3><p>Tuloja, menoja, kategorioita, tapahtumia ja historiallisia saldoja. Menokorit ovat esimerkkiluokittelu. Säästölaskuri käyttää valitun kuukauden menoja.</p><h3>Talousvalmentaja</h3><p>Keskustelu käyttää Claude-tekoälyä. Claude muodostaa etusivun havainnot valitun asiakkaan tiedoista. Havainnon avaaminen aloittaa keskustelun siitä. Myös Kysy-keskustelu käyttää valitun demoasiakkaan taloustietoja. Claudelle lähetetään viestit sekä vain kysymykseen tarvittavat tämän asiakkaan tiedot. Muiden asiakkaiden yksilöllisiä tietoja ei lähetetä. Vertailut perustuvat ryhmätason lukuihin.</p><p class="fine-print">Hackathon-demo. Ei S-Pankin virallinen palvelu eikä yhteyttä oikeaan pankkitiliin.</p>`);}
 }
 document.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;if(button.dataset.action)action(button.dataset.action);if(button.dataset.insight&&activeInsights){const card=activeInsights.insights.find(item=>item.id===button.dataset.insight);if(card)showChat.openInsight({customerId:profile.customer_id,card,asOf:activeInsights.as_of});}if(button.dataset.category)showTransactions(button.dataset.category);if(button.dataset.basket!==undefined)showBaskets(+button.dataset.basket);if(button.dataset.context)modal(button.dataset.context,`<p>Tämä on nykyisen S-mobiilin välilehden paikka. Tässä esittelyssä voit tutustua uuteen <strong>Oma talous</strong> -välilehteen.</p><button class="primary-button full-width" data-action="close">Takaisin omaan talouteen</button>`);});
-document.addEventListener('change',event=>{if(event.target.id==='month'){selectedMonth=event.target.value;render();}});
+document.addEventListener('click', event=>{
+  const button = event.target.closest('button');
+  if (!button) return;
+  if (button.dataset.topic) openTopic(button.dataset.topic);
+  if (button.dataset.topicRetry) void loadTopicSummary(button.closest('.topic-summary'), button.dataset.topicRetry);
+  if (button.dataset.topicChat) {
+    if (activeTopicResult) showChat.openExploration(activeTopicResult);
+    else {
+      const topic = explorationTopics.find(item=>item.id === button.dataset.topicChat);
+      showChat(`${topic.title} Tarkasteltava kuukausi: ${selectedMonth}. Aineiston tilannepäivä: ${customerSession.as_of}.`, {autoSend:true});
+    }
+  }
+});
+document.addEventListener('submit', event=>{
+  if (event.target.id !== 'explore-form') return;
+  event.preventDefault();
+  const input = document.querySelector('#explore-question');
+  const question = input.value.trim();
+  if (!question) { input.focus(); return; }
+  showChat(question, {autoSend:true});
+});
+document.addEventListener('change',event=>{if(event.target.id==='customer-selector'){void loadCustomer(event.target.value);return;}if(event.target.id==='month'){selectedMonth=event.target.value;render();}});
 document.addEventListener('input',event=>{if(event.target.id==='saving-cut'){document.querySelector('#saving-percent').textContent=`${event.target.value} %`;document.querySelector('#saving-result').textContent=euro(scenarioSavings(m.categories,{Restaurants:+event.target.value}));}});
 detail.addEventListener('click',event=>{if(event.target===detail){const r=detail.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)detail.close();}});
 detail.addEventListener('close',()=>{if(lastFocus?.isConnected)lastFocus.focus();else document.querySelector('.nav-item.active')?.focus();});
-init();
+window.addEventListener('focus', () => { void synchronizeSession(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) void synchronizeSession(); });
+void loadCustomer();

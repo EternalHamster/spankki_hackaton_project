@@ -9,3 +9,4 @@ __pycache__/
 *.duckdb.wal
 backend/data/
 backend/.deploy/
+ui-demos/.runtime/

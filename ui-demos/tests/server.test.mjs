@@ -4,10 +4,11 @@ import http from 'node:http';
 import { once } from 'node:events';
 import { fileURLToPath } from 'node:url';
 import { createAppServer } from '../server.mjs';
+import { stubDataSource, stubCoach, openSession } from './helpers.mjs';
 
 let server, base;
 before(async () => {
-  server = createAppServer();
+  server = createAppServer({ dataSource: stubDataSource(), coach: stubCoach() });
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   base = `http://127.0.0.1:${server.address().port}`;
@@ -19,7 +20,7 @@ after(async () => {
 
 test('HTTP serves the entry page and every app/analytics runtime asset', async () => {
   for (const [route, type] of [
-    ['/', 'text/html'], ['/app.js', 'text/javascript'], ['/model.js', 'text/javascript'],
+    ['/', 'text/html'], ['/app.js', 'text/javascript'], ['/model.js', 'text/javascript'], ['/exploration.js', 'text/javascript'],
     ['/styles.css', 'text/css'], ['/adapters/project-finance.js', 'text/javascript'],
     ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'],
     ['/finance-analytics/index.js', 'text/javascript'], ['/finance-analytics/model.js', 'text/javascript'],
@@ -33,7 +34,7 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
     assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
     assert.ok(response.headers.get('content-security-policy').includes("script-src 'self'"));
   }
-  const response = await fetch(base + '/demo-data.json');
+  const response = await (await openSession(base)).get('/demo-data.json');
   const data = await response.json();
   assert.equal(data.profiles.length, 1);
   assert.equal(data.profiles[0].customer_id, 'CUST00207');
@@ -58,7 +59,7 @@ test('health/readiness checks work and HEAD matches GET metadata without a body'
 });
 
 test('readiness fails when the runtime package is incomplete', async () => {
-  const incomplete = createAppServer({ publicRoot: fileURLToPath(new URL('../archive/', import.meta.url)) });
+  const incomplete = createAppServer({ dataSource: stubDataSource(), coach: stubCoach(), publicRoot: fileURLToPath(new URL('../archive/', import.meta.url)) });
   incomplete.listen(0, '127.0.0.1');
   await once(incomplete, 'listening');
   try {

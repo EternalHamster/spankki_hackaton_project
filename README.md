@@ -17,10 +17,10 @@ which figures to fetch and explains them in plain language, in Finnish or Englis
 | [`Features/`](Features/features_README.txt) | Deterministic per-customer metrics (monthly table + 90 features per customer) | Done |
 | [`BDA/`](BDA/README.md) | Hierarchical Bayesian spending model with Statistics Finland priors; insights and LLM tools | Done, validated |
 | [`backend/`](backend/README.md) | FastAPI + Claude (direct Anthropic API) + DuckDB coach, Cloud Run deployment | Running; chat tools not yet BDA-backed |
-| [`coach_context/`](coach_context/README.md) | Profile card and insight context: compact per-customer summaries for the model's prompt | Done; profile card not connected yet |
-| [`ui-demos/`](ui-demos/README.md) | S-mobiili-style **Oma talous** web app with live Claude chat and Rahavuotesi | Running locally and on Cloud Run |
+| [`coach_context/`](coach_context/README.md) | Profile card and insight context: compact per-customer summaries for the model's prompt | Connected to web insights and every chat |
+| [`ui-demos/`](ui-demos/README.md) | **Oma talous** web app: three demo customers, live Claude insights/chat, private DuckDB tools and Rahavuotesi | Local and Cloud Run runtime |
 | [`wrapped/`](wrapped/README.md) | **Rahavuotesi**: Spotify Wrapped-style year in money, in the UI | Done (Finnish) |
-| [`demo/`](demo/PERSONAS.md) | Four demo personas with their stories and demo questions | Chosen; not in the UI yet |
+| [`demo/`](demo/PERSONAS.md) | Four narrative personas with stories and demo questions | Separate from the three live UI selections |
 | [`scripts/`](scripts/) | `build_features.py` (Features/), `select_personas.py` (demo/) | Done |
 
 ## How it fits together
@@ -35,7 +35,10 @@ Data/ (raw CSVs)
  │                                 └─► wrapped/cards.py
  ├─ wrapped/build_facts.py ───► wrapped/output/facts.json ─► ui-demos/server-data/wrapped-data.json
  ├─ backend ingest ───────────► DuckDB snapshot ─► backend /v1/chat (Claude + customer-scoped tools)
- └─ ui-demos/scripts ─────────► ui-demos/server-data/demo-data.json ─► Oma talous UI ─► /api/chat (Claude; optional server-selected insight context)
+ └─ BDA/output/coach.duckdb ──► ui-demos/runtime/worker.py (persistent, read-only)
+                                      ├─► selected-customer chart bootstrap ─► Oma talous UI
+                                      ├─► compact profile + insight context ─► /api/insights (Claude, 1-hour card cache)
+                                      └─► compact profile + seven scoped tools ─► /api/chat (Claude)
 ```
 
 ## The data in one paragraph
@@ -76,7 +79,9 @@ Deploys to Cloud Run with `deploy.cmd`.
 - **`profile_card.py`:** a deterministic 500–860-token summary of one customer. It lets overview questions
   ("what kind of spender am I?") be answered without tool calls. It is designed to go after the shared, cached
   part of the prompt, so prompt caching keeps working. Safe amounts are rounded down, like BDA's.
-- **`insight_context.py`:** the profile card plus the detail behind it, used by `/v1/insights`.
+- **`insight_context.py`:** the profile card plus the detail behind it, used by the web app's `/api/insights` and the separate backend's `/v1/insights`.
+
+The web worker caches both contexts per customer and database snapshot. Every web chat includes the compact profile; detailed transaction questions use bounded tools instead of putting the full customer history into each prompt.
 
 ### Web app (`ui-demos/`)
 A mobile-first **Oma talous** tab in S-mobiili's style. It shows:
@@ -87,8 +92,11 @@ A mobile-first **Oma talous** tab in S-mobiili's style. It shows:
 - the three baskets,
 - a savings slider.
 
-**Kysy** sends questions to Claude through the Node server (`/api/chat`). Three clickable front-page insights start a chat with the configured synthetic customer's dated summary and aggregate peer statistics. General chat has no financial context. The server selects one synthetic customer for all public visitors, rejects customer/context overrides, and scopes transaction data, insights and Rahavuotesi to that customer. Source bundles remain outside the public directory; authenticated sessions are required before real customer data is connected.
-Plain JavaScript ES modules with a strict CSP and no build step.
+The front-page selector offers three synthetic demo customers. Node signs the selection in an HttpOnly cookie and checks a fresh selection nonce on every data, insight, recap and chat request. Switching customers clears the old display and conversation; late responses cannot populate the new selection.
+
+Claude generates three clickable insights when a customer is first opened. A per-customer/snapshot application cache reuses validated cards for one hour; charts load independently while the first model request takes several seconds. Failed generation requires an explicit retry. **Kysy** and insight chats both receive the selected customer's compact, dated profile. Seven bounded tools query that customer's historical spending, cash flow, transactions, safe-to-spend, scenarios, model details and group peer comparisons. The worker runs Python/DuckDB 2 read-only inside the same container; the visitor needs only a browser. Anthropic prompt caching reuses eligible prompt prefixes separately from the application's card cache.
+
+The public selector intentionally exposes all three synthetic personas. Server scoping prevents a chat/tool request from switching identity; other people appear only as group aggregates. Real customer data still requires verified authentication and a server-side ownership mapping. Database/context sources stay outside the public directory. The frontend uses plain JavaScript ES modules with a strict CSP and no build step. Cloud Run uses 1 GiB, zero minimum instances and one maximum instance; cold starts clear in-memory caches.
 
 ### Rahavuotesi (`wrapped/`)
 A full-screen, swipeable story of the customer's last 12 months (Oct 2025 – Sep 2026), in Finnish and in the
@@ -115,14 +123,24 @@ The tone rules (never shame, essentials are never a "favourite") are tested for 
 | Sanni, 32 | `CUST03711` | Saving steadily towards a first home |
 | Pekka, 59 | `CUST04971` | A surprise bill a week before payday |
 
-Their Rahavuotesi recaps are in the private source bundle. The public UI exposes only its server-configured synthetic customer (`CUST00207` by default); there is no public customer switcher.
+Their Rahavuotesi recaps are in the private source bundle. The live UI separately offers `CUST00207` (default), `CUST00127` and `CUST00103` through its demo selector. Each selection scopes charts, insights, chat and recap to that synthetic customer.
 
 ## Run it
 
-```bash
-# Web app (Node 24, no install): http://127.0.0.1:4173/
-cd ui-demos && node server.mjs              # chat needs ANTHROPIC_API_KEY in the environment
+Web app setup on Windows (Node 24, Python 3.12+, Git LFS):
 
+```powershell
+git lfs pull
+cd ui-demos
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r runtime\requirements.txt
+Copy-Item .env.example .env                 # set ANTHROPIC_API_KEY privately
+node --env-file=.env server.mjs            # http://127.0.0.1:4173/
+```
+
+Keep this DuckDB 2 environment isolated from the existing project/backend DuckDB 1.5.6 environment. Node automatically finds `ui-demos/.venv`. Cloud deployment packages the database and minimal Python code via `ui-demos/deploy/deploy.ps1`; production uses Secret Manager for the provider key and a stable session signing secret of at least 32 characters.
+
+```bash
 # Regenerate derived data (stdlib Python unless noted)
 python scripts/build_features.py            # Features/, ~2.5 min
 python wrapped/build_facts.py               # wrapped/output/facts.json, ~3 min
@@ -136,23 +154,21 @@ Backend setup, local run and Cloud Run deployment: [`backend/README.md`](backend
 ## Tests
 
 ```bash
-cd ui-demos && node scripts/check.mjs                      # UI, chat server, Rahavuotesi rendering
+# From the repository root:
+node ui-demos/scripts/check.mjs                           # UI, chat server, Rahavuotesi rendering
+ui-demos/.venv/Scripts/python -m unittest discover -s ui-demos/runtime -p test_worker.py -v
 python -m unittest discover -s wrapped/tests -t .          # Rahavuotesi facts and cards, all customers
 python -m unittest discover -s coach_context/tests -t .    # profile card, insight context
-cd backend && python -m pytest -q                          # backend, offline with mocked HTTP
-cd BDA && .venv/Scripts/python -m engine.check --repro     # spending model self-check
+(cd backend && python -m pytest -q)                       # backend, offline with mocked HTTP
+(cd BDA && .venv/Scripts/python -m engine.check --repro)   # spending model self-check
 ```
 
 No test makes a paid API call.
 
 ## Not done yet
 
-- **Live tools are not connected to the UI chat.** Insight chats use a prepared single-customer summary. Next steps:
-  - point it at the backend's `/v1/chat`,
-  - put the profile card in the system prompt,
-  - give the backend BDA's tools for safe-to-spend, safe-to-save, peers and surprise fund. The backend's own
-    `calculate_safe_to_spend` is still a placeholder.
-- **Authenticated multi-customer sessions are not implemented.** The public demo deliberately exposes one synthetic customer to all visitors.
+- **Real-customer authentication is not implemented.** Signed demo sessions select from three public synthetic personas; a production bank integration must map verified users to their own records.
+- **The separate FastAPI backend has its own integration work.** The live UI uses its local DuckDB worker and BDA-backed tools; it does not call `/v1/chat`. The backend's `calculate_safe_to_spend` remains a placeholder.
 - **Rahavuotesi is Finnish only.** A language button is planned.
 - **The touch gestures haven't been tested on a real phone.**
 - **Banking login:** demo tokens only. A real deployment needs verified S-mobiili sessions.

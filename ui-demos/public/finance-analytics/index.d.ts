@@ -16,6 +16,8 @@ export interface FinanceAnalyticsOptions {
   data: FinanceDataset;
   /** YYYY-MM; defaults to the final covered month. */
   selectedMonth?: string;
+  /** Defaults to all sections; hosts can reveal just the charts relevant to a question. */
+  sections?: Array<'breakdown' | 'annual' | 'history' | 'rhythm'>;
   onSelectMonth?: (month: string) => void;
   /** Omit to use the component's own transaction dialog. */
   onSelectCategory?: (category: string) => void;

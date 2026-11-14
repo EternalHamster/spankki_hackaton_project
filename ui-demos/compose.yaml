@@ -10,6 +10,8 @@ services:
       HOST: 0.0.0.0
       PORT: "8080"
       NODE_ENV: production
+      DEMO_SESSION_SECRET: ${DEMO_SESSION_SECRET:?Set DEMO_SESSION_SECRET in .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     init: true
     read_only: true
     cap_drop:

@@ -82,10 +82,13 @@ function Grant-BuildRole {
 Push-Location -LiteralPath $sourceRoot
 try {
     if ($Plan) {
+        Write-Host 'node scripts/prepare-runtime.mjs'
         Write-Host 'node scripts/check.mjs'
     } else {
         if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'Install Node.js 24 LTS to validate the package.' }
         if (-not (Get-Command gcloud -ErrorAction SilentlyContinue)) { throw 'Install the Google Cloud CLI and run gcloud init first.' }
+        & node scripts/prepare-runtime.mjs
+        if ($LASTEXITCODE -ne 0) { throw 'Runtime packaging failed; deployment stopped.' }
         & node scripts/check.mjs
         if ($LASTEXITCODE -ne 0) { throw 'Local validation failed; deployment stopped.' }
     }
@@ -111,12 +114,20 @@ try {
         '--liveness-probe=httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=30,failureThreshold=3',
         '--invoker-iam-check', $accessFlag, '--quiet'
     )
+    $secretBindings = @()
     if ($config.ContainsKey('ChatSecret')) {
         if ($config.ChatSecret -notmatch '^[a-zA-Z0-9_-]+$' -or $config.ChatSecretVersion -notmatch '^[1-9][0-9]*$') {
             throw 'ChatSecret must be a Secret Manager name and ChatSecretVersion a numeric version.'
         }
-        $deployArguments += "--update-secrets=ANTHROPIC_API_KEY=$($config.ChatSecret):$($config.ChatSecretVersion)"
+        $secretBindings += "ANTHROPIC_API_KEY=$($config.ChatSecret):$($config.ChatSecretVersion)"
     }
+    if ($config.ContainsKey('SessionSecret')) {
+        if ($config.SessionSecret -notmatch '^[a-zA-Z0-9_-]+$' -or $config.SessionSecretVersion -notmatch '^[1-9][0-9]*$') {
+            throw 'SessionSecret must be a Secret Manager name and SessionSecretVersion a numeric version.'
+        }
+        $secretBindings += "DEMO_SESSION_SECRET=$($config.SessionSecret):$($config.SessionSecretVersion)"
+    }
+    if ($secretBindings.Count -gt 0) { $deployArguments += '--update-secrets=' + ($secretBindings -join ',') }
     Invoke-Gcloud -Arguments $deployArguments
     Invoke-Gcloud -Arguments @('run', 'services', 'describe', $config.Service, "--project=$ProjectId", "--region=$($config.Region)", '--format=value(status.url)')
 } finally {

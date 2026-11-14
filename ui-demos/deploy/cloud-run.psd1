@@ -4,11 +4,13 @@
     RuntimeAccount = 'oma-talous-ui'
     BuildAccount = 'oma-talous-ui-build'
     Cpu = 1
-    Memory = '256Mi'
+    Memory = '1Gi'
     MinInstances = 0
-    MaxInstances = 2
+    MaxInstances = 1
     Concurrency = 80
-    TimeoutSeconds = 60
+    TimeoutSeconds = 120
     ChatSecret = 'money-coach-anthropic-key'
     ChatSecretVersion = '1'
+    SessionSecret = 'oma-talous-demo-session'
+    SessionSecretVersion = '1'
 }
