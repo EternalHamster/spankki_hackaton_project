@@ -195,3 +195,36 @@ The supplied dataset was imported locally: **3,626,755 rows / 5,100 customers**,
 all **96** UI customer/month totals match. The **42,389** excluded unmapped rows correspond to
 the source's investment deposits, investment withdrawals and salary sweeps. The generated
 `data/finance.duckdb` stays local and is gitignored. `constraints.txt` records tested package versions.
+
+## Three key insights (`POST /v1/insights`)
+
+Three longer, explained insights for the authenticated customer, written by the model from the spending
+engine's output (`BDA/output`). One request, no tools. Code: `src/money_coach/insights.py`.
+
+**It is a dry run by default and spends no tokens.** A dry run returns the exact request that would be sent
+(system prompt, the customer's context, output schema) and its estimated size, and needs no API key.
+
+```cmd
+"%PYTHON_EXE%" -m money_coach.insights CUST00042           & rem dry run: prints the request, costs nothing
+"%PYTHON_EXE%" -m money_coach.insights CUST00042 --live    & rem ONE billable request
+```
+
+Set `INSIGHTS_LIVE=true` on the server to make the endpoint call the model. A live answer is:
+
+```json
+{"dry_run": false, "model": "...", "usage": {"input_tokens": 0, "output_tokens": 0}, "request_id": "...",
+ "insights": [{"title": "...", "headline_number": "€270 a week", "explanation": "...", "action": "...",
+               "numbers_verified": true, "unverified_numbers": []}]}
+```
+
+- **What the model sees:** only that customer's own figures plus group-level peer numbers (medians and model
+  parameters of their age band and city). No customer ID, no other customer's rows, no tools. The context is
+  built by `coach_context/insight_context.py`; its tests change every other customer's data and check that
+  the context does not move.
+- **Number check:** every number in the answer is compared with the context. An insight that contains a number
+  not found there gets `numbers_verified: false`, so the app can hide it.
+- **Size:** about 3,000 input tokens and 700 output tokens per customer.
+- **Deployment:** the endpoint reads `BDA/output/*.csv` and the `coach_context` package from the repository.
+  The current Docker image ships only `backend/src`, so in Cloud Run the endpoint answers 503 until those are
+  added to the image.
+- Tests (`tests/test_insights.py`) use mocked HTTP and never make a paid request.

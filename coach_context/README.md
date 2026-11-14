@@ -78,3 +78,24 @@ Only the spending model's committed outputs in `BDA/output/`: `customer_summary.
 `insights.csv` and `spender_type.csv`, plus line labels and peer thresholds from `BDA/engine/config.py`.
 When BDA is re-run, the cards update automatically. If BDA renames columns, the tests fail and point at it.
 "As of" is the end of the data (2026-09-30), matching the coach's fixed "today".
+
+## Insight context (`insight_context.py`)
+
+A longer context for one job: letting the model write three explained key insights (backend `POST /v1/insights`).
+It is the profile card plus, for every spending line, how often and how much per payment (customer and peer
+median), the Finnish average, last month against the usual month, how safe-to-spend was limited, and the peer
+group's model parameters. About 2,300 tokens, deterministic, standard library only.
+
+```python
+from coach_context.insight_context import InsightSource, build_insight_context, render_insight_context
+src = InsightSource()                                        # once, at startup
+text = render_insight_context(build_insight_context('CUST04971', src))
+```
+
+```bash
+python -m coach_context.insight_context CUST04971          # print the context text
+```
+
+It contains the customer's own rows and group-level numbers only: no customer ID and no other customer's data.
+Peer groups with fewer than 10 people are not described. `tests/test_insight_context.py` checks this by
+changing every other customer's data and verifying the context stays byte-identical.

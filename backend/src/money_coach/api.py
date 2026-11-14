@@ -19,6 +19,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict, Field
 
 from .agent import AgentLimitError, CoachAgent
+from .insights import ContextUnavailable, InsightError, InsightWriter, default_context_provider
 from .repository import DuckDBRepository
 from .client import DEFAULT_MODEL, create_client
 from .tools import FinanceTools
@@ -36,6 +37,8 @@ class Settings:
     process_chat_limit: int = 500
     # The coach's "today". None = last transaction date in the snapshot (falls back to the real date).
     as_of: date | None = None
+    # False = /v1/insights is a dry run: it returns the request it would send and never calls the model.
+    insights_live: bool = False
 
     @classmethod
     def from_env(cls):
@@ -48,6 +51,7 @@ class Settings:
             requests_per_minute=int(os.getenv("REQUESTS_PER_MINUTE", "10")),
             process_chat_limit=int(os.getenv("PROCESS_CHAT_LIMIT", "500")),
             as_of=date.fromisoformat(os.environ["COACH_AS_OF"]) if os.getenv("COACH_AS_OF") else None,
+            insights_live=os.getenv("INSIGHTS_LIVE", "false").lower() == "true",
         )
         if not isinstance(value.demo_tokens, dict) or any(
             not isinstance(k, str) or len(k) < 24 or not isinstance(v, str) or not v
@@ -96,7 +100,8 @@ class RequestBudget:
 
 
 def create_app(settings: Settings | None = None, *, repository=None, agent=None,
-               authenticate: Callable[[str], str | None] | None = None):
+               authenticate: Callable[[str], str | None] | None = None,
+               insight_context: Callable[[str], str] | None = None, insight_writer: InsightWriter | None = None):
     """authenticate must verify a real banking/identity session and map its subject server-side.
 
     No production authentication implementation is assumed. Default is deny-all.
@@ -106,6 +111,15 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
     repository = repository or DuckDBRepository(settings.database)
     budget = RequestBudget(settings)
     slots = threading.BoundedSemaphore(4)
+    context_lock = threading.Lock()
+    context_state = {"provider": insight_context}
+
+    def context_provider() -> Callable[[str], str]:
+        # The spending model's CSVs are loaded once, on the first insights request.
+        with context_lock:
+            if context_state["provider"] is None:
+                context_state["provider"] = default_context_provider()
+            return context_state["provider"]
 
     def coach_as_of() -> date | None:
         if settings.as_of:
@@ -123,6 +137,9 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
             client = create_client()
             if client:
                 app.state.agent = CoachAgent(client, model=settings.model, as_of=coach_as_of())
+        # In dry-run mode the writer needs no client (and no API key) at all.
+        app.state.insight_writer = insight_writer or InsightWriter(
+            client or getattr(agent, "client", None), model=settings.model, live=settings.insights_live)
         try:
             yield
         finally:
@@ -191,6 +208,34 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
             raise HTTPException(502, "Model provider request failed") from None
         except (duckdb.Error, ValueError, OSError):
             raise HTTPException(503, "Database snapshot unavailable") from None
+        finally:
+            slots.release()
+
+    @app.post("/v1/insights")
+    def insights(customer_id: str = Depends(customer)):
+        """Three key insights for the authenticated customer. A dry run unless INSIGHTS_LIVE=true."""
+        try:
+            context = context_provider()(customer_id)
+        except ContextUnavailable:
+            raise HTTPException(503, "Spending-model output unavailable") from None
+        except KeyError:
+            raise HTTPException(404, "No spending-model data for this customer") from None
+        writer = app.state.insight_writer
+        if not writer.live:
+            return {**writer.dry_run(context), "request_id": uuid4().hex}
+        if writer.client is None:
+            raise HTTPException(503, "ANTHROPIC_API_KEY is not configured on the server")
+        if not slots.acquire(blocking=False):
+            raise HTTPException(429, "Agent busy; retry shortly", headers={"Retry-After": "5"})
+        try:
+            budget.claim(customer_id)
+            return {**writer.run(context), "request_id": uuid4().hex}
+        except InsightError as exc:
+            raise HTTPException(422, str(exc)) from None
+        except anthropic.RateLimitError:
+            raise HTTPException(503, "Model provider busy; retry later") from None
+        except anthropic.APIError:
+            raise HTTPException(502, "Model provider request failed") from None
         finally:
             slots.release()
 
