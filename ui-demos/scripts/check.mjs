@@ -13,7 +13,7 @@ function run(args) {
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status || 1);
 }
-const sources = ['server.mjs', 'scripts/check.mjs', ...files('public'), ...files('tests')].filter(file => /\.(m?js)$/.test(file));
+const sources = ['server.mjs', 'chat.mjs', 'scripts/check.mjs', ...files('public'), ...files('tests')].filter(file => /\.(m?js)$/.test(file));
 for (const file of sources) run(['--check', file]);
 run(['--test', ...files('tests').filter(file => file.endsWith('.test.mjs')).sort()]);
 console.log('Syntax, financial calculations and HTTP integration checks passed.');

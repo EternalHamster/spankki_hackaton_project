@@ -13,7 +13,7 @@ node server.mjs
 
 Open **http://127.0.0.1:4173/**. The server binds only to the local machine and serves only `public/`. Stop a foreground server with Ctrl+C. Set `$env:PORT = '4174'` before starting to use another port.
 
-The project includes a tested static server, a multi-stage Dockerfile, local Docker Compose settings, and a Google Cloud Run deployment script. See [DEPLOYMENT.md](./DEPLOYMENT.md) for setup, settings, access and deployment commands. Preparing this package does not deploy a cloud service.
+The project includes a tested web server with a text-only chat endpoint, a multi-stage Dockerfile, local Docker Compose settings, and a Google Cloud Run deployment script. See [DEPLOYMENT.md](./DEPLOYMENT.md) for setup, settings, access and deployment commands. Preparing this package does not deploy a cloud service.
 
 ## Try the demo
 
@@ -26,9 +26,9 @@ The project includes a tested static server, a multi-stage Dockerfile, local Doc
 - Compare weekday/weekend spending with the customer's own previous month, including daily averages.
 - Explore three illustrative spending baskets.
 - Adjust the restaurant-spending reduction slider to calculate a possible monthly saving.
-- Open the **Kysy** chat bubble. Suggested questions fill an editable draft for the later conversational feature.
+- Open **Kysy**, type a question and send it to Claude. Follow-up messages retain recent conversation context. Enter sends; Shift+Enter adds a line break.
 
-**The chat is a UI preview only.** Sending is disabled, no questions are transmitted, and no local or cloud LLM is connected. There are no generated or scripted chat answers. Drafts live only in page memory and reset when the page reloads.
+**Chat is live when the server has `ANTHROPIC_API_KEY` configured.** The browser calls same-origin `POST /api/chat`; Node calls Claude with text messages only. No customer ID, project data, financial tools or database is sent. The server key stays in Secret Manager on Cloud Run. Conversations live in page memory, can be cleared with **Uusi keskustelu**, and reset on reload. Only the last five exchanges are included as context, within a 14,000-character budget.
 
 ## Data and calculations
 
@@ -47,7 +47,7 @@ The fourth sample and one linked mortgage history remain in the prepared data fo
 - Baskets use illustrative category rules. Regular needs include housing, groceries, utilities and transport; irregular needs include health and home/technology; discretionary choices include restaurants, lifestyle, entertainment and travel. The data does not establish whether individual purchases were necessary.
 - Potential savings = the selected month's restaurant spending × the chosen reduction percentage. This is a historical scenario, not a forecast or money transfer.
 
-All calculations run in the browser. There is no authentication, bank integration, external AI call or persistent storage.
+Financial calculations run in the browser. Chat calls the Anthropic API separately and has no access to those calculations or sample data. This is a public demo without banking authentication or application conversation storage. Provider requests are capped at 30 per minute and four simultaneous calls per server instance, with 800 output tokens each; these are demo limits, not a durable spending quota.
 
 ## Regenerate and check
 

@@ -2,8 +2,9 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createChatHandler } from './chat.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
-const requiredFiles = ['index.html', 'app.js', 'model.js', 'styles.css', 'demo-data.json',
+const requiredFiles = ['index.html', 'app.js', 'chat.js', 'model.js', 'styles.css', 'demo-data.json',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
@@ -21,8 +22,9 @@ function within(root, file) {
   return relative !== '' && !relative.startsWith('..' + path.sep) && relative !== '..' && !path.isAbsolute(relative);
 }
 
-export function createAppServer({ publicRoot = defaultRoot } = {}) {
+export function createAppServer({ publicRoot = defaultRoot, chatOptions } = {}) {
   const root = path.resolve(publicRoot);
+  const chat = createChatHandler(chatOptions);
   async function ready() {
     await Promise.all(requiredFiles.map(async file => {
       const stat = await fs.stat(path.join(root, file));
@@ -34,14 +36,19 @@ export function createAppServer({ publicRoot = defaultRoot } = {}) {
       res.writeHead(status, { ...headers, 'Content-Type': type, 'Content-Length': Buffer.byteLength(body), ...extra });
       res.end(req.method === 'HEAD' ? undefined : body);
     };
+    let route;
+    try { route = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); }
+    catch { send(400, 'Bad request'); return; }
+    if (route === '/api/chat') {
+      for (const [name, value] of Object.entries(headers)) res.setHeader(name, value);
+      await chat(req, res);
+      return;
+    }
     if (!['GET', 'HEAD'].includes(req.method)) {
       req.resume();
       send(405, 'Method not allowed', undefined, { Allow: 'GET, HEAD' });
       return;
     }
-    let route;
-    try { route = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); }
-    catch { send(400, 'Bad request'); return; }
     if (route.includes('\\') || route.includes('\0') || route.split('/').some(part => part.startsWith('.'))) {
       send(403, 'Forbidden'); return;
     }

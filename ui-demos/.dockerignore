@@ -3,6 +3,7 @@
 !Dockerfile
 !package.json
 !server.mjs
+!chat.mjs
 !public/
 !public/**
 !scripts/

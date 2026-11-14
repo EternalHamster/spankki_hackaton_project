@@ -95,7 +95,7 @@ try {
         Ensure-ServiceAccount -AccountId $config.RuntimeAccount -Email $runtimeEmail
         Ensure-ServiceAccount -AccountId $config.BuildAccount -Email $buildEmail
         Grant-BuildRole
-        # The runtime account needs no project roles: this UI does not call cloud APIs.
+        # Chat needs access only to its specific Secret Manager secret (see DEPLOYMENT.md).
     }
 
     $accessFlag = '--no-allow-unauthenticated'
@@ -106,11 +106,17 @@ try {
         '--port=8080', "--cpu=$($config.Cpu)", "--memory=$($config.Memory)",
         "--min-instances=$($config.MinInstances)", "--max-instances=$($config.MaxInstances)",
         "--concurrency=$($config.Concurrency)", "--timeout=$($config.TimeoutSeconds)",
-        '--set-env-vars=NODE_ENV=production,HOST=0.0.0.0', '--cpu-throttling', '--ingress=all',
+        '--update-env-vars=NODE_ENV=production,HOST=0.0.0.0', '--cpu-throttling', '--ingress=all',
         '--startup-probe=httpGet.path=/readyz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=5,failureThreshold=6',
         '--liveness-probe=httpGet.path=/healthz,httpGet.port=8080,initialDelaySeconds=0,timeoutSeconds=2,periodSeconds=30,failureThreshold=3',
         '--invoker-iam-check', $accessFlag, '--quiet'
     )
+    if ($config.ContainsKey('ChatSecret')) {
+        if ($config.ChatSecret -notmatch '^[a-zA-Z0-9_-]+$' -or $config.ChatSecretVersion -notmatch '^[1-9][0-9]*$') {
+            throw 'ChatSecret must be a Secret Manager name and ChatSecretVersion a numeric version.'
+        }
+        $deployArguments += "--update-secrets=ANTHROPIC_API_KEY=$($config.ChatSecret):$($config.ChatSecretVersion)"
+    }
     Invoke-Gcloud -Arguments $deployArguments
     Invoke-Gcloud -Arguments @('run', 'services', 'describe', $config.Service, "--project=$ProjectId", "--region=$($config.Region)", '--format=value(status.url)')
 } finally {

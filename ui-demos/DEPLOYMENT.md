@@ -1,8 +1,28 @@
 # Google Cloud Run package
 
-This folder is the complete deployment root for the **UI demo**. It serves the prepared synthetic samples and reusable analytics module. The separate `../backend/` Python coach is not called by this UI; the chat remains an unsent draft preview. No Google Cloud SDK, API key, database, service-account key or source CSV is needed at runtime.
+This folder is the complete deployment root for the **UI demo**. It serves the prepared synthetic samples and reusable analytics module. The same Node service also handles text-only Claude chat at `POST /api/chat`. The separate `../backend/` Python coach and project data are not used by chat. The server requires `ANTHROPIC_API_KEY`, injected from Secret Manager; no key is sent to the browser. No database, Google Cloud SDK, service-account key or source CSV is needed at runtime.
 
 The standalone release ZIP contains this deployment folder, documentation and tests. It excludes source CSVs, the Python backend, old UI archives and local validation artifacts. Extract it and run the commands below inside the extracted `oma-talous-ui/` directory.
+
+## Chat secret and live deployment
+
+The existing service is `oma-talous-ui` in `junctionhackathonspankki`, region `europe-north1`.
+`deploy/cloud-run.psd1` references `money-coach-anthropic-key`, numeric version `1`.
+Before the first chat deployment, allow the UI runtime identity to read this specific secret:
+
+```powershell
+gcloud secrets add-iam-policy-binding money-coach-anthropic-key --project=junctionhackathonspankki --member=serviceAccount:oma-talous-ui@junctionhackathonspankki.iam.gserviceaccount.com --role=roles/secretmanager.secretAccessor
+.\deploy\deploy.ps1 -ProjectId junctionhackathonspankki -Public
+```
+
+This reuses the existing secret without reading its value locally. The deploy script preserves other
+environment settings and binds the selected secret version. Future key rotations should update
+`ChatSecretVersion` before redeploying. Model calls incur Anthropic usage charges.
+
+The UI sends only text conversation, never project data. The Node endpoint limits input/history,
+allows four simultaneous calls and 30 requests/minute per instance, and bounds each reply to 800 tokens.
+These in-memory limits reset on restart and are not a durable quota. Requests time out after 35 seconds.
+The site remains a public hackathon demo. Customer-data integration will require authentication.
 
 ## 1. Check locally
 
@@ -136,4 +156,4 @@ Deletion of the service does not delete stored images/build artifacts or the ser
 
 ## Future coach/backend integration
 
-`public/adapters/project-finance.js` maps the sample data to the analytics contract documented in `INTEGRATION.md`. Keep identity verification and customer scoping in the backend. Before enabling chat, connect it to an authenticated API, handle loading/error states and keep provider keys server-side. The current Content Security Policy allows same-origin scripts and API calls; an intentional cross-origin API would require matching `connect-src` and backend CORS changes. The separate Python backend also needs its database snapshot, model-provider configuration and authentication configuration; the UI container does not supply those.
+`public/adapters/project-finance.js` maps the sample data to the analytics contract documented in `INTEGRATION.md`. Keep identity verification and customer scoping in the backend. Before connecting chat to customer data, add authenticated user sessions and customer-scoped API access. The current chat is text-only and already handles loading/errors with a server-side provider key. The current Content Security Policy allows same-origin scripts and API calls; an intentional cross-origin API would require matching `connect-src` and backend CORS changes. The separate Python backend also needs its database snapshot, model-provider configuration and authentication configuration; the UI container does not supply those.

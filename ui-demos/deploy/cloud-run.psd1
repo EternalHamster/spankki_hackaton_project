@@ -9,4 +9,6 @@
     MaxInstances = 2
     Concurrency = 80
     TimeoutSeconds = 60
+    ChatSecret = 'money-coach-anthropic-key'
+    ChatSecretVersion = '1'
 }
