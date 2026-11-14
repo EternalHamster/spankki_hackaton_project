@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { formatCoachText, formatInline } from '../public/coach-text.js';
 import { insightPeriod } from '../public/insights.js';
+import { screenshotReply } from './fixtures/coach-reply.mjs';
 
 test('coach replies render bold amounts, paragraphs and real lists', () => {
   assert.equal(formatCoachText('**Syyskuu**\n\n- Menot: **340 €**.\n- __Tarkista tilaukset__.\n\nAloita rauhassa.'),
@@ -19,6 +20,26 @@ test('model formatting never creates executable HTML or links', () => {
   assert.doesNotMatch(result, /<img|<script|<a\b|onerror="/);
   assert.equal(formatInline('`**<tag>**` & **saldo**'), '<code>**&lt;tag&gt;**</code> &amp; <strong>saldo</strong>');
   assert.equal(formatInline('Kesken **merkintä'), 'Kesken **merkintä');
+});
+
+test('the reported coach answer renders all five bold spans and both lists', () => {
+  const html = formatCoachText(screenshotReply);
+  assert.deepEqual([...html.matchAll(/<strong>(.*?)<\/strong>/g)].map(match => match[1]),
+    ['250 € kuukaudessa', '95 €', 'yksi käynti maksaa enemmän', 'noin 155 € kuukaudessa', 'Hyvä seuraava askel:']);
+  assert.equal((html.match(/<ul>/g) || []).length, 2);
+  assert.equal((html.match(/<li>/g) || []).length, 6);
+  assert.doesNotMatch(html, /\*\*|<p>- /);
+});
+
+test('bold spans survive line breaks in paragraphs and wrapped list items', () => {
+  assert.equal(formatCoachText('Varaa **noin 155 €\nkuukaudessa**.\n\nAloita rauhassa.'),
+    '<p>Varaa <strong>noin 155 €<br>kuukaudessa</strong>.</p><p>Aloita rauhassa.</p>');
+  assert.equal(formatCoachText('- Menot ovat **250 €\r\n  kuukaudessa**.\r\n- Vertailu: **95 €**.'),
+    '<ul><li>Menot ovat <strong>250 €<br>kuukaudessa</strong>.</li><li>Vertailu: <strong>95 €</strong>.</li></ul>');
+  assert.equal(formatCoachText('1. Säästä __155 €\nkuukaudessa__.\n2. Tarkista *seuraava askel*.'),
+    '<ol><li>Säästä <strong>155 €<br>kuukaudessa</strong>.</li><li>Tarkista <em>seuraava askel</em>.</li></ol>');
+  assert.equal(formatCoachText('**Hyvä\nseuraava askel:**\n- Katso menot.'),
+    '<p><strong>Hyvä<br>seuraava askel:</strong></p><ul><li>Katso menot.</li></ul>');
 });
 
 test('insight dates distinguish a weekly estimate from monthly and rolling-year evidence', () => {

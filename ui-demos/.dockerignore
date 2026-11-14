@@ -5,6 +5,8 @@
 !server.mjs
 !chat.mjs
 !coach.mjs
+!coach-memory.mjs
+!coach-projects.mjs
 !prepared.mjs
 !customers.mjs
 !data-source.mjs

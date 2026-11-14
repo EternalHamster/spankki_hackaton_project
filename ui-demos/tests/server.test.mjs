@@ -23,6 +23,8 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
     ['/', 'text/html'], ['/app.js', 'text/javascript'], ['/model.js', 'text/javascript'], ['/exploration.js', 'text/javascript'],
     ['/styles.css', 'text/css'], ['/adapters/project-finance.js', 'text/javascript'],
     ['/coach-text.js', 'text/javascript'], ['/insights.js', 'text/javascript'], ['/disclosure.js', 'text/javascript'],
+    ['/customer-memory.js', 'text/javascript'], ['/answer-depth.js', 'text/javascript'],
+    ['/purchase-projects.js', 'text/javascript'], ['/project-ui.js', 'text/javascript'],
     ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'],
     ['/finance-analytics/index.js', 'text/javascript'], ['/finance-analytics/model.js', 'text/javascript'],
     ['/finance-analytics/styles.css', 'text/css'], ['/finance-analytics/example.js', 'text/javascript'],

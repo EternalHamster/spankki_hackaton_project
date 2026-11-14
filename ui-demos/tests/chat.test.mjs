@@ -65,3 +65,56 @@ test('the chosen answer level reaches the coach, and unknown levels stop before 
   }
   assert.equal(calls.length, 4);
 });
+
+test('a one-answer rewrite keeps its original question and level scoped to that request', async t => {
+  const { post, calls, customer_id } = await fixture(t);
+  const messages = [{ role: 'user', content: 'Miten voisin säästää?' }];
+  const rewrite = { answer: '  Aineistossa säästövara oli 130 € kuukaudessa.  ' };
+  assert.equal((await post({ messages, level: 'simple', rewrite })).status, 200);
+  assert.equal(calls[0].customer, customer_id);
+  assert.deepEqual(calls[0].request.messages, messages);
+  assert.deepEqual(calls[0].request.rewrite, { answer: rewrite.answer.trim() });
+  assert.equal(calls[0].request.level, 'simple');
+  for (const invalid of [null, '', [], {}, { answer: '' }, { answer: ' ' }, { answer: 7 },
+    { answer: 'x'.repeat(6001) }, { answer: 'text', customer_id: 'CUST00127' }, { answer: 'text', level: 'detailed' }]) {
+    assert.equal((await post({ messages, rewrite: invalid })).status, 400);
+  }
+  assert.equal(calls.length, 1);
+  assert.equal((await post({ messages, level: 'standard' })).status, 200);
+  assert.equal(calls[1].request.level, 'standard');
+  assert.equal(calls[1].request.rewrite, undefined);
+});
+
+test('bounded browser memory reaches only the selected coach and malformed memory is rejected', async t => {
+  const { post, calls, customer_id } = await fixture(t);
+  const memory = [{ key: 'restaurants', text: 'En halua vähentää ravintolakäyntejä.' }];
+  const messages = [{ role: 'user', content: 'Miten voisin säästää?' }];
+  assert.equal((await post({ messages, memory })).status, 200);
+  assert.equal(calls[0].customer, customer_id);
+  assert.deepEqual(calls[0].request.memory, memory);
+  for (const invalid of [null, {}, [memory[0], memory[0]], [{ ...memory[0], customer_id: 'CUST00127' }],
+    [{ ...memory[0], text: 'x'.repeat(201) }], Array.from({ length: 13 }, (_, i) => ({ key: `key_${i}`, text: 'Toive' }))]) {
+    assert.equal((await post({ messages, memory: invalid })).status, 400);
+  }
+  assert.equal(calls.length, 1);
+  assert.equal((await post({ messages })).status, 200);
+  assert.deepEqual(calls[1].request.memory, []);
+});
+
+test('validated projects and an unconfirmed proposal are scoped to the selected chat', async t => {
+  const { post, calls, customer_id } = await fixture(t);
+  const proposal = { id: '11111111-1111-4111-a111-111111111111', title: 'Pyörä', price_eur: 100,
+    requested_months: 10, monthly_eur: 10, projected_months: 10, verdict: 'yes', as_of: '2026-09-30', conditions: [], tips: [] };
+  const project = { ...proposal, saved_eur: 20, created_at: '2026-11-14T12:00:00.000Z', memory_revision: '' };
+  const messages = [{ role: 'user', content: 'Tarkistetaan suunnitelma.' }];
+  assert.equal((await post({ messages, projects: [project], pending_project: proposal })).status, 200);
+  assert.equal(calls[0].customer, customer_id);
+  assert.deepEqual(calls[0].request.projects, [project]);
+  assert.deepEqual(calls[0].request.pendingProject, proposal);
+  for (const fields of [{ projects: null }, { projects: [project, project] },
+    { projects: [{ ...project, customer_id: 'CUST00127' }] }, { pending_project: { ...proposal, price_eur: -10 } },
+    { pending_project: { ...proposal, saved_eur: 50 } }]) {
+    assert.equal((await post({ messages, ...fields })).status, 400);
+  }
+  assert.equal(calls.length, 1);
+});

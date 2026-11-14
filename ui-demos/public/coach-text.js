@@ -2,7 +2,7 @@ const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', 
 
 // Only these inline marks produce HTML. Model text, raw HTML and links stay escaped.
 export function formatInline(text) {
-  const tokens = /`([^`\n]+)`|\*\*([^\n]+?)\*\*|__([^\n]+?)__|\*([^*\n]+)\*|_([^_\n]+)_/g;
+  const tokens = /`([^`\n]+)`|\*\*([\s\S]+?)\*\*|__([\s\S]+?)__|\*([^*\n]+)\*|_([^_\n]+)_/g;
   let html = '', start = 0;
   for (const match of String(text).matchAll(tokens)) {
     html += escape(String(text).slice(start, match.index));
@@ -10,14 +10,15 @@ export function formatInline(text) {
     html += `<${tag}>${escape(match.slice(1).find(value => value !== undefined))}</${tag}>`;
     start = match.index + match[0].length;
   }
-  return html + escape(String(text).slice(start));
+  return (html + escape(String(text).slice(start))).replace(/\r\n?|\n/g, '<br>');
 }
 
 export function formatCoachText(text) {
   const blocks = [];
   let paragraph = [], list = [], listType = '', listStart = 1;
   const flushParagraph = () => {
-    if (paragraph.length) blocks.push(`<p>${paragraph.map(formatInline).join('<br>')}</p>`);
+    // Parse the entire block so a model's line wrapping cannot split a bold span.
+    if (paragraph.length) blocks.push(`<p>${formatInline(paragraph.join('\n'))}</p>`);
     paragraph = [];
   };
   const flushList = () => {
@@ -35,7 +36,10 @@ export function formatCoachText(text) {
       listType = type; list.push(item[3]);
     } else if (heading) {
       flushParagraph(); flushList(); blocks.push(`<p><strong>${formatInline(heading[1])}</strong></p>`);
-    } else { flushList(); paragraph.push(line); }
+    } else if (list.length) {
+      // Markdown list items can continue on the following line, with or without indentation.
+      list[list.length - 1] += '\n' + line.trim();
+    } else { paragraph.push(line); }
   }
   flushParagraph(); flushList();
   return blocks.join('');

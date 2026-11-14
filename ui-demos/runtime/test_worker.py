@@ -39,6 +39,13 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(actual["summary"]["count"], 3626755)
             self.assertEqual(actual["summary"]["customerCount"], 5100)
             self.assertEqual(actual["as_of"], "2026-09-30")
+            weekly = actual["weekly_spending"]
+            safe = self.tool("safe_to_spend", {}, cid)
+            self.assertEqual(set(weekly), {"eur_week", "usual_extras_eur_week"})
+            for key, amount in weekly.items():
+                self.assertIsInstance(amount, (int, float))
+                self.assertGreaterEqual(amount, 0)
+                self.assertEqual(amount, safe[key])
             for other in worker.DEMO_CUSTOMERS:
                 if other != cid:
                     self.assertNotIn(other, json.dumps(actual))
@@ -181,6 +188,75 @@ class RuntimeTests(unittest.TestCase):
                           {"price_eur": 500, "months": 6, "customer_id": "CUST00127"}):
             with self.subTest(arguments=arguments), self.assertRaises(worker.RequestError):
                 self.tool("afford", arguments)
+
+    def test_purchase_plan_preserves_default_afford_result_and_grounds_tips_in_own_records(self):
+        args = {"price_eur": 1500, "months": 6, "protected_categories": [], "reserved_monthly_eur": 0}
+        for cid in worker.DEMO_CUSTOMERS:
+            result = self.request("purchase_plan", cid, args)
+            original = self.tool("afford", {"price_eur": 1500, "months": 6}, cid)
+            for key, value in original.items():
+                if key != "limitation":
+                    self.assertEqual(result[key], value, (cid, key))
+            self.assertEqual(result["tips_month"], "2026-09")
+            self.assertLessEqual(len(result["tips"]), 3)
+            self.assertEqual(len({tip["category"] for tip in result["tips"]}), len(result["tips"]))
+            rows = self.runtime.query("""select category, line, tx_amount_eur from transactions
+                where customer_id = ? and tx_date >= '2026-09-01' and tx_date < '2026-10-01'
+                and tx_amount_eur < 0""", [cid])
+            for tip in result["tips"]:
+                self.assertIn(tip["category"], worker.PURCHASE_CATEGORIES)
+                amounts = [-Decimal(str(row["tx_amount_eur"])).quantize(Decimal("0.01"), rounding=worker.ROUND_HALF_UP) for row in rows
+                           if row["category"] == tip["category"] and row["line"] == tip["line"]]
+                self.assertTrue(amounts)
+                expected = (sum(amounts) / len(amounts)).quantize(Decimal("0.01"), rounding=worker.ROUND_HALF_UP)
+                self.assertEqual(Decimal(str(tip["amount_eur"])), expected)
+                self.assertGreater(tip["amount_eur"], 0)
+                self.assertIn("siirrät summan tavoitteeseen", tip["text"])
+            self.assertNotRegex(json.dumps(result, allow_nan=False), r"CUST\d+")
+            self.assertEqual(self.request("purchase_plan", cid, args), result)
+
+    def test_purchase_plan_protection_changes_feasibility_and_never_proposes_protected_cuts_or_tips(self):
+        args = {"price_eur": 1500, "months": 6, "protected_categories": [], "reserved_monthly_eur": 0}
+        original = self.request("purchase_plan", "CUST00127", args)
+        self.assertTrue(any(cut["line"] == "restaurants" for cut in original["cuts"]))
+        protected = self.request("purchase_plan", "CUST00127", {**args, "protected_categories": ["Restaurants"]})
+        self.assertTrue(all(cut["line"] not in worker.PURCHASE_CATEGORIES["Restaurants"] for cut in protected["cuts"]))
+        self.assertTrue(all(tip["category"] != "Restaurants" for tip in protected["tips"]))
+        self.assertLess(protected["set_aside_month"], original["set_aside_month"])
+        self.assertGreater(protected["months_needed"], original["months_needed"])
+        for category, lines in worker.PURCHASE_CATEGORIES.items():
+            plan = self.request("purchase_plan", "CUST00127", {**args, "price_eur": 20000, "protected_categories": [category]})
+            self.assertTrue(all(cut["line"] not in lines for cut in plan["cuts"]))
+            self.assertTrue(all(tip["category"] != category for tip in plan["tips"]))
+
+    def test_purchase_plan_reserves_other_projects_capacity_and_cannot_reuse_current_cash(self):
+        args = {"price_eur": 1500, "months": 6, "protected_categories": [], "reserved_monthly_eur": 0}
+        original = self.request("purchase_plan", "CUST00127", args)
+        reserved = self.request("purchase_plan", "CUST00127", {**args, "reserved_monthly_eur": 50})
+        self.assertEqual(reserved["reserved_monthly_eur"], 50)
+        self.assertLessEqual(reserved["can_set_aside_month"], original["can_set_aside_month"])
+        self.assertLess(reserved["set_aside_month"], original["set_aside_month"])
+        self.assertGreater(reserved["months_needed"], original["months_needed"])
+        self.assertEqual(self.request("purchase_plan", "CUST00207", args)["verdict"], "already_affordable")
+        self.assertNotEqual(self.request("purchase_plan", "CUST00207", {**args, "reserved_monthly_eur": 1})["verdict"], "already_affordable")
+        impossible = self.request("purchase_plan", "CUST00127", {**args, "reserved_monthly_eur": 3000000})
+        self.assertEqual(impossible["verdict"], "not_now")
+        self.assertEqual(impossible["tips"], [])
+        self.assertEqual(self.request("purchase_plan", "CUST00127", args), original, "Reservations must not mutate the model snapshot")
+
+    def test_purchase_plan_rejects_unbounded_preferences_reservations_and_identity_overrides(self):
+        args = {"price_eur": 1500, "months": 6, "protected_categories": [], "reserved_monthly_eur": 0}
+        invalid = [{}, {key: value for key, value in args.items() if key != "protected_categories"},
+                   {**args, "customer_id": "CUST00127"},
+                   *({**args, "protected_categories": value} for value in (None, "Restaurants", ["Housing"], ["Restaurants", "Restaurants"], [{}], ["Travel"] * 5)),
+                   *({**args, "reserved_monthly_eur": value} for value in (-1, 3000001, "50", True, None, float("nan"), float("inf"))),
+                   {**args, "price_eur": 0}, {**args, "months": 1.5}]
+        for value in invalid:
+            with self.subTest(args=value), self.assertRaises(worker.RequestError):
+                self.request("purchase_plan", args=value)
+        with self.assertRaises(worker.RequestError):
+            self.request("purchase_plan", "CUST99999", args)
+        self.assertNotIn("purchase_plan", {tool["name"] for tool in self.request("tools")})
 
     def test_interleaved_customers_and_cached_requests_never_cross(self):
         period = {"start_date": "2026-09-01", "end_date": "2026-10-01"}

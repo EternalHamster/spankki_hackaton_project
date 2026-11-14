@@ -269,7 +269,7 @@ def afford(cid, price_eur, months=6):
     return _afford(cid, price_eur, months, query=_q)
 
 
-def _afford(cid, price_eur, months=6, *, query):
+def _afford(cid, price_eur, months=6, *, query, protected_lines=(), reserved_monthly_eur=0):
     """Use the caller's snapshot connection without changing the process-wide BDA database."""
     try:
         price, months = float(price_eur), int(months)
@@ -279,6 +279,11 @@ def _afford(cid, price_eur, months=6, *, query):
         raise CoachError("price_eur must be between 1 and 1,000,000")
     if not 1 <= months <= AFFORD_MAX_MONTHS:
         raise CoachError(f"months must be between 1 and {AFFORD_MAX_MONTHS}")
+    protected = set(protected_lines)
+    if protected - set(C.DISCRETIONARY):
+        raise CoachError("protected_lines must contain only discretionary spending lines")
+    if type(reserved_monthly_eur) not in (int, float) or not math.isfinite(reserved_monthly_eur) or not 0 <= reserved_monthly_eur <= 3_000_000:
+        raise CoachError("reserved_monthly_eur must be a nonnegative amount up to 3,000,000")
     summary = query("select * from customer_summary where customer_id = ?", [cid])
     if summary.empty:
         raise CoachError(f"unknown customer {cid}")
@@ -302,6 +307,11 @@ def _afford(cid, price_eur, months=6, *, query):
     saving = nice_down(max(0.0, float(s["savings_12m"])))           # already moved to savings each month
     # income - spending - saving below zero: that much has to be found before anything can be set aside
     shortfall = _up5(max(0.0, -float(s["surplus_month"])))
+    # Other active projects already use this saving capacity. Reserve surplus first;
+    # any remainder must be covered before this new project's savings can start.
+    if reserved_monthly_eur:
+        shortfall = _up5(shortfall + max(0.0, reserved_monthly_eur - room))
+        room = nice_down(max(0.0, room - reserved_monthly_eur))
     spare_now = nice_down(max(0.0, float(s["balance"]) - float(s["surprise_fund"]) - C.SAFE_CUSHION_EUR
                               - float(s["regular_month"])))
 
@@ -314,7 +324,7 @@ def _afford(cid, price_eur, months=6, *, query):
         out["budget_short_month"] = shortfall
 
     cuts = []
-    if spare_now >= price:
+    if spare_now >= price and not reserved_monthly_eur:
         verdict, set_aside, final_months = "already_affordable", 0, 0
         out["spare_money_on_account"] = spare_now
     elif room >= need:
@@ -324,7 +334,7 @@ def _afford(cid, price_eur, months=6, *, query):
         out["from_current_saving_month"] = redirect = min(missing, saving)
         missing -= redirect
         out["missing_month"] = missing
-        cand = cl.loc[[l for l in C.DISCRETIONARY if l in cl.index]].copy()
+        cand = cl.loc[[l for l in C.DISCRETIONARY if l in cl.index and l not in protected]].copy()
         cand["excess"] = (cand["expected_month"] - cand["peer_median"]).fillna(0.0)
         cand = cand.sort_values(["excess", "expected_month"], ascending=False, kind="stable")
         left = missing

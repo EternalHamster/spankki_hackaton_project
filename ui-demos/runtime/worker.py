@@ -36,6 +36,20 @@ GROUPS = {
     "fixed_bills": ("housing", "utilities"),
 }
 MODEL_CONFIG = _load_bda_config()
+# Large optional purchases share a model line across these three bank categories.
+# Protecting any of them therefore excludes that pooled line conservatively.
+PURCHASE_CATEGORIES = {
+    "Restaurants": ("restaurants", "fast_food", "bars"),
+    "Lifestyle": ("lifestyle", "big_purchase"),
+    "Entertainment": ("entertainment", "big_purchase"),
+    "Travel": ("travel", "big_purchase"),
+}
+PURCHASE_TIP_LABELS = {
+    "Restaurants": ("Ravintolat ja kahvilat", "ravintolaostoksen"),
+    "Lifestyle": ("Ostokset", "harkinnanvaraisen ostoksen"),
+    "Entertainment": ("Vapaa-aika", "vapaa-ajan ostoksen"),
+    "Travel": ("Matkailu", "matkailuun liittyvän ostoksen"),
+}
 DATE_PROPERTIES = {
     "start_date": {"type": "string", "description": "First included day, YYYY-MM-DD, from the historical snapshot."},
     "end_date": {"type": "string", "description": "Exclusive upper bound, YYYY-MM-DD: September ends at October 1."},
@@ -228,7 +242,9 @@ class CustomerRuntime:
             # Browser calculations expect numeric amounts, while tool results use exact decimal strings.
             for row in profile["transactions"]:
                 row["amount"], row["balance"] = float(row["amount"]), float(row["balance"])
-            self._bootstraps[cid] = {"summary": self._summary, "profiles": [profile], "as_of": self.as_of, "version": self.version}
+            weekly = build_insight_context(cid, self.source(cid))["safe_to_spend_detail"]
+            self._bootstraps[cid] = {"summary": self._summary, "profiles": [profile], "as_of": self.as_of, "version": self.version,
+                                     "weekly_spending": {key: weekly[key] for key in ("eur_week", "usual_extras_eur_week")}}
         return self._bootstraps[cid]
 
     def period(self, arguments):
@@ -281,6 +297,58 @@ class CustomerRuntime:
         self._tool_cache[key] = result
         if len(self._tool_cache) > 256:
             self._tool_cache.popitem(last=False)
+        return result
+
+    def purchase_plan(self, cid, args):
+        """Internal project proposal: a constrained plan plus dated optional-purchase examples."""
+        required = {"price_eur", "months", "protected_categories", "reserved_monthly_eur"}
+        if set(args) != required:
+            raise RequestError("Purchase plan requires price_eur, months, protected_categories and reserved_monthly_eur only")
+        validate_arguments("afford", {key: args[key] for key in ("price_eur", "months")})
+        protected = args["protected_categories"]
+        reserved = args["reserved_monthly_eur"]
+        if not isinstance(protected, list) or len(protected) > len(PURCHASE_CATEGORIES) or any(
+                not isinstance(category, str) or category not in PURCHASE_CATEGORIES for category in protected) or len(set(protected)) != len(protected):
+            raise RequestError("Use each supported optional category at most once")
+        if type(reserved) not in (int, float) or not math.isfinite(reserved) or not 0 <= reserved <= 3_000_000:
+            raise RequestError("reserved_monthly_eur must be a nonnegative finite amount up to 3000000")
+        protected_lines = {line for category in protected for line in PURCHASE_CATEGORIES[category]}
+        if not protected_lines.issubset(self.cfg.DISCRETIONARY):
+            raise RequestError("Purchase category mapping is unavailable")
+        result = _afford(cid, args["price_eur"], args["months"], query=self.query_frame,
+                         protected_lines=protected_lines, reserved_monthly_eur=reserved)
+        snapshot = date.fromisoformat(self.as_of)
+        end = snapshot + timedelta(days=1) if (snapshot + timedelta(days=1)).day == 1 else snapshot.replace(day=1)
+        start = (end - timedelta(days=1)).replace(day=1)
+        tips = []
+        if result["verdict"] != "not_now" and start >= date.fromisoformat(self.coverage["first"]):
+            rows = self.query("""select category, line, count(*) payments,
+                sum(cast(-tx_amount_eur as decimal(18,2))) total_eur
+                from transactions where customer_id = ? and tx_date >= ? and tx_date < ? and tx_amount_eur < 0
+                and category in ('Restaurants', 'Lifestyle', 'Entertainment', 'Travel')
+                group by category, line order by total_eur desc, category, line""", [cid, start, end])
+            seen = set(protected)
+            for row in rows:
+                category = row["category"]
+                if category in seen or row["line"] not in self.cfg.DISCRETIONARY or row["payments"] <= 0:
+                    continue
+                amount = Decimal(row["total_eur"]) / Decimal(row["payments"])
+                amount = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                if amount <= 0:
+                    continue
+                label, purchase = PURCHASE_TIP_LABELS[category]
+                tips.append({"category": category, "line": row["line"], "label": label,
+                             "amount_eur": float(amount),
+                             "text": f"Jos jätät yhden {purchase} väliin ja siirrät summan tavoitteeseen, etenet nopeammin."})
+                seen.add(category)
+                if len(tips) == 3:
+                    break
+        result.update(tips=tips, tips_month=start.strftime("%Y-%m"), protected_categories=list(protected),
+                      reserved_monthly_eur=float(reserved), model_estimate=True, historical_snapshot=True,
+                      as_of=self.as_of, data_version=self.version,
+                      limitation="Scenario based on the historical snapshot, with protected spending and other projects' monthly reservations. No money has been saved or transferred automatically.")
+        if re.search(r"CUST\d+", json.dumps(result, allow_nan=False)):
+            raise RequestError("Unexpected identifier in purchase plan")
         return result
 
     def _execute(self, cid, name, args):
@@ -394,6 +462,8 @@ class CustomerRuntime:
                 return getattr(self, operation)(cid)
             if operation == "tool" and set(args) == {"name", "arguments"}:
                 return self.execute(cid, args["name"], args["arguments"])
+            if operation == "purchase_plan":
+                return self.purchase_plan(cid, args)
             raise RequestError("Unknown operation")
 
 

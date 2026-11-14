@@ -8,7 +8,7 @@ import { createCoach } from './coach.mjs';
 import { createPreparedCoach } from './prepared.mjs';
 import { createSessions, DEMO_CUSTOMERS, isDemoCustomer, sameOrigin } from './customers.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
-const requiredFiles = ['index.html', 'app.js', 'chat.js', 'coach-text.js', 'insights.js', 'disclosure.js', 'exploration.js', 'model.js', 'styles.css',
+const requiredFiles = ['index.html', 'app.js', 'chat.js', 'answer-depth.js', 'coach-text.js', 'customer-memory.js', 'purchase-projects.js', 'project-ui.js', 'insights.js', 'disclosure.js', 'exploration.js', 'model.js', 'styles.css',
   'wrapped.js', 'wrapped.css',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -32,8 +32,8 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   if (!isDemoCustomer(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
   const model = coach || createPreparedCoach({ dataSource, coach: createCoach({ dataSource, ...chatOptions }) });
-  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level) =>
-    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level }) });
+  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level, memory, projects, pendingProject, rewrite) =>
+    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level, memory, projects, pendingProject, rewrite }) });
   let wrappedData;
   async function scopedWrapped(id) {
     if (!wrappedData) wrappedData = fs.readFile(new URL('./server-data/wrapped-data.json', import.meta.url), 'utf8').then(JSON.parse)

@@ -4,10 +4,12 @@ import { metrics, basketTotals, scenarioSavings, transactionKind } from './model
 import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
-import { explorationTopics, createExplorationSummaries, affordQuestion } from './exploration.js';
+import { explorationTopics, createExplorationSummaries } from './exploration.js';
 import { formatInline } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { setDisclosure } from './disclosure.js';
+import { createProjectUI } from './project-ui.js';
+import { LEVELS, LEVEL_KEY, levelIndex, getAnswerLevel, setAnswerLevel } from './answer-depth.js';
 
 // Appearance follows the user's references; all money data is synthetic.
 const paths={
@@ -138,17 +140,43 @@ function render(){
   root.innerHTML=`<div class="app-shell"><header class="topbar"><span class="demo-pill">DEMO</span><h1>Oma talous</h1><button class="icon-button" data-action="about" aria-label="Tietoa demoaineistosta">${icon('info')}</button></header>
     <main id="main-content" class="mint-content"><label class="customer-picker" for="customer-selector"><span>${icon('person')}Valittu demoasiakas</span><select id="customer-selector">${customerSession.customers.map(customer=>`<option value="${esc(customer.id)}" ${customer.id===customerSession.customer_id?'selected':''}>${esc(customer.label)}</option>`).join('')}</select></label>
     <section class="trainer-intro" aria-label="Kysy talousvalmentajalta"><form id="explore-form" class="explore-composer"><label class="sr-only" for="explore-question">Kysy omasta taloudestasi</label><input id="explore-question" type="text" placeholder="Kysy omasta taloudestasi…" maxlength="2000" required><button type="submit" aria-label="Lähetä kysymys valmentajalle">${icon('arrow')}</button></form><span class="trainer-note">AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin</span></section>
-    <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3><div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
+    <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3>${topic.id === 'afford' ? '<section id="afford-projects" class="afford-projects" aria-label="Omat hankintatavoitteet" hidden></section>' : ''}<div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
     <div class="section-title insights-title"><h2>Tärkeimmät havainnot</h2><span class="ai-label">AI:n tuottama</span></div><section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät AI-havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
     <div id="recap-teaser">${recapTeaser()}</div>
-    <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small id="transactions-period">${capitalize(monthName(selectedMonths.transactions))}</small></span>${icon('chevron')}</button></div>
+    <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small id="transactions-period">${capitalize(monthName(selectedMonths.transactions))}</small></span>${icon('chevron')}</button><button class="utility-row" data-action="settings">${icon('person')}<span><strong>Valmentajan asetukset</strong><small id="answer-depth-summary">Vastausten taso: ${LEVELS[levelIndex(getAnswerLevel())].label}</small></span>${icon('chevron')}</button></div>
     <p class="demo-note">Synteettinen demoaineisto · tiedot ${esc(dateLabel(customerSession.as_of))} asti<br>Ei yhteyttä oikeaan pankkitiliin.</p></main>
-    <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-context="Minä">${icon('person')}<span>Minä</span></button></nav></div>`;
+    <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-action="settings" aria-label="Minä – asetukset">${icon('person')}<span>Minä</span></button></nav></div>`;
   void loadInsights();
+  renderProjects();
   if (activeTopic) openTopic(activeTopic, false);
 }
 function recapTeaser() {
   return wrapped.has(profile.customer_id) ? wrapped.teaser() : '';
+}
+function weeklyAllowance() {
+  const allowance = data.weekly_spending;
+  if (!allowance || ![allowance.eur_week, allowance.usual_extras_eur_week].every(value =>
+    typeof value === 'number' && Number.isFinite(value) && value >= 0)) {
+    return '<p class="topic-caption">Käyttövaran palkki ei ole saatavilla.</p>';
+  }
+  const available = allowance.eur_week, usual = allowance.usual_extras_eur_week;
+  // Compare the dated estimate with usual spending, not an invented amount already spent.
+  const maximum = usual || available || 1;
+  const amount = available > 0 ? `noin ${euro(available, 0)}` : euro(0, 0);
+  const comparison = usual > 0 ? `Tavallinen viikkokulutus noin ${euro(usual, 0)}.` : 'Tavallista viikkokulutusta ei ole arvioitu.';
+  const note = available === 0 ? 'Lisäostoihin ei jää käyttövaraa tässä arviossa.'
+    : usual === 0 ? 'Palkki näyttää arvioidun käyttövarasi.'
+    : available >= usual ? 'Käyttövara kattaa tavallisen viikkokulutuksesi.'
+    : 'Käyttövara on tavallista viikkokulutustasi pienempi.';
+  return `<section class="weekly-allowance${available === 0 ? ' weekly-allowance-empty' : ''}" aria-labelledby="weekly-allowance-title">
+    <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Käytettävissä lisäostoihin</span>${icon('wallet')}</div>
+    <p class="weekly-allowance-amount"><strong>${amount}</strong><span>/ viikko</span></p>
+    <p class="weekly-allowance-description">Ravintoloihin, ostoksiin ja muuhun mukavaan.</p>
+    <label class="weekly-allowance-label" for="weekly-allowance-progress">${usual > 0 ? 'Käyttövara suhteessa tavalliseen kulutukseen' : 'Arvioitu käyttövara'}</label>
+    <progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(available, maximum)}" max="${maximum}" aria-valuetext="${esc(`Käyttövara ${amount} viikossa. ${comparison}`)}" aria-describedby="weekly-allowance-note"></progress>
+    ${usual > 0 ? `<div class="weekly-allowance-scale"><span>Tavallinen viikkokulutus</span><strong>noin ${euro(usual, 0)}</strong></div>` : ''}
+    <p id="weekly-allowance-note" class="weekly-allowance-note">${note}</p>
+  </section>`;
 }
 function openTopic(topicId, toggle = true) {
   const topic = explorationTopics.find(item=>item.id === topicId);
@@ -171,19 +199,16 @@ function openTopic(topicId, toggle = true) {
   const panel = document.querySelector(`#panel-${topicId}`);
   document.querySelector(`#topic-${topicId}`).setAttribute('aria-expanded', 'true');
   if (topicId === 'afford') {
-    panel.innerHTML = `<p class="afford-intro">Uusi pyörä, lomamatka vai jotain ihan muuta? Katsotaan, mitä toiveesi vaatisi ja millaiset muutokset voisivat auttaa.</p>
-      <form id="afford-form" class="afford-form">
-        <label for="afford-purchase">Mitä haluaisit hankkia?<input id="afford-purchase" name="purchase" type="text" placeholder="Esim. sähköpyörä" maxlength="120" required></label>
-        <div class="afford-fields"><label for="afford-price">Hinta (€)<input id="afford-price" name="price" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" placeholder="Esim. 1 500" required></label>
-        <label for="afford-months">Aikaa (kuukautta)<input id="afford-months" name="months" type="number" inputmode="numeric" min="1" max="60" step="1" value="6" required></label></div>
-        <button type="submit" class="primary-button full-width">Katso, mitä se vaatisi ${icon('arrow')}</button>
-        <p class="afford-error" role="alert" hidden></p>
-      </form><p class="topic-caption">Saat valmentajalta arvion kuukausisummasta ja tarvittavista muutoksista. Arvio perustuu ${esc(dateLabel(customerSession.as_of))} tilanteeseen.</p>`;
+    panel.innerHTML = `<div class="afford-conversation"><p class="afford-intro">Uusi pyörä, lomamatka vai jotain ihan muuta? Kerro, mistä haaveilet. Mietitään yhdessä sinulle sopiva suunnitelma.</p>
+      <form id="afford-form" class="afford-conversation-form"><label for="afford-idea">Mitä haluaisit toteuttaa?</label><textarea id="afford-idea" name="idea" rows="3" maxlength="2000" placeholder="Haluaisin hankkia uuden pyörän, mutta en tiedä, paljonko voisin säästää kuukaudessa…" required></textarea>
+        <div class="afford-examples" aria-label="Ideoita keskustelun alkuun"><button type="button" data-afford-example="Haluaisin hankkia uuden pyörän.">Uusi pyörä</button><button type="button" data-afford-example="Haaveilen lomamatkasta. Miten voisin säästää sitä varten?">Lomamatka</button><button type="button" data-afford-example="Minulla on hankinta mielessä, mutta en vielä tiedä sopivaa budjettia.">Budjetti vielä auki</button></div>
+        <button type="submit" class="primary-button full-width">Jutellaan tästä ${icon('arrow')}</button>
+      </form><p class="topic-caption">Voit aloittaa pelkästä ideasta. Valmentaja auttaa hinnan ja aikataulun kanssa. Kun suunnitelma tuntuu sopivalta, voit vahvistaa sen omaksi tavoitteeksesi.</p></div>`;
     void setDisclosure(panel, true, !toggle);
     return;
   }
   const summary = `<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>`;
-  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption">Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
+  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption">Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>${weeklyAllowance()}` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
   if (topicId === 'spending') {
     const shared = { data: projectFinanceData(profile, data.summary, names), selectedMonth: month,
       onSelectCategory: category=>showTransactions(category, topicMonth(topicId)),
@@ -288,6 +313,32 @@ function modal(title,body,kind=''){
   detail.innerHTML=`<div class="dialog-heading"><h2 id="dialog-title">${title}</h2><button class="icon-button" data-action="close" aria-label="Sulje">${icon('close')}</button></div><div class="dialog-content">${body}</div>`;
   detail.setAttribute('aria-labelledby','dialog-title');if(!detail.open)detail.showModal();
 }
+function updateAnswerDepthSetting() {
+  const option = LEVELS[levelIndex(getAnswerLevel())];
+  const summary = document.querySelector('#answer-depth-summary');
+  if (summary) summary.textContent = `Vastausten taso: ${option.label}`;
+  const slider = detail.querySelector('#answer-depth-setting');
+  if (!slider) return;
+  slider.value = String(levelIndex(option.id));
+  slider.setAttribute('aria-valuetext', option.label);
+  detail.querySelector('#answer-depth-current').textContent = option.label;
+  detail.querySelector('#answer-depth-description').textContent = option.description;
+  detail.querySelectorAll('[data-depth-label]').forEach(label => {
+    label.classList.toggle('selected', label.dataset.depthLabel === option.id);
+  });
+}
+function showSettings() {
+  const option = LEVELS[levelIndex(getAnswerLevel())];
+  modal('Asetukset', `<section class="answer-depth-setting" aria-labelledby="answer-depth-title">
+    <div class="answer-depth-heading"><label id="answer-depth-title" for="answer-depth-setting">Valmentajan vastausten taso</label><output id="answer-depth-current" for="answer-depth-setting">${option.label}</output></div>
+    <p>Valitse, kuinka tarkasti valmentaja vastaa uusiin kysymyksiisi.</p>
+    <input id="answer-depth-setting" type="range" min="0" max="2" step="1" value="${levelIndex(option.id)}" aria-valuetext="${option.label}" aria-describedby="answer-depth-description answer-depth-scope">
+    <div class="answer-depth-labels" aria-hidden="true">${LEVELS.map(level => `<span data-depth-label="${level.id}" class="${option.id === level.id ? 'selected' : ''}">${level.label}</span>`).join('')}</div>
+    <p id="answer-depth-description" class="answer-depth-description">${option.description}</p>
+    <p id="answer-depth-scope" class="answer-depth-scope">Tämä on oletus kaikissa keskusteluissa. Voit muokata yksittäistä vastausta sen omista painikkeista muuttamatta tätä asetusta.</p>
+    <p id="answer-depth-save-status" class="answer-depth-save-status" role="status">Valinta tallennetaan tähän selaimeen.</p>
+  </section>`, 'settings-dialog');
+}
 function showTransactions(kind='all', month=selectedMonths.transactions){
   if (!months.includes(month)) return;
   selectedMonths.transactions = month;
@@ -303,7 +354,11 @@ function showBaskets(selected){const totals=basketTotals(m.categories);modal(sel
 const showChat = createChatDialog({ modal, detail, icon,
   getSelection: () => customerSession ? { ...customerSession, label: customerLabel() } : null,
   onSelectionStale: () => { void loadCustomer(); },
+  onProjectsChanged: () => renderProjects(),
 });
+const projectUI = createProjectUI({ getContainer: () => document.querySelector('#afford-projects'),
+  getSelection: () => customerSession, icon, onAsk: question => showChat(question, { autoSend: true }) });
+function renderProjects() { if (profile && customerSession) projectUI.render(); }
 // The year-in-review story; its "ask the coach" buttons open the chat with the question filled in.
 const wrapped = createWrapped({ onAsk: question => showChat(question, { autoSend: true })});
 // Deep link, e.g. from a push notification: #rahavuosi opens the story, #rahavuosi/3 opens card 3.
@@ -315,6 +370,7 @@ function action(name){
   if(name==='close'){detail.close();return;}
   if(name==='top'){window.scrollTo({top:0,behavior:'smooth'});return;}
   if(name==='chat'){showChat();return;}
+  if(name==='settings'){showSettings();return;}
   if(name==='wrapped'){wrapped.open(profile.customer_id);return;}  if(name==='account'){showTransactions();return;}
   if(name==='income'||name==='spending'){showTransactions(name,selectedMonth);return;}
   if(name==='categories'){modal('Mihin rahani menivät?',`<p>${capitalize(monthName(selectedMonth))}</p><div class="dialog-categories">${Object.entries(m.categories).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([c,v])=>categoryRow(c,v)).join('')}</div>`);return;}
@@ -327,6 +383,10 @@ document.addEventListener('click',event=>{const button=event.target.closest('but
 document.addEventListener('click', event=>{
   const button = event.target.closest('button');
   if (!button) return;
+  if (button.dataset.affordExample) {
+    const input = document.querySelector('#afford-idea');
+    if (input) { input.value = button.dataset.affordExample; input.focus(); }
+  }
   if (button.dataset.topic) openTopic(button.dataset.topic);
   if (button.dataset.topicRetry) void loadTopicSummary(button.closest('.topic-summary'), button.dataset.topicRetry);
   if (button.dataset.topicChat) {
@@ -343,14 +403,9 @@ document.addEventListener('submit', event=>{
     event.preventDefault();
     const form = event.target;
     if (!form.reportValidity()) return;
-    try {
-      const question = affordQuestion(Object.fromEntries(new FormData(form)));
-      form.querySelector('.afford-error').hidden = true;
-      showChat(question, {autoSend:true});
-    } catch (error) {
-      const alert = form.querySelector('.afford-error');
-      alert.textContent = error.message; alert.hidden = false;
-    }
+    const input = form.querySelector('#afford-idea'), question = input.value.trim();
+    if (!question) { input.focus(); return; }
+    showChat(question, {autoSend:true});
     return;
   }
   if (event.target.id !== 'explore-form') return;
@@ -368,9 +423,26 @@ document.addEventListener('change',event=>{
     document.querySelector('#month-transactions')?.focus({preventScroll:true});
   } else if (scope) changeTopicMonth(scope, event.target.value);
 });
-document.addEventListener('input',event=>{if(event.target.id==='saving-cut'){document.querySelector('#saving-percent').textContent=`${event.target.value} %`;document.querySelector('#saving-result').textContent=euro(scenarioSavings(m.categories,{Restaurants:+event.target.value}));}});
+document.addEventListener('input',event=>{
+  if(event.target.id==='answer-depth-setting') {
+    const option = LEVELS[Number(event.target.value)];
+    if (!option) return;
+    const result = setAnswerLevel(option.id);
+    updateAnswerDepthSetting();
+    detail.querySelector('#answer-depth-save-status').textContent = result.persisted
+      ? 'Tallennettu. Valinta koskee uusia vastauksia.'
+      : 'Valinta on käytössä tämän käynnin ajan. Selaimeen tallentaminen ei onnistunut.';
+    return;
+  }
+  if(event.target.id==='saving-cut'){document.querySelector('#saving-percent').textContent=`${event.target.value} %`;document.querySelector('#saving-result').textContent=euro(scenarioSavings(m.categories,{Restaurants:+event.target.value}));}
+});
 detail.addEventListener('click',event=>{if(event.target===detail){const r=detail.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)detail.close();}});
 detail.addEventListener('close',()=>{if(lastFocus?.isConnected)lastFocus.focus();else document.querySelector('.nav-item.active')?.focus();});
 window.addEventListener('focus', () => { void synchronizeSession(); });
+window.addEventListener('storage', event => {
+  if (event.key === null || event.key === LEVEL_KEY) updateAnswerDepthSetting();
+  if (customerSession && (event.key === null || event.key === `oma-talous-projects-v1:${customerSession.customer_id}` ||
+      event.key === `oma-talous-memory-v1:${customerSession.customer_id}`)) renderProjects();
+});
 document.addEventListener('visibilitychange', () => { if (!document.hidden) void synchronizeSession(); });
 void loadCustomer();

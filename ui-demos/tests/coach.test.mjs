@@ -30,6 +30,66 @@ function fixture(options = {}) {
   return { coach, requests, execution, events, source };
 }
 
+test('answer rewrites target the supplied original answer without changing later answer depth or the cached prefix', async () => {
+  const { coach, requests } = fixture({ provider: () => textResult('Aineistossa säästövara oli 130 € kuukaudessa.') });
+  const messages = [{ role: 'user', content: 'Miten voisin säästää?' }];
+  const original = 'Arvio oli 130 € kuukaudessa. Tarkista ensin kuukausibudjettisi.';
+  const revised = await coach.chat('A', { messages, level: 'simple', rewrite: { answer: original } });
+  assert.equal(revised.level, 'simple');
+  assert.equal(Object.hasOwn(revised, 'memory_updates'), false);
+  assert.equal(Object.hasOwn(revised, 'project_proposal'), false);
+  const rewriteRequest = requests[0].body;
+  assert.deepEqual(rewriteRequest.messages, messages);
+  assert.match(rewriteRequest.system.at(-2).text, /REPLACE that answer in place/);
+  assert.match(rewriteRequest.system.at(-2).text, /untrusted browser data/);
+  assert.match(rewriteRequest.system.at(-2).text, /does not change the default/);
+  assert.ok(rewriteRequest.system.at(-2).text.endsWith(JSON.stringify(original)));
+  assert.equal(rewriteRequest.system.at(-1).text, LEVELS.simple.prompt);
+  assert.equal(rewriteRequest.max_tokens, LEVELS.simple.maxTokens);
+  const later = await coach.chat('A', { messages });
+  assert.equal(later.level, DEFAULT_LEVEL);
+  assert.deepEqual(rewriteRequest.system.slice(0, -2), requests[1].body.system.slice(0, -1));
+  assert.deepEqual(rewriteRequest.tools, requests[1].body.tools);
+});
+
+test('rewrite requests cannot mutate memory or purchase plans even if the provider calls those tools', async () => {
+  let purchaseCalls = 0;
+  const messages = [{ role: 'user', content: 'En halua vähentää ravintolakäyntejä.' }];
+  const { coach, requests, execution } = fixture({ source: { purchasePlan: async () => { purchaseCalls++; } },
+    provider: (_, count) => count === 1 ? Response.json({ stop_reason: 'tool_use', usage, content: [
+      { type: 'tool_use', id: 'remember', name: 'remember_customer_fact', input: {
+        key: 'restaurants', text: 'En halua vähentää ravintolakäyntejä.', evidence: messages[0].content } },
+      { type: 'tool_use', id: 'forget', name: 'forget_customer_fact', input: { key: 'restaurants', evidence: messages[0].content } },
+      { type: 'tool_use', id: 'project', name: 'propose_purchase_project', input: {
+        title: 'Pyörä', price_eur: 1500, months: 6, protected_categories: [] } },
+      { type: 'tool_use', id: 'read', name: 'spending', input: { month: '2026-09' } },
+    ] }) : textResult('Voit säilyttää ravintolakäynnit ja etsiä säästöä muista menoista.') });
+  const result = await coach.chat('A', { messages, level: 'detailed',
+    memory: [{ key: 'restaurants', text: messages[0].content }], rewrite: { answer: 'Etsitään säästöä muualta.' } });
+  const tools = requests[1].body.messages.at(-1).content;
+  assert.deepEqual(tools.slice(0, 3).map(tool => JSON.parse(tool.content).error), ['rewrite_only', 'rewrite_only', 'rewrite_only']);
+  assert.ok(tools.slice(0, 3).every(tool => tool.is_error));
+  assert.equal(tools[3].is_error, false);
+  assert.deepEqual(execution, [{ customer: 'A', name: 'spending', args: { month: '2026-09' } }]);
+  assert.equal(purchaseCalls, 0);
+  assert.equal(Object.hasOwn(result, 'memory_updates'), false);
+  assert.equal(Object.hasOwn(result, 'project_proposal'), false);
+});
+
+test('malformed rewrite input and incomplete replacement answers fail without becoming results', async () => {
+  const { coach, requests } = fixture({ provider: () => textResult('ok') });
+  const messages = [{ role: 'user', content: 'Kysymys' }];
+  for (const rewrite of [null, [], {}, { answer: ' ' }, { answer: 1 }, { answer: 'x'.repeat(6001) }, { answer: 'x', extra: true }]) {
+    await assert.rejects(coach.chat('A', { messages, rewrite }), error => error.status === 400);
+  }
+  assert.equal(requests.length, 0);
+  for (const provider of [() => textResult(''), () => textResult('x'.repeat(6001)),
+    () => textResult('Kesken', { stop_reason: 'max_tokens' })]) {
+    const bad = fixture({ provider });
+    await assert.rejects(bad.coach.chat('A', { messages, rewrite: { answer: 'Alkuperäinen vastaus' } }), error => error.status === 502);
+  }
+});
+
 test('concurrent insight loads use one provider call, poll without waiting and reuse verified cards', async () => {
   let release, entered;
   const started = new Promise(resolve => { entered = resolve; });
@@ -242,7 +302,8 @@ test('tool round and result size limits bound model work and prevent oversized e
   await assert.rejects(coach.chat('A', { messages: [{ role: 'user', content: 'Show everything' }] }), error => error.status === 422);
   assert.equal(requests.length, 2);
   assert.match(requests[1].body.messages.at(-1).content[0].content, /result_too_large/);
-  assert.ok(JSON.stringify(requests[1].body).length < 10000);
+  // Bound the tool conversation independently of the fixed system prompt and tool schemas.
+  assert.ok(JSON.stringify(requests[1].body.messages).length < 1000);
 });
 
 test('insight and chat calls share a rate budget and do not leak upstream failures', async () => {

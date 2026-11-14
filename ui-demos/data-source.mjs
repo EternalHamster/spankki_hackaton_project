@@ -68,6 +68,7 @@ export function createDataSource({ python = interpreter(), worker = path.join(ro
     context: customer => call('context', customer),
     toolDefinitions: () => call('tools'),
     execute: (customer, name, args) => call('tool', customer, { name, arguments: args }),
+    purchasePlan: (customer, args) => call('purchase_plan', customer, args),
     async warm() { await call('ready'); for (const { id } of DEMO_CUSTOMERS) { await call('context', id); await call('bootstrap', id); } },
     close() { closed = true; child?.kill(); failAll(); },
   };

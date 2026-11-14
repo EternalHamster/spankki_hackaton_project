@@ -1,11 +1,11 @@
 export const explorationTopics = [
-  { id: 'afford', title: 'Onko minulla varaa tähän?', hint: 'Oma hankinta, oma aikataulu – mitä se vaatisi?', icon: 'bag' },
+  { id: 'afford', title: 'Onko minulla varaa tähän?', hint: 'Kerro haaveestasi – tehdään siitä suunnitelma', icon: 'bag' },
   { id: 'spending', title: 'Mihin rahani menivät?', hint: 'Ymmärrä menojasi ja niiden muutoksia', icon: 'chart' },
   { id: 'week', title: 'Paljonko voin käyttää tällä viikolla?', hint: 'Arvio käytettävissä olevasta rahasta', icon: 'wallet' },
   { id: 'saving', title: 'Miten voisin säästää enemmän?', hint: 'Löydä arkeesi sopiva pieni muutos', icon: 'coffee' },
 ];
 
-export const affordTemplate = 'Onko minulla varaa ostaa [tuote], joka maksaa [hinta] €, [kuukaudet] kuukauden kuluttua? Mitä se vaatisi kuukaudessa?';
+export const affordTemplate = 'Haluaisin suunnitella hankintaa. Voitko auttaa?';
 
 export function affordQuestion({ purchase, price, months }) {
   const item = String(purchase || '').trim(), amount = Number(String(price).replace(',', '.')), duration = Number(months);
