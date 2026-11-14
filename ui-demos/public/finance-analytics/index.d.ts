@@ -18,6 +18,8 @@ export interface FinanceAnalyticsOptions {
   selectedMonth?: string;
   /** Defaults to all sections; hosts can reveal just the charts relevant to a question. */
   sections?: Array<'breakdown' | 'annual' | 'history' | 'rhythm'>;
+  /** Half-donut and integrated category labels, with full details available on demand. */
+  compactBreakdown?: boolean;
   onSelectMonth?: (month: string) => void;
   /** Omit to use the component's own transaction dialog. */
   onSelectCategory?: (category: string) => void;

@@ -173,6 +173,38 @@ test('forged identity, undeclared tools and nested tool args never reach the dat
   }
 });
 
+test('purchase chat advertises afford, returns its full plan to the model and supports a revised deadline', async () => {
+  const calls = [];
+  const plan = { verdict: 'takes_longer', price_eur: 1500, months: 6, needed_month: 250,
+    set_aside_month: 150, months_needed: 10, from_current_saving_month: 50,
+    cuts: [{ line: 'restaurants', cut_month: 40, after_month: 100 }],
+    note: 'The surprise fund is not full yet.', as_of: '2026-09-30', historical_snapshot: true };
+  const answer = 'Pyörä vaatisi tämän arvion mukaan 10 kuukautta ja 150 € kuukaudessa.';
+  const { coach, requests } = fixture({ source: {
+    toolDefinitions: () => [{ name: 'afford', description: 'Plan a purchase.', input_schema: {
+      type: 'object', properties: { price_eur: { type: 'number' }, months: { type: 'integer' } },
+      required: ['price_eur', 'months'], additionalProperties: false,
+    } }],
+    execute: async (customer, name, args) => { calls.push({ customer, name, args }); return { ...plan, ...args }; },
+  }, provider: (request, count) => {
+    if (count % 2 === 1) return toolResult('afford', { price_eur: 1500, months: count === 1 ? 6 : 12 });
+    const result = request.body.messages.at(-1).content[0];
+    assert.equal(result.is_error, false);
+    assert.deepEqual(JSON.parse(result.content), { ...plan, months: count === 2 ? 6 : 12 });
+    return textResult(answer);
+  } });
+  const messages = [{ role: 'user', content: 'Onko minulla varaa 1500 € pyörään 6 kuukaudessa?' }];
+  const first = await coach.chat('A', { messages });
+  assert.deepEqual(first.tools_used, ['afford']);
+  assert.equal(first.answer, answer);
+  await coach.chat('A', { messages: [...messages, { role: 'assistant', content: answer }, { role: 'user', content: 'Entä 12 kuukaudessa?' }] });
+  assert.deepEqual(calls, [6, 12].map(months => ({ customer: 'A', name: 'afford', args: { price_eur: 1500, months } })));
+  const instructions = requests[0].body.system.map(block => block.text).join('\n');
+  assert.match(instructions, /If price or timeframe is missing/);
+  assert.match(instructions, /redirecting existing savings/);
+  assert.match(instructions, /longer timeline still depends on the listed cuts/);
+});
+
 test('controlled database argument errors let the model correct its query while internal failures stay private', async () => {
   for (const [code, message, expected] of [
     ['invalid_request', 'end_date must be after start_date', 'invalid_arguments'],

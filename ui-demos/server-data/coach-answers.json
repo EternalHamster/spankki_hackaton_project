@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "content_version": "duckdb-coach-v7",
+  "content_version": "duckdb-coach-v8",
   "model": "claude-haiku-5-5",
   "data_version": "2779f59f6a18488d953e75d70aca1e23164d7d81348cdbe4535471f583854aea",
   "coverage_from": "2024-10-01",
   "as_of": "2026-09-30",
-  "generated_at": "2026-11-14T13:52:33.554Z",
+  "generated_at": "2026-11-14T14:25:54.726Z",
   "customers": {
     "CUST00207": {
       "months": {
         "2026-04": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 912,28 €.",
-              "Eniten kului asumiseen, 692,48 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 427,66 €: 427,66 € enemmän kuin edelliskuussa.",
+              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
             ],
-            "answer": "• Kulutus oli yhteensä 1 912,28 €.\n• Eniten kului asumiseen, 692,48 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 427,66 €: 427,66 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
           },
           "saving": {
             "bullets": [
@@ -28,10 +28,10 @@
         "2026-05": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 694,04 €.",
-              "Eniten kului ruokaostoksiin, 1 056,39 €."
+              "Ruokaostoksiin kului 1 056,39 €: 780,05 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 2 694,04 €.\n• Eniten kului ruokaostoksiin, 1 056,39 €."
+            "answer": "• Ruokaostoksiin kului 1 056,39 €: 780,05 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -44,10 +44,10 @@
         "2026-06": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 3 324,35 €.",
-              "Eniten kului ravintoloihin, 809,29 €."
+              "Ruokaostoksiin kului 416,56 €: 639,83 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 3 324,35 €.\n• Eniten kului ravintoloihin, 809,29 €."
+            "answer": "• Ruokaostoksiin kului 416,56 €: 639,83 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -60,10 +60,10 @@
         "2026-07": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 947,04 €.",
-              "Eniten kului asumiseen, 642,47 €."
+              "Ravintoloihin kului 273,94 €: 535,35 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 947,04 €.\n• Eniten kului asumiseen, 642,47 €."
+            "answer": "• Ravintoloihin kului 273,94 €: 535,35 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -76,10 +76,10 @@
         "2026-08": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 3 044,25 €.",
-              "Eniten kului ravintoloihin, 997,13 €."
+              "Ravintoloihin kului 997,13 €: 723,19 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 3 044,25 €.\n• Eniten kului ravintoloihin, 997,13 €."
+            "answer": "• Ravintoloihin kului 997,13 €: 723,19 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -92,10 +92,10 @@
         "2026-09": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 653,22 €.",
-              "Eniten kului asumiseen, 693,62 €."
+              "Ravintoloihin kului 109,79 €: 887,34 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 653,22 €.\n• Eniten kului asumiseen, 693,62 €."
+            "answer": "• Ravintoloihin kului 109,79 €: 887,34 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -108,10 +108,10 @@
         "2025-10": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 611,65 €.",
-              "Eniten kului asumiseen, 640,07 €."
+              "Matkailuun kului 446,06 €: 446,06 € enemmän kuin edelliskuussa.",
+              "Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
             ],
-            "answer": "• Kulutus oli yhteensä 1 611,65 €.\n• Eniten kului asumiseen, 640,07 €."
+            "answer": "• Matkailuun kului 446,06 €: 446,06 € enemmän kuin edelliskuussa.\n• Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
           },
           "saving": {
             "bullets": [
@@ -124,10 +124,10 @@
         "2025-11": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 3 746,57 €.",
-              "Eniten kului ravintoloihin, 1 009,61 €."
+              "Ravintoloihin kului 1 009,61 €: 1 009,61 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 3 746,57 €.\n• Eniten kului ravintoloihin, 1 009,61 €."
+            "answer": "• Ravintoloihin kului 1 009,61 €: 1 009,61 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -140,10 +140,10 @@
         "2025-12": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 220,14 €.",
-              "Eniten kului asumiseen, 667,40 €."
+              "Ravintoloihin kului 241,52 €: 768,09 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 2 220,14 €.\n• Eniten kului asumiseen, 667,40 €."
+            "answer": "• Ravintoloihin kului 241,52 €: 768,09 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -156,10 +156,10 @@
         "2026-01": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 3 159,81 €.",
-              "Eniten kului kotiin ja tekniikkaan, 973,05 €."
+              "Kotiin ja tekniikkaan kului 973,05 €: 706,60 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 3 159,81 €.\n• Eniten kului kotiin ja tekniikkaan, 973,05 €."
+            "answer": "• Kotiin ja tekniikkaan kului 973,05 €: 706,60 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -172,10 +172,10 @@
         "2026-02": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 485,20 €.",
-              "Eniten kului asumiseen, 693,79 €."
+              "Kotiin ja tekniikkaan kului 185,92 €: 787,13 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 485,20 €.\n• Eniten kului asumiseen, 693,79 €."
+            "answer": "• Kotiin ja tekniikkaan kului 185,92 €: 787,13 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -188,10 +188,10 @@
         "2026-03": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 197,99 €.",
-              "Eniten kului asumiseen, 686,71 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 339,49 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 197,99 €.\n• Eniten kului asumiseen, 686,71 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 339,49 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -204,10 +204,10 @@
         "2025-04": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 3 584,47 €.",
-              "Eniten kului ravintoloihin, 1 939,57 €."
+              "Ravintoloihin kului 1 939,57 €: 1 939,57 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 3 584,47 €.\n• Eniten kului ravintoloihin, 1 939,57 €."
+            "answer": "• Ravintoloihin kului 1 939,57 €: 1 939,57 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -220,10 +220,10 @@
         "2025-05": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 1 775,77 €.",
-              "Eniten kului ravintoloihin, 715,60 €."
+              "Ravintoloihin kului 715,60 €: 1 223,97 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 1 775,77 €.\n• Eniten kului ravintoloihin, 715,60 €."
+            "answer": "• Ravintoloihin kului 715,60 €: 1 223,97 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -236,10 +236,10 @@
         "2025-06": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 250,34 €.",
-              "Eniten kului asumiseen, 656,66 €."
+              "Kotiin ja tekniikkaan kului 0,00 €: 262,71 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 2 250,34 €.\n• Eniten kului asumiseen, 656,66 €."
+            "answer": "• Kotiin ja tekniikkaan kului 0,00 €: 262,71 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -252,10 +252,10 @@
         "2025-07": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 802,13 €.",
-              "Eniten kului asumiseen, 685,72 €."
+              "Ravintoloihin kului 5,65 €: 500,58 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 802,13 €.\n• Eniten kului asumiseen, 685,72 €."
+            "answer": "• Ravintoloihin kului 5,65 €: 500,58 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -268,10 +268,10 @@
         "2025-08": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 869,03 €.",
-              "Eniten kului asumiseen, 693,90 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 18,79 €. Tästä menosta voi löytyä joustoa.",
+              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
             ],
-            "answer": "• Rahaa kului yhteensä 869,03 €.\n• Eniten kului asumiseen, 693,90 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 18,79 €. Tästä menosta voi löytyä joustoa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
           },
           "saving": {
             "bullets": [
@@ -284,10 +284,10 @@
         "2025-09": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 875,99 €.",
-              "Eniten kului asumiseen, 687,39 €."
+              "Ravintoloihin kului 47,90 €. Tästä menosta voi löytyä joustoa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 875,99 €.\n• Eniten kului asumiseen, 687,39 €."
+            "answer": "• Ravintoloihin kului 47,90 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -300,10 +300,10 @@
         "2024-10": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 4 126,85 €.",
-              "Eniten kului ravintoloihin, 1 575,82 €."
+              "Ravintoloihin kului 1 575,82 €. Tästä menosta voi löytyä joustoa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 4 126,85 €.\n• Eniten kului ravintoloihin, 1 575,82 €."
+            "answer": "• Ravintoloihin kului 1 575,82 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -316,10 +316,10 @@
         "2024-11": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 3 950,80 €.",
-              "Eniten kului ruokaostoksiin, 896,27 €."
+              "Ravintoloihin kului 584,88 €: 990,94 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 3 950,80 €.\n• Eniten kului ruokaostoksiin, 896,27 €."
+            "answer": "• Ravintoloihin kului 584,88 €: 990,94 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -332,10 +332,10 @@
         "2024-12": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 291,37 €.",
-              "Eniten kului asumiseen, 684,26 €."
+              "Ruokaostoksiin kului 0,00 €: 896,27 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 291,37 €.\n• Eniten kului asumiseen, 684,26 €."
+            "answer": "• Ruokaostoksiin kului 0,00 €: 896,27 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -348,10 +348,10 @@
         "2025-01": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 981,40 €.",
-              "Eniten kului ruokaostoksiin, 856,79 €."
+              "Ruokaostoksiin kului 856,79 €: 856,79 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 2 981,40 €.\n• Eniten kului ruokaostoksiin, 856,79 €."
+            "answer": "• Ruokaostoksiin kului 856,79 €: 856,79 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -364,10 +364,10 @@
         "2025-02": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 878,51 €.",
-              "Eniten kului ruokaostoksiin, 1 506,89 €."
+              "Ravintoloihin kului 0,00 €: 736,28 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 2 878,51 €.\n• Eniten kului ruokaostoksiin, 1 506,89 €."
+            "answer": "• Ravintoloihin kului 0,00 €: 736,28 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -380,10 +380,10 @@
         "2025-03": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 339,89 €.",
-              "Eniten kului liikkumiseen, 772,76 €."
+              "Ruokaostoksiin kului 0,00 €: 1 506,89 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 2 339,89 €.\n• Eniten kului liikkumiseen, 772,76 €."
+            "answer": "• Ruokaostoksiin kului 0,00 €: 1 506,89 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -402,7 +402,7 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-d8922a86c866a7ac-1",
+            "id": "insight-f54ed95ee5590a62-1",
             "period": "monthly",
             "title": "Valitse edullisempi tapa viettää vapaa-aikaa",
             "headline_number": "260 € syyskuussa",
@@ -410,7 +410,7 @@
             "action": "Katso syyskuun vapaa-ajan ostokset ja valitse, minkä voisit korvata maksuttomalla tekemisellä."
           },
           {
-            "id": "insight-d8922a86c866a7ac-2",
+            "id": "insight-f54ed95ee5590a62-2",
             "period": "weekly",
             "title": "Suunnittele lisäostokset ennen ostamista",
             "headline_number": "Arvio 260 €/vko",
@@ -418,7 +418,7 @@
             "action": "Listaa suunnittelemasi lisäostokset ja vertaa niiden yhteissummaa arvioon. Tarkista nykyinen saldo ja laskut ennen ostamista."
           },
           {
-            "id": "insight-d8922a86c866a7ac-3",
+            "id": "insight-f54ed95ee5590a62-3",
             "period": "yearly",
             "title": "Valitse säästötavoite ja etsi sille tilaa",
             "headline_number": "Noin 130 €/kk jäi",
@@ -440,10 +440,10 @@
         "2026-04": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 679,11 €.",
-              "Eniten kului asumiseen, 900,84 €."
+              "Ruokaostoksiin kului 56,85 €: 423,64 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 679,11 €.\n• Eniten kului asumiseen, 900,84 €."
+            "answer": "• Ruokaostoksiin kului 56,85 €: 423,64 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -456,10 +456,10 @@
         "2026-05": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 035,34 €.",
-              "Eniten kului asumiseen, 858,14 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 173,89 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 035,34 €.\n• Eniten kului asumiseen, 858,14 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 173,89 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -472,10 +472,10 @@
         "2026-06": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 832,56 €.",
-              "Eniten kului asumiseen, 867,81 €."
+              "Ruokaostoksiin kului 268,47 €: 248,57 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 1 832,56 €.\n• Eniten kului asumiseen, 867,81 €."
+            "answer": "• Ruokaostoksiin kului 268,47 €: 248,57 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -488,10 +488,10 @@
         "2026-07": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 863,42 €.",
-              "Eniten kului asumiseen, 898,08 €."
+              "Kotiin ja tekniikkaan kului 46,04 €: 149,51 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 863,42 €.\n• Eniten kului asumiseen, 898,08 €."
+            "answer": "• Kotiin ja tekniikkaan kului 46,04 €: 149,51 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -504,10 +504,10 @@
         "2026-08": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 074,31 €.",
-              "Eniten kului asumiseen, 885,82 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 124,31 €: 124,31 € enemmän kuin edelliskuussa.",
+              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
             ],
-            "answer": "• Kulutus oli yhteensä 2 074,31 €.\n• Eniten kului asumiseen, 885,82 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 124,31 €: 124,31 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
           },
           "saving": {
             "bullets": [
@@ -520,10 +520,10 @@
         "2026-09": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 756,61 €.",
-              "Eniten kului asumiseen, 926,09 €."
+              "Ravintoloihin kului 508,80 €: 300,90 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 2 756,61 €.\n• Eniten kului asumiseen, 926,09 €."
+            "answer": "• Ravintoloihin kului 508,80 €: 300,90 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -536,10 +536,10 @@
         "2025-10": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 131,43 €.",
-              "Eniten kului asumiseen, 930,88 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 228,45 €: 228,45 € enemmän kuin edelliskuussa.",
+              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
             ],
-            "answer": "• Kulutus oli yhteensä 2 131,43 €.\n• Eniten kului asumiseen, 930,88 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 228,45 €: 228,45 € enemmän kuin edelliskuussa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
           },
           "saving": {
             "bullets": [
@@ -552,10 +552,10 @@
         "2025-11": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 926,33 €.",
-              "Eniten kului asumiseen, 924,30 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 228,45 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 926,33 €.\n• Eniten kului asumiseen, 924,30 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 0,00 €: 228,45 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -568,10 +568,10 @@
         "2025-12": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 023,99 €.",
-              "Eniten kului asumiseen, 873,66 €."
+              "Ruokaostoksiin kului 11,94 €: 247,06 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 023,99 €.\n• Eniten kului asumiseen, 873,66 €."
+            "answer": "• Ruokaostoksiin kului 11,94 €: 247,06 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -584,10 +584,10 @@
         "2026-01": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 055,79 €.",
-              "Eniten kului asumiseen, 924,20 €."
+              "Ravintoloihin kului 297,44 €: 293,64 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 2 055,79 €.\n• Eniten kului asumiseen, 924,20 €."
+            "answer": "• Ravintoloihin kului 297,44 €: 293,64 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -600,10 +600,10 @@
         "2026-02": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 1 730,87 €.",
-              "Eniten kului asumiseen, 895,70 €."
+              "Vapaa-aikaan kului 50,90 €: 239,14 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 1 730,87 €.\n• Eniten kului asumiseen, 895,70 €."
+            "answer": "• Vapaa-aikaan kului 50,90 €: 239,14 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -616,10 +616,10 @@
         "2026-03": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 2 989,15 €.",
-              "Eniten kului asumiseen, 872,76 €."
+              "Kotiin ja tekniikkaan kului 423,58 €: 304,70 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 2 989,15 €.\n• Eniten kului asumiseen, 872,76 €."
+            "answer": "• Kotiin ja tekniikkaan kului 423,58 €: 304,70 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -632,10 +632,10 @@
         "2025-04": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 710,77 €.",
-              "Eniten kului asumiseen, 922,36 €."
+              "Kotiin ja tekniikkaan kului 273,01 €: 203,44 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Rahaa kului yhteensä 2 710,77 €.\n• Eniten kului asumiseen, 922,36 €."
+            "answer": "• Kotiin ja tekniikkaan kului 273,01 €: 203,44 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -648,10 +648,10 @@
         "2025-05": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 3 306,52 €.",
-              "Eniten kului asumiseen, 868,47 €."
+              "Ravintoloihin kului 485,26 €: 386,43 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 3 306,52 €.\n• Eniten kului asumiseen, 868,47 €."
+            "answer": "• Ravintoloihin kului 485,26 €: 386,43 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -664,10 +664,10 @@
         "2025-06": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 234,73 €.",
-              "Eniten kului asumiseen, 913,09 €."
+              "Liikkumiseen kului 210,05 €: 539,23 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 2 234,73 €.\n• Eniten kului asumiseen, 913,09 €."
+            "answer": "• Liikkumiseen kului 210,05 €: 539,23 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -680,10 +680,10 @@
         "2025-07": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 1 896,30 €.",
-              "Eniten kului asumiseen, 886,88 €."
+              "Ruokaostoksiin kului 422,89 €: 236,61 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Rahaa kului yhteensä 1 896,30 €.\n• Eniten kului asumiseen, 886,88 €."
+            "answer": "• Ruokaostoksiin kului 422,89 €: 236,61 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -696,10 +696,10 @@
         "2025-08": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 1 672,66 €.",
-              "Eniten kului asumiseen, 931,41 €."
+              "Ruokaostoksiin kului 145,99 €: 276,90 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 1 672,66 €.\n• Eniten kului asumiseen, 931,41 €."
+            "answer": "• Ruokaostoksiin kului 145,99 €: 276,90 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -712,10 +712,10 @@
         "2025-09": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 1 240,52 €.",
-              "Eniten kului asumiseen, 915,38 €."
+              "Vapaa-aikaan kului 70,40 €: 189,62 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 1 240,52 €.\n• Eniten kului asumiseen, 915,38 €."
+            "answer": "• Vapaa-aikaan kului 70,40 €: 189,62 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -728,10 +728,10 @@
         "2024-10": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 1 923,56 €.",
-              "Eniten kului asumiseen, 873,39 €."
+              "Ravintoloihin kului 127,97 €. Tästä menosta voi löytyä joustoa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 1 923,56 €.\n• Eniten kului asumiseen, 873,39 €."
+            "answer": "• Ravintoloihin kului 127,97 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -744,10 +744,10 @@
         "2024-11": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 229,23 €.",
-              "Eniten kului asumiseen, 863,11 €."
+              "Ravintoloihin kului 494,20 €: 366,23 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 2 229,23 €.\n• Eniten kului asumiseen, 863,11 €."
+            "answer": "• Ravintoloihin kului 494,20 €: 366,23 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -760,10 +760,10 @@
         "2024-12": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 541,23 €.",
-              "Eniten kului asumiseen, 902,96 €."
+              "Vapaa-aikaan kului 570,45 €: 570,45 € enemmän kuin edelliskuussa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Rahaa kului yhteensä 2 541,23 €.\n• Eniten kului asumiseen, 902,96 €."
+            "answer": "• Vapaa-aikaan kului 570,45 €: 570,45 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -776,10 +776,10 @@
         "2025-01": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 407,99 €.",
-              "Eniten kului asumiseen, 872,54 €."
+              "Ruokaostoksiin kului 339,76 €: 339,76 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Rahaa kului yhteensä 2 407,99 €.\n• Eniten kului asumiseen, 872,54 €."
+            "answer": "• Ruokaostoksiin kului 339,76 €: 339,76 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -792,10 +792,10 @@
         "2025-02": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 3 134,37 €.",
-              "Eniten kului asumiseen, 898,93 €."
+              "Vapaa-aikaan kului 74,71 €: 398,46 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 3 134,37 €.\n• Eniten kului asumiseen, 898,93 €."
+            "answer": "• Vapaa-aikaan kului 74,71 €: 398,46 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -808,10 +808,10 @@
         "2025-03": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 2 092,51 €.",
-              "Eniten kului asumiseen, 913,65 €."
+              "Terveyteen kului 0,00 €: 287,18 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 2 092,51 €.\n• Eniten kului asumiseen, 913,65 €."
+            "answer": "• Terveyteen kului 0,00 €: 287,18 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -830,7 +830,7 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-ffd4915e68a82cae-1",
+            "id": "insight-1eb02c49d65e9194-1",
             "period": "monthly",
             "title": "Vaihda noutoruoka edullisempaan vaihtoehtoon",
             "headline_number": "340 € syyskuussa",
@@ -838,7 +838,7 @@
             "action": "Katso syyskuun noutoruokaostokset ja valitse tilaus, jonka voisit korvata kotona tehdyllä aterialla."
           },
           {
-            "id": "insight-ffd4915e68a82cae-2",
+            "id": "insight-1eb02c49d65e9194-2",
             "period": "weekly",
             "title": "Valitse tärkeimmät lisäostokset etukäteen",
             "headline_number": "Arvio 120 €/vko",
@@ -846,7 +846,7 @@
             "action": "Laita suunnittelemasi lisäostokset tärkeysjärjestykseen. Tarkista nykyiset laskut ja käyttöraha ennen ostamista."
           },
           {
-            "id": "insight-ffd4915e68a82cae-3",
+            "id": "insight-1eb02c49d65e9194-3",
             "period": "yearly",
             "title": "Varaa joustoa yllättäville laskuille",
             "headline_number": "Noin 25 €/kk jäi",
@@ -868,10 +868,10 @@
         "2026-04": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 263,55 €.",
-              "Eniten kului laskuihin, yhteensä 169,26 €."
+              "Ravintoloihin kului 22,81 €. Tästä menosta voi löytyä joustoa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 263,55 €.\n• Eniten kului laskuihin, yhteensä 169,26 €."
+            "answer": "• Ravintoloihin kului 22,81 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -885,10 +885,10 @@
         "2026-05": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 443,81 €.",
-              "Eniten kului laskuihin, yhteensä 207,77 €."
+              "Ruokaostoksiin kului 77,71 €: 64,88 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Rahaa kului yhteensä 443,81 €.\n• Eniten kului laskuihin, yhteensä 207,77 €."
+            "answer": "• Ruokaostoksiin kului 77,71 €: 64,88 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -902,10 +902,10 @@
         "2026-06": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 413,54 €.",
-              "Eniten kului ruokaostoksiin, yhteensä 129,49 €."
+              "Ravintoloihin kului 76,29 €: 66,51 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Rahaa kului yhteensä 413,54 €.\n• Eniten kului ruokaostoksiin, yhteensä 129,49 €."
+            "answer": "• Ravintoloihin kului 76,29 €: 66,51 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -919,10 +919,10 @@
         "2026-07": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 398,40 €.",
-              "Eniten kului laskuihin, yhteensä 127,17 €."
+              "Ruokaostoksiin kului 32,19 €: 97,30 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 398,40 €.\n• Eniten kului laskuihin, yhteensä 127,17 €."
+            "answer": "• Ruokaostoksiin kului 32,19 €: 97,30 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -936,10 +936,10 @@
         "2026-08": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 310,97 €.",
-              "Eniten kului laskuihin, yhteensä 185,18 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 1,50 €: 91,40 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Rahaa kului yhteensä 310,97 €.\n• Eniten kului laskuihin, yhteensä 185,18 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 1,50 €: 91,40 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -953,10 +953,10 @@
         "2026-09": {
           "spending": {
             "bullets": [
-              "Rahaa kului yhteensä 400,82 €.",
-              "Eniten kului vapaa-aikaan, yhteensä 122,59 €."
+              "Vapaa-aikaan kului 122,59 €: 111,78 € enemmän kuin edelliskuussa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Rahaa kului yhteensä 400,82 €.\n• Eniten kului vapaa-aikaan, yhteensä 122,59 €."
+            "answer": "• Vapaa-aikaan kului 122,59 €: 111,78 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -970,10 +970,10 @@
         "2025-10": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 250,75 €.",
-              "Eniten kului laskuihin, yhteensä 134,86 €."
+              "Ravintoloihin kului 10,59 €. Tästä menosta voi löytyä joustoa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 250,75 €.\n• Eniten kului laskuihin, yhteensä 134,86 €."
+            "answer": "• Ravintoloihin kului 10,59 €. Tästä menosta voi löytyä joustoa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -987,10 +987,10 @@
         "2025-11": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 458,91 €.",
-              "Eniten kului laskuihin, yhteensä 199,45 €."
+              "Vapaa-aikaan kului 72,64 €: 72,64 € enemmän kuin edelliskuussa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Kulutus oli yhteensä 458,91 €.\n• Eniten kului laskuihin, yhteensä 199,45 €."
+            "answer": "• Vapaa-aikaan kului 72,64 €: 72,64 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -1004,10 +1004,10 @@
         "2025-12": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 503,96 €.",
-              "Eniten kului laskuihin, yhteensä 202,95 €."
+              "Ravintoloihin kului 77,64 €: 77,64 € enemmän kuin edelliskuussa.",
+              "Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
             ],
-            "answer": "• Kulutus oli yhteensä 503,96 €.\n• Eniten kului laskuihin, yhteensä 202,95 €."
+            "answer": "• Ravintoloihin kului 77,64 €: 77,64 € enemmän kuin edelliskuussa.\n• Avaa ravintolaostokset ja etsi käynti, jonka voisit korvata kotona tehdyllä aterialla."
           },
           "saving": {
             "bullets": [
@@ -1021,10 +1021,10 @@
         "2026-01": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 332,86 €.",
-              "Eniten kului laskuihin, yhteensä 128,61 €."
+              "Liikkumiseen kului 0,00 €: 60,45 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 332,86 €.\n• Eniten kului laskuihin, yhteensä 128,61 €."
+            "answer": "• Liikkumiseen kului 0,00 €: 60,45 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1038,10 +1038,10 @@
         "2026-02": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 171,53 €.",
-              "Eniten kului laskuihin, yhteensä 61,95 €."
+              "Ravintoloihin kului 18,78 €: 81,84 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 171,53 €.\n• Eniten kului laskuihin, yhteensä 61,95 €."
+            "answer": "• Ravintoloihin kului 18,78 €: 81,84 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1055,10 +1055,10 @@
         "2026-03": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 237,63 €.",
-              "Eniten kului laskuihin, yhteensä 151,16 €."
+              "Vapaa-aikaan kului 19,78 €. Tästä menosta voi löytyä joustoa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Kulutus oli yhteensä 237,63 €.\n• Eniten kului laskuihin, yhteensä 151,16 €."
+            "answer": "• Vapaa-aikaan kului 19,78 €. Tästä menosta voi löytyä joustoa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -1072,10 +1072,10 @@
         "2025-04": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 851,60 €.",
-              "Eniten kului ruokaostoksiin, 255,71 €."
+              "Kotiin ja tekniikkaan kului 204,63 €: 177,73 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 851,60 €.\n• Eniten kului ruokaostoksiin, 255,71 €."
+            "answer": "• Kotiin ja tekniikkaan kului 204,63 €: 177,73 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -1089,10 +1089,10 @@
         "2025-05": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 465,75 €.",
-              "Eniten kului laskuihin, 167,16 €."
+              "Kotiin ja tekniikkaan kului 33,26 €: 171,37 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Kulutus oli yhteensä 465,75 €.\n• Eniten kului laskuihin, 167,16 €."
+            "answer": "• Kotiin ja tekniikkaan kului 33,26 €: 171,37 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1106,10 +1106,10 @@
         "2025-06": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 516,40 €.",
-              "Eniten kului laskuihin, 191,27 €."
+              "Kotiin ja tekniikkaan kului 112,12 €: 78,86 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 516,40 €.\n• Eniten kului laskuihin, 191,27 €."
+            "answer": "• Kotiin ja tekniikkaan kului 112,12 €: 78,86 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -1123,10 +1123,10 @@
         "2025-07": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 514,24 €.",
-              "Eniten kului laskuihin, 166,14 €."
+              "Ruokaostoksiin kului 116,87 €: 91,18 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Kulutus oli yhteensä 514,24 €.\n• Eniten kului laskuihin, 166,14 €."
+            "answer": "• Ruokaostoksiin kului 116,87 €: 91,18 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -1140,10 +1140,10 @@
         "2025-08": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 472,68 €.",
-              "Eniten kului laskuihin, 128,69 €."
+              "Vapaa-aikaan kului 39,66 €. Tästä menosta voi löytyä joustoa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Kulutus oli yhteensä 472,68 €.\n• Eniten kului laskuihin, 128,69 €."
+            "answer": "• Vapaa-aikaan kului 39,66 €. Tästä menosta voi löytyä joustoa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -1157,10 +1157,10 @@
         "2025-09": {
           "spending": {
             "bullets": [
-              "Kulutus oli yhteensä 437,63 €.",
-              "Eniten kului laskuihin, 218,00 €."
+              "Ostoksiin ja itsestä huolehtimiseen kului 36,34 €. Tästä menosta voi löytyä joustoa.",
+              "Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
             ],
-            "answer": "• Kulutus oli yhteensä 437,63 €.\n• Eniten kului laskuihin, 218,00 €."
+            "answer": "• Ostoksiin ja itsestä huolehtimiseen kului 36,34 €. Tästä menosta voi löytyä joustoa.\n• Katso ostokset läpi ja valitse, minkä hankinnan voisit siirtää myöhemmäksi."
           },
           "saving": {
             "bullets": [
@@ -1174,10 +1174,10 @@
         "2024-10": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 605,30 €.",
-              "Eniten kului laskuihin, yhteensä 168,52 €."
+              "Matkailuun kului 150,82 €. Tästä menosta voi löytyä joustoa.",
+              "Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
             ],
-            "answer": "• Menot olivat yhteensä 605,30 €.\n• Eniten kului laskuihin, yhteensä 168,52 €."
+            "answer": "• Matkailuun kului 150,82 €. Tästä menosta voi löytyä joustoa.\n• Tarkista matkamenot ja erottele yksittäinen matka toistuvista kuluista."
           },
           "saving": {
             "bullets": [
@@ -1191,10 +1191,10 @@
         "2024-11": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 572,38 €.",
-              "Eniten kului laskuihin, yhteensä 254,33 €."
+              "Matkailuun kului 48,81 €: 102,01 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Menot olivat yhteensä 572,38 €.\n• Eniten kului laskuihin, yhteensä 254,33 €."
+            "answer": "• Matkailuun kului 48,81 €: 102,01 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1208,10 +1208,10 @@
         "2024-12": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 703,63 €.",
-              "Eniten kului ruokaostoksiin, yhteensä 294,57 €."
+              "Ruokaostoksiin kului 294,57 €: 148,19 € enemmän kuin edelliskuussa.",
+              "Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
             ],
-            "answer": "• Menot olivat yhteensä 703,63 €.\n• Eniten kului ruokaostoksiin, yhteensä 294,57 €."
+            "answer": "• Ruokaostoksiin kului 294,57 €: 148,19 € enemmän kuin edelliskuussa.\n• Avaa kategorian tapahtumat ja tarkista, oliko mukana yksittäinen suuri maksu vai useita arjen ostoksia."
           },
           "saving": {
             "bullets": [
@@ -1225,10 +1225,10 @@
         "2025-01": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 659,98 €.",
-              "Eniten kului ruokaostoksiin, yhteensä 173,08 €."
+              "Ruokaostoksiin kului 173,08 €: 121,49 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Menot olivat yhteensä 659,98 €.\n• Eniten kului ruokaostoksiin, yhteensä 173,08 €."
+            "answer": "• Ruokaostoksiin kului 173,08 €: 121,49 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1242,10 +1242,10 @@
         "2025-02": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 818,77 €.",
-              "Eniten kului laskuihin, yhteensä 169,48 €."
+              "Vapaa-aikaan kului 151,63 €: 135,86 € enemmän kuin edelliskuussa.",
+              "Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
             ],
-            "answer": "• Menot olivat yhteensä 818,77 €.\n• Eniten kului laskuihin, yhteensä 169,48 €."
+            "answer": "• Vapaa-aikaan kului 151,63 €: 135,86 € enemmän kuin edelliskuussa.\n• Katso vapaa-ajan ostokset ja valitse maksuton vaihtoehto jollekin niistä."
           },
           "saving": {
             "bullets": [
@@ -1259,10 +1259,10 @@
         "2025-03": {
           "spending": {
             "bullets": [
-              "Menot olivat yhteensä 744,99 €.",
-              "Eniten kului laskuihin, yhteensä 243,74 €."
+              "Vapaa-aikaan kului 43,66 €: 107,97 € vähemmän kuin edelliskuussa.",
+              "Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
             ],
-            "answer": "• Menot olivat yhteensä 744,99 €.\n• Eniten kului laskuihin, yhteensä 243,74 €."
+            "answer": "• Vapaa-aikaan kului 43,66 €: 107,97 € vähemmän kuin edelliskuussa.\n• Vertaa tämän ja edellisen kuun tapahtumia: jäikö jokin ostos pois vai siirtyikö se toiseen kuukauteen?"
           },
           "saving": {
             "bullets": [
@@ -1282,7 +1282,7 @@
         "model": "claude-haiku-5-5",
         "insights": [
           {
-            "id": "insight-c2009d67bd726a0a-1",
+            "id": "insight-b6fdddaf01929fd6-1",
             "period": "weekly",
             "title": "Varaa rahat välttämättömiin maksuihin",
             "headline_number": "Arvio 0 €/vko",
@@ -1290,7 +1290,7 @@
             "action": "Tarkista erääntyvät laskut ja nykyinen saldo. Siirrä valinnaisia ostoksia, kunnes välttämättömiin maksuihin on rahaa."
           },
           {
-            "id": "insight-c2009d67bd726a0a-2",
+            "id": "insight-b6fdddaf01929fd6-2",
             "period": "yearly",
             "title": "Sovita säästösiirrot arjen maksuihin",
             "headline_number": "35 350 € säästöön",
@@ -1298,7 +1298,7 @@
             "action": "Tarkista automaattisen säästösiirron summa ja ajoitus. Pienennä siirtoa tarvittaessa, jotta laskurahat jäävät käyttötilille."
           },
           {
-            "id": "insight-c2009d67bd726a0a-3",
+            "id": "insight-b6fdddaf01929fd6-3",
             "period": "monthly",
             "title": "Etsi vapaa-ajan menoista kevennettävää",
             "headline_number": "120 € syyskuussa",

@@ -1,6 +1,6 @@
 # Private DuckDB worker
 
-`worker.py` is a persistent, local-only JSON-lines process owned by the Node web server. It opens `coach.duckdb` read-only, uses two DuckDB threads and a 256 MB DuckDB memory limit, and never exposes a network listener. It requires Python 3.12+ and the pinned `duckdb==2.0.0` package; older DuckDB releases cannot read this snapshot's storage format.
+`worker.py` is a persistent, local-only JSON-lines process owned by the Node web server. It opens `coach.duckdb` read-only, uses two DuckDB threads and a 256 MB DuckDB memory limit, and never exposes a network listener. It requires Python 3.12+ and the pinned packages in `requirements.txt` (DuckDB and pandas); older DuckDB releases cannot read this snapshot's storage format.
 
 The Node server resolves the selected customer from its session and passes that identity separately from tool arguments. The worker additionally allowlists `CUST00207`, `CUST00127` and `CUST00103`. Each context source contains only one customer's rows, with shared comparisons coming only from aggregate peer tables. No arbitrary SQL or model-supplied customer identifier is accepted.
 
@@ -20,10 +20,12 @@ Successful replies are `{ "id": ..., "result": ... }`. Failures are `{ "id": ...
 | `ready` | `status`, `as_of`, `version`, demo customer allowlist, `coverage_from`, `coverage_to` |
 | `bootstrap` | `summary`, `profiles: [selectedProfile]`, `as_of`, `version`; profile transaction shape matches the existing UI |
 | `context` | `profile`, `insight_context`, `as_of`, `version`, `coverage_from`, `coverage_to`; both prompt strings omit customer IDs |
-| `tools` | Seven Anthropic-compatible tool definitions |
+| `tools` | Eight Anthropic-compatible tool definitions |
 | `tool` | Selected customer's bounded tool result; `args` must contain only `name` and `arguments` |
 
-Available tools: `get_spending`, `get_cash_flow`, `get_transactions`, `safe_to_spend`, `what_if`, `compare_to_peers`, and `get_model_detail`. Date ranges are start-inclusive/end-exclusive and at most 1,096 days. Individual transaction results are limited to 20 rows per page. Exact totals use per-transaction decimal casts; scenarios use the existing model's rounding policy. Every tool result is explicitly dated and distinguishes model estimates from historical amounts.
+Available tools: `get_spending`, `get_cash_flow`, `get_transactions`, `safe_to_spend`, `afford`, `what_if`, `compare_to_peers`, and `get_model_detail`. Date ranges are start-inclusive/end-exclusive and at most 1,096 days. Individual transaction results are limited to 20 rows per page. Exact totals use per-transaction decimal casts; scenarios use the existing model's rounding policy. Every tool result is explicitly dated and distinguishes model estimates from historical amounts.
+
+`afford` requires `price_eur` (positive, at most €1,000,000) and `months` (whole number, 1–60). It calls the existing BDA affordability calculation through this worker's read-only connection, including when `COACH_DB_PATH` selects a different snapshot. Its verdict, monthly target, redirected savings, optional spending cuts, buffer note and alternative timeline are returned to the chat model intact. The model asks for missing inputs and explains these as a dated scenario. `safe_to_spend` remains the weekly spending check.
 
 Historical coverage comes from `meta.first_month` through `meta.as_of`, read once at startup. The current snapshot covers October 1, 2024 through September 30, 2026, inclusive. A customer's first/last transaction dates are returned separately as `observed_transactions`; days without a transaction do not create coverage gaps. `outside_snapshot_range` signals a request extending beyond dataset coverage; the original `outside_observed_range` field is retained as an alias of that corrected flag. Invalid filters return controlled validation feedback with allowed fields/values, never raw arguments or database errors.
 
@@ -37,7 +39,7 @@ The raw snapshot contains 24 recorded calendar months. The fitted BDA model uses
 
 The deployed database is immutable. Replace it with a new deployment and restart the worker to load a new snapshot. Contexts and browser bootstrap records are cached separately for each selected customer. Tool results use a bounded 256-entry cache keyed by snapshot version, customer, tool and arguments. The request dispatcher serializes access, including concurrent callers, so connection/caches cannot switch identity mid-request.
 
-Only `duckdb` is an external Python dependency. Package `coach_context/__init__.py`, `profile_card.py`, `insight_context.py`, and `BDA/engine/config.py` with the worker. No CSV scan, pandas dependency or model fitting is performed at runtime.
+Install `runtime/requirements.txt` for DuckDB and pandas, which the existing BDA affordability calculator uses. `scripts/prepare-runtime.mjs` packages the context modules plus `BDA/engine/__init__.py`, `config.py`, `coach.py` and `insights.py`. No CSV scan or model fitting is performed at runtime; affordability reads the fitted `model_season` table alongside the selected customer's summary and spending lines.
 
 ## Verification
 

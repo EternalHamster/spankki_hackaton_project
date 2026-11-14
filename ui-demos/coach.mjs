@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { insightPeriod } from './public/insights.js';
+import { spendingHighlight, previousMonth } from './spending-highlights.mjs';
 
-export const PROMPT_VERSION = 'duckdb-coach-v7';
+export const PROMPT_VERSION = 'duckdb-coach-v8';
 const CACHE_CONTROL = { type: 'ephemeral' };
 // Both entry points share these blocks and tool definitions so the customer's cached prefix is reusable.
 const SYSTEM = `You are a concise, kind financial coach in the Finnish Oma talous synthetic demo.
@@ -90,8 +91,15 @@ Every topic must be an array of two or three distinct short bullet texts, each a
 Use one simple sentence per bullet. No headings, Markdown, bullet prefixes, customer identifiers, technical
 terms or explanations of models. Avoid words like mediaani, likviditeetti, kassavirta, snapshot or malliarvio.
 The app displays the period separately. Do not repeat the date or explain the date in every bullet.
-For spending, give the total and the supplied largest spending category. That category really is ranked
-first; do not label another category largest. For saving, distinguish money left after everyday expenses
+For spending, explain spending_highlight in two short bullets beneath the chart. The chart already shows
+the total and category shares: do not repeat them or default to the largest category such as housing.
+For category_change, mention the category's amount, change_eur and direction versus previous_month. Explain
+why it is worth looking at, but never invent a cause, recurring trend, merchant or purchase frequency.
+For category_focus, identify that flexible or variable expense without calling it an unusual increase or
+the largest expense. Give a concrete, gentle next step using its transactions; do not suggest cutting
+essential spending. A decrease may be one-off: suggest checking what changed, not claiming a lasting saving.
+For fixed_only or no_spending, state the limitation plainly without inventing a pattern.
+For saving, distinguish money left after everyday expenses
 (remaining_before_savings_eur) from money left after saving transfers (remaining_after_savings_eur).
 Saving transfers are money moved aside, not consumer expenses. Never present either remainder as bank
 balance or a promise of spendable money. Mention actual saving transfers only with the supplied amounts.
@@ -110,6 +118,29 @@ Exact recorded monthly totals do not need "noin"; use it for the estimated weekl
 Return JSON only in this shape (repeat the month object for every supplied month):
 {"months":{"YYYY-MM":{"spending":["...","..."],"saving":["...","...","..."]}},"week":["...","..."]}
 Omit week entirely when no week facts are supplied; months may be empty when only week was requested.`;
+
+// Chat-only guidance leaves the existing prepared summaries and their content version valid.
+const AFFORD_GUIDANCE = `For purchase goals, use afford with the user's price_eur and months, including
+follow-up changes to the price or timeframe. safe_to_spend only checks weekly room; it cannot answer
+whether a purchase is achievable over several months. If price or timeframe is missing, ask one brief
+question for the missing details; never invent a price or silently assume the default six months.
+Use months as a duration from the historical as_of snapshot. Explain that this is an estimate based on
+that dated situation, not a prediction from today's balance. Never calculate a plan from the profile alone.
+After afford returns, make the answer feel like a small, achievable plan for the user's named purchase:
+lead with its verdict in natural language, then the monthly amount and one concrete next step. Use up to
+four short bullets when needed to include the conditions. Quote only amounts and timelines from the tool.
+already_affordable means the recorded spare_money_on_account covered it at the snapshot, not today.
+yes means the goal is reachable in the requested months, with any from_current_saving_month explicitly
+described as redirecting existing savings, not new savings or extra disposable income.
+yes_with_changes depends on the listed cuts: describe their cut_month and after_month in everyday words.
+takes_longer means the requested deadline is not met; state months_needed and set_aside_month, and make
+clear that the longer timeline still depends on the listed cuts and any redirected savings.
+not_now means balance the budget first; do not present the listed cuts as a successful purchase plan.
+Use needed_month for the requested target and set_aside_month for the proposed plan; these can differ.
+Mention budget_short_month or the surprise_fund_short/note when present. Never promise certainty,
+double-count savings, invent spending cuts or frequency targets, or omit conditions to sound encouraging.
+Invite a useful follow-up such as trying a cheaper purchase or a different timeframe, without pressure.
+If the tool fails, explain that the plan could not be calculated; do not substitute a made-up plan.`;
 
 const CATEGORY_NAMES = { Housing: 'Asuminen', Utilities: 'Laskut', Groceries: 'Ruokaostokset', Health: 'Terveys',
   'Home & Tech': 'Koti ja tekniikka', Transportation: 'Liikkuminen', Restaurants: 'Ravintolat',
@@ -193,7 +224,7 @@ function euros(amount) {
   return `${amount < 0 ? '-' : ''}${Math.floor(Math.abs(amount) / 100)}.${String(Math.abs(amount) % 100).padStart(2, '0')}`;
 }
 
-function monthlyFacts(month, cash, spending) {
+function monthlyFacts(month, cash, spending, previousSpending = null) {
   const income = cents(cash.income_eur), expenses = cents(cash.spending_eur);
   const transfers = cents(cash.investment_out_eur), withdrawals = cents(cash.investment_in_eur);
   const remainder = income - expenses;
@@ -215,6 +246,7 @@ function monthlyFacts(month, cash, spending) {
     remaining_before_savings_eur: euros(remainder), saving_transfers_eur: euros(transfers),
     withdrawals_from_savings_eur: euros(withdrawals), remaining_after_savings_eur: euros(remainder - transfers + withdrawals),
     largest_spending_category: categories.length ? { category: CATEGORY_NAMES[categories[0].category], amount_eur: euros(categories[0].amount) } : null,
+    spending_highlight: spendingHighlight(month, spending.categories, previousSpending?.categories || null),
     cut_example: optional ? { category: CATEGORY_NAMES[optional.category], percent: 20, before_eur: euros(optional.amount),
       saving_eur: euros(reduction), after_eur: euros(optional.amount - reduction),
       remaining_after_expenses_if_cut_eur: euros(remainder + reduction) } : null,
@@ -462,7 +494,14 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
         const [cash, spending] = await Promise.all([
           dataSource.execute(customerId, 'get_cash_flow', args), dataSource.execute(customerId, 'get_spending', args),
         ]);
-        return [month, monthlyFacts(month, checkedTool(cash), checkedTool(spending))];
+        const prior = previousMonth(month);
+        // Only compare two fully covered calendar months; the first recorded month has no baseline.
+        const canCompare = snapshot.coverage_from && `${prior}-01` >= snapshot.coverage_from &&
+          new Date(Date.UTC(year, index, 0)).toISOString().slice(0,10) <= snapshot.as_of;
+        const previousSpending = canCompare ? checkedTool(await dataSource.execute(customerId, 'get_spending', {
+          start_date: `${prior}-01`, end_date: args.start_date,
+        })) : null;
+        return [month, monthlyFacts(month, checkedTool(cash), checkedTool(spending), previousSpending)];
       }));
       if (includeWeek) {
         const source = checkedTool(await dataSource.execute(customerId, 'safe_to_spend', {}));
@@ -502,7 +541,7 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
   async function chat(customerId, { messages, insightId } = {}) {
     if (!validMessages(messages)) throw new CoachError(400, 'Keskustelu ei kelpaa. Aloita uusi keskustelu.');
     const snapshot = await context(customerId);
-    const prompt = system(snapshot);
+    const prompt = [...system(snapshot), { type: 'text', text: AFFORD_GUIDANCE }];
     if (insightId !== undefined) {
       const current = cache.get(cacheKey(customerId, snapshot));
       const selected = current?.status === 'ready' && current.value.insights.find(row => row.id === insightId);

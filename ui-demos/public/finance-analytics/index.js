@@ -53,6 +53,17 @@ function donut(entries, total, caption) {
     ${entries.map((entry,i) => { const arc = total ? entry.value / total * 100 : 0; const result = `<circle cx="110" cy="110" r="91" pathLength="100" fill="none" stroke="${palette[i%palette.length]}" stroke-width="15" stroke-dasharray="${Math.max(0,arc-(entries.length>1?.65:0))} 100" stroke-dashoffset="${-offset}" transform="rotate(-90 110 110)"/>`; offset += arc; return result; }).join('')}</svg><div class="fa-donut-total"><span>${caption}</span><strong>${money(total)}</strong><small>yhteensä</small></div></div>`;
 }
 
+function halfDonut(entries, total, caption) {
+  let offset = 0;
+  const arcPath = 'M12 94 A78 78 0 0 1 168 94';
+  return `<svg class="fa-half-donut" viewBox="0 0 180 112" role="img" aria-label="${escape(caption)} ${escape(money(total))}. Kategoriat kaavion vieressä."><path d="${arcPath}" fill="none" stroke="#e5eee7" stroke-width="18"/>
+    ${entries.map((entry,i) => {
+      const arc = total ? entry.value / total * 100 : 0;
+      const segment = `<path d="${arcPath}" pathLength="100" fill="none" stroke="${palette[i]}" stroke-width="18" stroke-dasharray="${Math.max(0,arc - (entries.length > 1 ? .7 : 0))} 100" stroke-dashoffset="${-offset}"/>`;
+      offset += arc; return segment;
+    }).join('')}<text class="fa-half-caption" x="90" y="70" text-anchor="middle">${caption}</text><text class="fa-half-total" x="90" y="94" text-anchor="middle">${escape(money(total))}</text></svg>`;
+}
+
 /**
  * Mount the portable financial UI. No fetching, storage or app-global listeners.
  * @param {HTMLElement} host
@@ -79,6 +90,15 @@ export function createFinanceAnalytics(host, options) {
 
   function breakdownCard() {
     const model = breakdown(dataset, state.month, state.kind);
+    if (config.compactBreakdown) {
+      const entries = model.entries.length <= 4 ? model.entries : [...model.entries.slice(0,3), {
+        category: '__others', label: state.kind === 'expense' ? 'Muut menot' : 'Muut tulot',
+        value: model.entries.slice(3).reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100,
+        share: model.entries.slice(3).reduce((sum, entry) => sum + entry.share, 0),
+      }];
+      const categoryButton = (entry, index) => `<button type="button" data-fa="category" data-value="${escape(entry.category)}" aria-label="${escape(entry.label)}: ${escape(money(entry.value))}, ${number(entry.share,1)} prosenttia${entry.category === '__others' ? ', näytä kaikki kategoriat' : ', avaa tapahtumat'}"><i class="fa-dot" style="--swatch:${palette[index % palette.length]}"></i><span><span class="fa-compact-category">${escape(entry.label)}</span><strong>${money(entry.value)}</strong><small>${number(entry.share,1)} %</small></span></button>`;
+      return `<section class="fa-section fa-compact-section" aria-label="Kuukauden tulojen ja menojen jakauma"><div class="fa-card fa-compact-breakdown"><div class="fa-segmented" role="group" aria-label="Jakauman sisältö">${[['expense','Menot'],['income','Tulot']].map(([kind,label])=>`<button type="button" data-fa="kind" data-value="${kind}" aria-pressed="${state.kind===kind}">${label}</button>`).join('')}</div><div class="fa-compact-visual">${halfDonut(entries, model.total, state.kind === 'expense' ? 'Menot yhteensä' : 'Tulot yhteensä')}<div class="fa-compact-legend">${entries.map(categoryButton).join('')}</div></div>${!model.total ? '<p class="fa-empty">Ei tapahtumia tässä ryhmässä.</p>' : ''}${model.entries.length > 4 ? `<button type="button" class="fa-text-button" data-fa="all-categories" aria-expanded="${state.allCategories}">${state.allCategories ? 'Piilota kategoriat' : 'Kaikki kategoriat'} ${chevron('down')}</button>${state.allCategories ? `<div class="fa-compact-expanded">${model.entries.map(categoryButton).join('')}</div>` : ''}` : ''}</div></section>`;
+    }
     const entries = state.allCategories || model.entries.length <= 5 ? model.entries : [...model.entries.slice(0,4), { category:'__others', label:'Muut menot', value:model.entries.slice(4).reduce((n,e)=>n+e.value,0), share:model.entries.slice(4).reduce((n,e)=>n+e.share,0) }];
     return `<section class="fa-section"><div class="fa-section-heading"><h2>Mistä taloutesi koostuu?</h2><span>${monthLabel(state.month)}</span></div><div class="fa-card fa-breakdown-card">
       <div class="fa-segmented" role="group" aria-label="Jakauman sisältö">${[['expense','Menot'],['income','Tulot']].map(([kind,label])=>`<button type="button" data-fa="kind" data-value="${kind}" aria-pressed="${state.kind===kind}">${label}</button>`).join('')}</div>

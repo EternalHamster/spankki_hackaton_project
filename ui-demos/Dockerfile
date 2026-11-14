@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r /tmp/runtime-requirements.txt && useradd --uid
 ENV PYTHONUNBUFFERED=1 PYTHONUTF8=1 COACH_CODE_ROOT=/app COACH_DB_PATH=/app/BDA/output/coach.duckdb
 
 FROM base AS verify
-COPY package.json server.mjs chat.mjs coach.mjs prepared.mjs customers.mjs data-source.mjs ./
+COPY package.json server.mjs chat.mjs coach.mjs prepared.mjs customers.mjs data-source.mjs spending-highlights.mjs ./
 COPY .runtime/ ./
 COPY runtime/worker.py ./runtime/worker.py
 COPY server-data/ ./server-data/
@@ -20,7 +20,7 @@ RUN node scripts/check-prepared.mjs
 
 FROM base AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=8080
-COPY --from=verify --chown=coach:coach /app/package.json /app/server.mjs /app/chat.mjs /app/coach.mjs /app/prepared.mjs /app/customers.mjs /app/data-source.mjs ./
+COPY --from=verify --chown=coach:coach /app/package.json /app/server.mjs /app/chat.mjs /app/coach.mjs /app/prepared.mjs /app/customers.mjs /app/data-source.mjs /app/spending-highlights.mjs ./
 COPY --from=verify --chown=coach:coach /app/BDA/ ./BDA/
 COPY --from=verify --chown=coach:coach /app/coach_context/ ./coach_context/
 COPY --from=verify --chown=coach:coach /app/runtime/ ./runtime/

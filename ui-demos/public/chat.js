@@ -1,15 +1,16 @@
 import { formatCoachText, formatInline } from './coach-text.js';
 import { insightPeriod } from './insights.js';
+import { affordTemplate } from './exploration.js';
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
 // Suggested questions. A template's [gaps] must be filled in by the user before it can be sent.
 const SUGGESTIONS = [
+  { text: affordTemplate, label: 'Onko minulla varaa tähän?', hint: 'Lisää hankinta, hinta ja aika kuukausina' },
   { text: 'Miten aloitan budjetoinnin?' },
-  { text: 'Onko minulla varaa ostaa [tuote], joka maksaa [hinta] €?', label: 'Onko minulla varaa…?', hint: 'Lisää tuote ja hinta itse' },
   { text: 'Anna kolme säästövinkkiä arkeen.' },
 ];
-const GAP = /\[(?:tuote|hinta)\]/;
+const GAP = /\[(?:tuote|hinta|kuukaudet)\]/;
 const ready = draft => Boolean(draft.trim()) && !GAP.test(draft);
 
 export function createChatDialog({ modal, detail, icon, getSelection = () => null, onSelectionStale = () => {} }) {
@@ -95,7 +96,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       <p id="chat-progress" class="chat-progress" role="status"></p>
       <p id="chat-error" class="chat-error" role="alert" hidden></p>
       <form id="chat-form" class="chat-composer"><label class="sr-only" for="chat-question">Kirjoita kysymyksesi</label><textarea id="chat-question" rows="2" placeholder="Kirjoita kysymyksesi…" maxlength="2000" required>${escape(session.draft)}</textarea><button type="submit" class="chat-send" aria-label="Lähetä kysymys">${icon('arrow')}</button></form>
-      <p id="chat-hint" class="chat-hint" hidden>Kirjoita ostoksen nimi ja hinta kohtiin [tuote] ja [hinta] ennen lähettämistä. Sarkain siirtää seuraavaan kohtaan.</p>
+      <p id="chat-hint" class="chat-hint" hidden>Lisää [tuote], [hinta] ja [kuukaudet] ennen lähettämistä. Sarkain siirtää seuraavaan kohtaan.</p>
       <div class="chat-footer"><span>Viestit ja kysymykseen tarvittavat valitun demoasiakkaan tiedot lähetetään Claudelle. Keskustelu tyhjenee, kun vaihdat asiakasta, aloitat uuden keskustelun tai päivität sivun.</span><button type="button" id="chat-reset">Uusi keskustelu</button></div>
     `, 'chat-dialog');
     const input = detail.querySelector('#chat-question');

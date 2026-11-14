@@ -1,9 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createExplorationSummaries, explorationQuestion } from '../public/exploration.js';
+import { createExplorationSummaries, explorationQuestion, explorationTopics, affordQuestion } from '../public/exploration.js';
 
 const selection = { customer_id: 'CUST00207', selection_id: 'selected-a', as_of: '2026-09-30' };
 const input = { topic: 'spending', month: '2026-09', selection };
+
+test('purchase planning is first and carries the entered item, price and deadline into chat', () => {
+  assert.equal(explorationTopics[0].id, 'afford');
+  const question = affordQuestion({ purchase: '  sähköpyörä  ', price: '1500,50', months: '8' });
+  assert.match(question, /ostaa sähköpyörä/);
+  assert.match(question.replace(/\s/g, ''), /1500,50€/);
+  assert.match(question, /8 kuukauden/);
+  for (const changes of [{ purchase: ' ' }, { price: 'no price' }, { price: 0 }, { price: Infinity },
+    { price: 1000001 }, { months: '' }, { months: 1.5 }, { months: 61 }]) {
+    assert.throws(() => affordQuestion({ purchase: 'pyörä', price: 500, months: 6, ...changes }));
+  }
+});
 const response = (answer = 'Kuukauden yhteenveto.', selectionId = selection.selection_id) => ({
   ok: true, status: 200, json: async () => ({ bullets: [answer, 'Katso menosi.'], customer_id: selection.customer_id, selection_id: selectionId }),
 });

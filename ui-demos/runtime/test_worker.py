@@ -5,6 +5,7 @@ import json
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
 from decimal import Decimal
 from pathlib import Path
 
@@ -156,6 +157,30 @@ class RuntimeTests(unittest.TestCase):
         self.assertGreaterEqual(peers["group_size"], 10)
         self.assertEqual(len(peers["lines"]), 1)
         self.assertNotRegex(json.dumps(peers), r"CUST\d+")
+
+    def test_afford_uses_existing_calculator_with_the_runtime_snapshot(self):
+        from BDA.engine import coach
+        for cid in worker.DEMO_CUSTOMERS:
+            for price, months in ((100, 1), (1500, 6), (20000, 12), (1000000, 60)):
+                # The public BDA function and runtime must produce the same plan.
+                with patch.object(coach, "_q", self.runtime.query_frame):
+                    expected = coach.afford(cid, price, months)
+                with patch.object(coach, "_q", side_effect=AssertionError("Wrong database connection")):
+                    result = self.tool("afford", {"price_eur": price, "months": months}, cid)
+                self.assertEqual({key: result[key] for key in expected}, expected)
+                self.assertTrue(result["historical_snapshot"])
+                self.assertTrue(result["model_estimate"])
+                self.assertEqual(result["as_of"], self.runtime.as_of)
+                self.assertNotRegex(json.dumps(result, allow_nan=False), r"CUST\d+")
+                self.assertTrue(all(cut["line"] in worker.MODEL_CONFIG.DISCRETIONARY for cut in result["cuts"]))
+
+    def test_afford_rejects_missing_invalid_and_customer_supplied_arguments(self):
+        for arguments in ({}, {"price_eur": 500}, {"months": 6},
+                          *({"price_eur": price, "months": 6} for price in (0, -1, 1000001, True, "500", float("nan"), float("inf"))),
+                          *({"price_eur": 500, "months": months} for months in (0, 61, 1.5, True, "6")),
+                          {"price_eur": 500, "months": 6, "customer_id": "CUST00127"}):
+            with self.subTest(arguments=arguments), self.assertRaises(worker.RequestError):
+                self.tool("afford", arguments)
 
     def test_interleaved_customers_and_cached_requests_never_cross(self):
         period = {"start_date": "2026-09-01", "end_date": "2026-10-01"}

@@ -266,6 +266,11 @@ def afford(cid, price_eur, months=6):
     what the customer already moves to savings each month, then by cutting extras, starting where they
     spend most above their peers. Essentials are never cut.
     """
+    return _afford(cid, price_eur, months, query=_q)
+
+
+def _afford(cid, price_eur, months=6, *, query):
+    """Use the caller's snapshot connection without changing the process-wide BDA database."""
     try:
         price, months = float(price_eur), int(months)
     except (TypeError, ValueError):
@@ -274,13 +279,16 @@ def afford(cid, price_eur, months=6):
         raise CoachError("price_eur must be between 1 and 1,000,000")
     if not 1 <= months <= AFFORD_MAX_MONTHS:
         raise CoachError(f"months must be between 1 and {AFFORD_MAX_MONTHS}")
-    s = _summary(cid)
-    cl = _q("select * from customer_line where customer_id = ?", [cid]).set_index("line")
+    summary = query("select * from customer_summary where customer_id = ?", [cid])
+    if summary.empty:
+        raise CoachError(f"unknown customer {cid}")
+    s = summary.iloc[0]
+    cl = query("select * from customer_line where customer_id = ?", [cid]).set_index("line")
 
     # the months ahead compared with an average month (e.g. a window with December costs more)
     first = pd.Timestamp(s["as_of"]).replace(day=1) + pd.offsets.MonthBegin(1)
     moy = [(first + pd.DateOffset(months=i)).month for i in range(months)]
-    season = _q("select line, month_of_year, factor from model_season").pivot(
+    season = query("select line, month_of_year, factor from model_season").pivot(
         index="line", columns="month_of_year", values="factor")
     season_extra = 0.0
     for line in cl.index:

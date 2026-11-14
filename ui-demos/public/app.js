@@ -4,9 +4,10 @@ import { metrics, basketTotals, scenarioSavings, transactionKind } from './model
 import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
-import { explorationTopics, createExplorationSummaries } from './exploration.js';
+import { explorationTopics, createExplorationSummaries, affordQuestion } from './exploration.js';
 import { formatInline } from './coach-text.js';
 import { insightPeriod } from './insights.js';
+import { setDisclosure } from './disclosure.js';
 
 // Appearance follows the user's references; all money data is synthetic.
 const paths={
@@ -153,8 +154,15 @@ function openTopic(topicId, toggle = true) {
   const topic = explorationTopics.find(item=>item.id === topicId);
   if (!topic) return;
   const close = toggle && activeTopic === topicId;
-  analytics?.destroy(); analytics = null; activeTopicResult = null;
-  document.querySelectorAll('.topic-panel').forEach(panel=>{ panel.hidden = true; panel.innerHTML = ''; });
+  const previousAnalytics = analytics;
+  analytics = null; activeTopicResult = null;
+  const previousPanel = activeTopic && document.querySelector(`#panel-${activeTopic}`);
+  if (previousPanel && (close || activeTopic !== topicId)) {
+    void setDisclosure(previousPanel, false).then(finished => {
+      previousAnalytics?.destroy();
+      if (finished) previousPanel.innerHTML = '';
+    });
+  } else previousAnalytics?.destroy();
   document.querySelectorAll('[data-topic]').forEach(button=>button.setAttribute('aria-expanded', 'false'));
   activeTopic = close ? null : topicId;
   if (close) return;
@@ -162,14 +170,33 @@ function openTopic(topicId, toggle = true) {
   m = metrics(profile, month);
   const panel = document.querySelector(`#panel-${topicId}`);
   document.querySelector(`#topic-${topicId}`).setAttribute('aria-expanded', 'true');
-  panel.hidden = false;
-  panel.innerHTML = `${topicId === 'week' ? `<p class="topic-caption">Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>` : monthPicker(topicId)}<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>${topicId === 'week' ? '' : `<div id="financial-analytics"></div>${topicId === 'spending' ? `<button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button>` : `<div class="saving-experiment"><h4>Kokeile pientä muutosta</h4><p>Katso, paljonko olisi jäänyt säästöön, jos olisit käyttänyt vähemmän ravintoloihin.</p><label class="savings-label" for="saving-cut">Vähennys <b id="saving-percent">20 %</b></label><input id="saving-cut" type="range" min="0" max="50" step="5" value="20"><div class="saving-inline-result"><span>Olisi jäänyt säästöön</span><strong id="saving-result" aria-live="polite">${euro(scenarioSavings(m.categories,{Restaurants:20}))}</strong></div><p class="topic-caption">${capitalize(monthName(month))} · ravintoloihin kului ${euro(m.categories.Restaurants)}.</p></div>`}`}`;
-  if (topicId !== 'week') analytics = createFinanceAnalytics(panel.querySelector('#financial-analytics'), {
-    data: projectFinanceData(profile, data.summary, names), selectedMonth: month,
-    sections: topicId === 'spending' ? ['breakdown', 'annual', 'history'] : ['rhythm'],
-    onSelectCategory: category=>showTransactions(category, topicMonth(topicId)),
-    onSelectMonth: month=>changeTopicMonth(topicId, month),
-  });
+  if (topicId === 'afford') {
+    panel.innerHTML = `<p class="afford-intro">Uusi pyörä, lomamatka vai jotain ihan muuta? Katsotaan, mitä toiveesi vaatisi ja millaiset muutokset voisivat auttaa.</p>
+      <form id="afford-form" class="afford-form">
+        <label for="afford-purchase">Mitä haluaisit hankkia?<input id="afford-purchase" name="purchase" type="text" placeholder="Esim. sähköpyörä" maxlength="120" required></label>
+        <div class="afford-fields"><label for="afford-price">Hinta (€)<input id="afford-price" name="price" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" placeholder="Esim. 1 500" required></label>
+        <label for="afford-months">Aikaa (kuukautta)<input id="afford-months" name="months" type="number" inputmode="numeric" min="1" max="60" step="1" value="6" required></label></div>
+        <button type="submit" class="primary-button full-width">Katso, mitä se vaatisi ${icon('arrow')}</button>
+        <p class="afford-error" role="alert" hidden></p>
+      </form><p class="topic-caption">Saat valmentajalta arvion kuukausisummasta ja tarvittavista muutoksista. Arvio perustuu ${esc(dateLabel(customerSession.as_of))} tilanteeseen.</p>`;
+    void setDisclosure(panel, true, !toggle);
+    return;
+  }
+  const summary = `<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>`;
+  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption">Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
+  if (topicId === 'spending') {
+    const shared = { data: projectFinanceData(profile, data.summary, names), selectedMonth: month,
+      onSelectCategory: category=>showTransactions(category, topicMonth(topicId)),
+      onSelectMonth: month=>changeTopicMonth(topicId, month) };
+    const chart = createFinanceAnalytics(panel.querySelector('#spending-breakdown'), {
+      ...shared, sections: ['breakdown'], compactBreakdown: true,
+    });
+    const history = createFinanceAnalytics(panel.querySelector('#spending-history'), {
+      ...shared, sections: ['annual', 'history'],
+    });
+    analytics = { destroy() { chart.destroy(); history.destroy(); } };
+  }
+  void setDisclosure(panel, true, !toggle);
   void loadTopicSummary(panel.querySelector('.topic-summary'), topicId);
 }
 function changeTopicMonth(topic, month) {
@@ -182,20 +209,21 @@ function changeTopicMonth(topic, month) {
 }
 async function loadTopicSummary(target, topic) {
   const epoch = customerEpoch, selected = customerSession, month = topicMonth(topic);
+  const label = topic === 'spending' ? 'AI-nosto menoistasi' : 'AI:n tuottama yhteenveto';
   target.setAttribute('aria-busy', 'true');
-  target.innerHTML = '<span class="ai-label">AI:n tuottama yhteenveto</span><p class="summary-pending" role="status"><span class="insights-pulse" aria-hidden="true"></span>Yhteenvetoa ladataan…</p>';
+  target.innerHTML = `<span class="ai-label">${label}</span><p class="summary-pending" role="status"><span class="insights-pulse" aria-hidden="true"></span>Yhteenvetoa ladataan…</p>`;
   try {
     const result = await explorationSummaries.load({topic, month, selection:selected});
-    if (!target.isConnected || epoch !== customerEpoch) return;
+    if (!target.isConnected || epoch !== customerEpoch || activeTopic !== topic) return;
     if (result.selectionId !== selected.selection_id) throw Object.assign(new Error('Demoasiakas vaihtui.'), {staleSelection:true});
     if (!Array.isArray(result.bullets) || result.bullets.length < 2 || result.bullets.length > 3 ||
         result.bullets.some(bullet=>typeof bullet !== 'string' || !bullet.trim())) throw new Error('Yhteenveto puuttuu.');
     activeTopicResult = result;
-    target.innerHTML = `<span class="ai-label">AI:n tuottama yhteenveto</span><ul class="summary-bullets">${result.bullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>`;
+    target.innerHTML = `<span class="ai-label">${label}</span><ul class="summary-bullets">${result.bullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>`;
   } catch (error) {
-    if (!target.isConnected || epoch !== customerEpoch) return;
+    if (!target.isConnected || epoch !== customerEpoch || activeTopic !== topic) return;
     if (error.staleSelection) { void loadCustomer(); return; }
-    target.innerHTML = `<span class="ai-label">AI-yhteenveto ei ole saatavilla</span><p>Voit silti tutkia alla olevia lukuja tai kysyä valmentajalta.</p><button class="text-button" data-topic-retry="${topic}">Yritä uudelleen</button>`;
+    target.innerHTML = `<span class="ai-label">AI-yhteenveto ei ole saatavilla</span><p>Voit silti tutkia lukuja tai kysyä valmentajalta.</p><button class="text-button" data-topic-retry="${topic}">Yritä uudelleen</button>`;
   } finally {
     if (target.isConnected) target.setAttribute('aria-busy', 'false');
   }
@@ -312,6 +340,20 @@ document.addEventListener('click', event=>{
   }
 });
 document.addEventListener('submit', event=>{
+  if (event.target.id === 'afford-form') {
+    event.preventDefault();
+    const form = event.target;
+    if (!form.reportValidity()) return;
+    try {
+      const question = affordQuestion(Object.fromEntries(new FormData(form)));
+      form.querySelector('.afford-error').hidden = true;
+      showChat(question, {autoSend:true});
+    } catch (error) {
+      const alert = form.querySelector('.afford-error');
+      alert.textContent = error.message; alert.hidden = false;
+    }
+    return;
+  }
   if (event.target.id !== 'explore-form') return;
   event.preventDefault();
   const input = document.querySelector('#explore-question');

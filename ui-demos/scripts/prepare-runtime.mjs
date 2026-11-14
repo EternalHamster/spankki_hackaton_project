@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const ui = fileURLToPath(new URL('../', import.meta.url)), repo = path.resolve(ui, '..');
 const target = path.join(ui, '.runtime');
 const inputs = ['coach_context/__init__.py', 'coach_context/profile_card.py', 'coach_context/insight_context.py',
-  'BDA/engine/config.py', 'BDA/output/coach.duckdb'];
+  'BDA/engine/__init__.py', 'BDA/engine/config.py', 'BDA/engine/coach.py', 'BDA/engine/insights.py', 'BDA/output/coach.duckdb'];
 const database = path.join(repo, 'BDA/output/coach.duckdb');
 if ((await fs.stat(database)).size < 1000000) throw new Error('Fetch the DuckDB snapshot with git lfs pull before deployment.');
 const hash = createHash('sha256');

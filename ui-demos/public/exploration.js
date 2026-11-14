@@ -1,8 +1,21 @@
 export const explorationTopics = [
+  { id: 'afford', title: 'Onko minulla varaa tähän?', hint: 'Oma hankinta, oma aikataulu – mitä se vaatisi?', icon: 'bag' },
   { id: 'spending', title: 'Mihin rahani menivät?', hint: 'Ymmärrä menojasi ja niiden muutoksia', icon: 'chart' },
   { id: 'week', title: 'Paljonko voin käyttää tällä viikolla?', hint: 'Arvio käytettävissä olevasta rahasta', icon: 'wallet' },
   { id: 'saving', title: 'Miten voisin säästää enemmän?', hint: 'Löydä arkeesi sopiva pieni muutos', icon: 'coffee' },
 ];
+
+export const affordTemplate = 'Onko minulla varaa ostaa [tuote], joka maksaa [hinta] €, [kuukaudet] kuukauden kuluttua? Mitä se vaatisi kuukaudessa?';
+
+export function affordQuestion({ purchase, price, months }) {
+  const item = String(purchase || '').trim(), amount = Number(String(price).replace(',', '.')), duration = Number(months);
+  if (!item || item.length > 120 || !Number.isFinite(amount) || amount < 0.01 || amount > 1000000 ||
+      !Number.isInteger(duration) || duration < 1 || duration > 60) {
+    throw new TypeError('Lisää hankinta, hinta (0,01–1 000 000 €) ja aika (1–60 kuukautta).');
+  }
+  const euros = new Intl.NumberFormat('fi-FI', { minimumFractionDigits: Number.isInteger(amount) ? 0 : 2, maximumFractionDigits: 2 }).format(amount);
+  return `Onko minulla varaa ostaa ${item}, joka maksaa ${euros} €, ${duration} kuukauden kuluttua? Mitä se vaatisi kuukaudessa?`;
+}
 
 export function explorationQuestion(topic, month, asOf) {
   if (topic === 'spending') return `Mihin rahani menivät? Tarkasteltava kuukausi: ${month}.`;
@@ -47,7 +60,8 @@ export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
       return entry.promise;
     },
     warm(selection, month) {
-      return Promise.allSettled(explorationTopics.map(({ id: topic }) => store.load({ topic, month, selection })));
+      return Promise.allSettled(explorationTopics.filter(({ id }) => id !== 'afford')
+        .map(({ id: topic }) => store.load({ topic, month, selection })));
     },
     reset() {
       for (const entry of entries.values()) entry.controller.abort();

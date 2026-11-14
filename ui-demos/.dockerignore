@@ -8,6 +8,7 @@
 !prepared.mjs
 !customers.mjs
 !data-source.mjs
+!spending-highlights.mjs
 !.runtime/
 !.runtime/manifest.json
 !.runtime/BDA/

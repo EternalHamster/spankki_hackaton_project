@@ -67,7 +67,17 @@ test('real persistent DuckDB worker serves isolated selected customers over HTTP
   assert.equal(typeof ready.version, 'string');
   assert.ok(ready.version.length > 0);
   assert.deepEqual(ready.customers, DEMO_CUSTOMERS.map(row => row.id));
-  assert.equal((await dataSource.toolDefinitions()).length, 7);
+  const definitions = await dataSource.toolDefinitions();
+  assert.equal(definitions.length, 8);
+  assert.deepEqual(definitions.find(tool => tool.name === 'afford').input_schema.required, ['price_eur', 'months']);
+  for (const { id } of DEMO_CUSTOMERS) {
+    const plan = await dataSource.execute(id, 'afford', { price_eur: 1500, months: 6 });
+    assert.equal(plan.price_eur, 1500);
+    assert.equal(plan.months, 6);
+    assert.equal(plan.historical_snapshot, true);
+    assert.ok(['already_affordable', 'yes', 'yes_with_changes', 'takes_longer', 'not_now'].includes(plan.verdict));
+    assert.doesNotMatch(JSON.stringify(plan), /CUST\d+/);
+  }
   server.listen(0, '127.0.0.1');
   await once(server, 'listening');
   const base = `http://127.0.0.1:${server.address().port}`;

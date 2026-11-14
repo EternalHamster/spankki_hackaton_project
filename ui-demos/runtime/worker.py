@@ -24,6 +24,7 @@ CODE_ROOT = Path(os.getenv("COACH_CODE_ROOT", Path(__file__).resolve().parents[2
 sys.path.insert(0, str(CODE_ROOT))
 from coach_context.profile_card import _load_bda_config, build_profile_card, render_profile_card, nice, nice_down
 from coach_context.insight_context import build_insight_context, render_insight_context
+from BDA.engine.coach import _afford
 
 DEMO_CUSTOMERS = ("CUST00207", "CUST00127", "CUST00103")
 SPENDING_CATEGORIES = ("Housing", "Utilities", "Groceries", "Health", "Home & Tech", "Transportation",
@@ -56,6 +57,9 @@ TOOLS = [
                {**DATE_PROPERTIES, "category": {"type": "string"}, "limit": {"type": "integer", "minimum": 1, "maximum": 20}, "offset": {"type": "integer", "minimum": 0, "maximum": 2000}}, DATE_PROPERTIES),
     definition("safe_to_spend", "Dated BDA model estimate of weekly room for extras, its limiting factors, next payday, safe saving and surprise-fund target. Optional purchase amount is compared by code with the modeled weekly budget; this is not a live-bank affordability guarantee.",
                {"purchase_eur": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000000}}),
+    definition("afford", "Plan a purchase costing price_eur over months (1–60). Use for 'can I afford X in Y months?' and purchase goals, not the weekly safe_to_spend check. Returns a verdict, required monthly saving, money redirected from existing savings, specific optional spending cuts, and an alternative timeline. Ask for a missing price or timeframe before calling. This is a scenario based on the dated snapshot, not a live balance or a guarantee.",
+               {"price_eur": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000000},
+                "months": {"type": "integer", "minimum": 1, "maximum": 60}}, ("price_eur", "months")),
     definition("what_if", "Model-based savings scenario for reducing a spending line or group. Backend calculates monthly/yearly effects; figures are estimates, not forecasts or transfers.",
                {"line": LINE_PROPERTY, "cut_percent": {"type": "number", "exclusiveMinimum": 0, "maximum": 100}}, ("line", "cut_percent")),
     definition("compare_to_peers", "Own modeled spending versus group medians and national aggregates. Explains frequency versus payment size. No individual peer data.", {"line": LINE_PROPERTY}, ("line",)),
@@ -132,7 +136,7 @@ class CustomerRuntime:
         self._bootstraps = {}
         self._tool_cache = OrderedDict()
         # Fail startup rather than silently serving the wrong/missing database schema.
-        for table in ("customers", "transactions", "customer_summary", "customer_line", "insights", "spender_type", "model_hyper"):
+        for table in ("customers", "transactions", "customer_summary", "customer_line", "insights", "spender_type", "model_hyper", "model_season"):
             self.connection.execute(f"select * from {table} limit 0")
 
     def _file_digest(self):
@@ -151,6 +155,14 @@ class CustomerRuntime:
             cursor.execute(sql, parameters)
             names = [item[0] for item in cursor.description]
             return [clean(dict(zip(names, row))) for row in cursor.fetchall()]
+        finally:
+            cursor.close()
+
+    def query_frame(self, sql, parameters=()):
+        """BDA calculations use this runtime's read-only snapshot and customer-bound query parameters."""
+        cursor = self.connection.cursor()
+        try:
+            return cursor.execute(sql, parameters).df()
         finally:
             cursor.close()
 
@@ -272,6 +284,9 @@ class CustomerRuntime:
         return result
 
     def _execute(self, cid, name, args):
+        if name == "afford":
+            return {**_afford(cid, **args, query=self.query_frame), "model_estimate": True,
+                    "limitation": "Scenario starting at the historical snapshot, not today's available money. Income, bills and other purchases may have changed."}
         if name in ("get_spending", "get_transactions", "get_cash_flow"):
             where, params, start, end = self._where(cid, args, spending=name == "get_spending")
             if cid not in self._observed_transactions:
