@@ -17,10 +17,10 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8,<10", "httpx>=0.28,<1", "httpx2>=2.16,<3"]
-cloud = ["anthropic[vertex,google_cloud]>=1.17,<2"]
 
 [project.scripts]
 money-coach-import = "money_coach.ingest:main"
+money-coach-smoke = "money_coach.smoke:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

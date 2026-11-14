@@ -3,6 +3,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from .tools import FinanceTools, definitions
+from .client import DEFAULT_MODEL
 
 SYSTEM = """You are a concise, kind personal economic trainer for an S-Pankki hackathon prototype.
 Use the user's language. Explain one useful concept without shaming spending choices.
@@ -22,7 +23,7 @@ class AgentLimitError(RuntimeError):
 
 
 class CoachAgent:
-    def __init__(self, client, model="claude-haiku-5-5", max_rounds=4, max_tokens=900, max_tool_calls=8):
+    def __init__(self, client, model=DEFAULT_MODEL, max_rounds=4, max_tokens=900, max_tool_calls=8):
         self.client, self.model = client, model
         self.max_rounds, self.max_tokens, self.max_tool_calls = max_rounds, max_tokens, max_tool_calls
 

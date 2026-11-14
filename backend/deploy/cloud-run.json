@@ -1,0 +1,7 @@
+{
+  "project": "junctionhackathonspankki",
+  "region": "europe-north1",
+  "service": "money-coach",
+  "build_account": "money-coach-build",
+  "snapshot": "data/finance.duckdb"
+}

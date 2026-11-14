@@ -3,7 +3,7 @@ WORKDIR /app
 COPY pyproject.toml ./
 COPY constraints.txt ./
 COPY src ./src
-RUN pip install --no-cache-dir -c constraints.txt '.[cloud]' && useradd --uid 10001 --create-home coach
+RUN pip install --no-cache-dir -c constraints.txt . && useradd --uid 10001 --create-home coach
 USER coach
 ENV PYTHONUNBUFFERED=1 PORT=8080
 EXPOSE 8080

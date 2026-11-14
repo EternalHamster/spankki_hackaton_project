@@ -206,4 +206,43 @@ def test_default_auth_fails_closed_and_missing_key(repository, monkeypatch):
         assert client.get("/readyz").status_code == 503
         assert client.post("/v1/chat", headers={"Authorization": "Bearer A"}, json={"message": "hi"}).status_code == 401
     with TestClient(create_app(Settings(), repository=repository, authenticate=lambda token: "A")) as client:
-        assert client.post("/v1/chat", headers={"Authorization": "Bearer verified"}, json={"message": "hi"}).status_code == 503
+        response = client.post("/v1/chat", headers={"Authorization": "Bearer verified"}, json={"message": "hi"})
+        assert response.status_code == 503
+        assert "ANTHROPIC_API_KEY" in response.json()["detail"]
+
+
+def test_api_lifespan_uses_direct_client(repository, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    requests = []
+    with sdk_client([{"stop_reason": "end_turn", "content": [{"type": "text", "text": "Hi!"}]}], requests) as sdk:
+        from unittest.mock import patch
+        with patch("money_coach.api.create_client", return_value=sdk) as factory:
+            with TestClient(create_app(Settings(), repository=repository, authenticate=lambda _: "A")) as client:
+                response = client.post("/v1/chat", headers={"Authorization": "Bearer session"}, json={"message": "hi"})
+                assert response.status_code == 200
+                assert response.json()["answer"] == "Hi!"
+            factory.assert_called_once_with()
+            assert sdk.is_closed()
+
+
+def test_demo_build_excludes_secrets_and_checks_customer(repository, tmp_path):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("prepare_cloud_run", Path(__file__).parents[1] / "scripts" / "prepare_cloud_run.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    backend = tmp_path / "backend"
+    (backend / "src" / "money_coach").mkdir(parents=True)
+    (backend / "src" / "money_coach" / "api.py").write_text("# app code")
+    (backend / "src" / ".env").write_text("SECRET=do-not-package")
+    for name in ("pyproject.toml", "constraints.txt", "Dockerfile"):
+        (backend / name).write_text("# fixture")
+    with pytest.raises(ValueError, match="no data"):
+        module.prepare(backend, repository.path, "absent")
+    assert not (backend / ".deploy").exists()
+    deployment = module.prepare(backend, repository.path, "A")
+    files = {str(f.relative_to(deployment / "source")).replace('\\', '/') for f in (deployment / "source").rglob('*') if f.is_file()}
+    assert files == {"pyproject.toml", "constraints.txt", "Dockerfile", "src/money_coach/api.py", "data/finance.duckdb", ".gcloudignore"}
+    environment = json.loads((deployment / "runtime-env.yaml").read_text())
+    assert "ANTHROPIC_API_KEY" not in environment
+    token = (deployment / "demo-token.txt").read_text().strip()
+    assert json.loads(environment["DEMO_TOKENS_JSON"]) == {token: "A"}

@@ -1,99 +1,69 @@
-# Financial coach backend baseline
+# Financial coach backend
 
-FastAPI -> Anthropic Python SDK -> approved financial tools -> read-only DuckDB snapshot.
-The existing `ui-demos` webapp and its planned Google Cloud hosting remain as they are.
-This backend supplies the future chat API; it does not enable the prototype's disabled chat button.
+The backend uses the **direct Anthropic API** for Claude and **Google Cloud Run** for hosting.
+The webapp sends requests to FastAPI. Claude chooses approved tools, Python/DuckDB calculates
+financial results, and Claude explains the returned aggregates.
 
-The PDF and continuation notes were used as design context. The current request takes precedence:
-Claude replaces the earlier OpenAI/Ollama suggestions, and the eventual database schema is not assumed.
+The source database schema stays configurable. Customer isolation, decimal calculations and the
+existing webapp are unchanged. The frontend chat button is still a preview awaiting API integration.
 
-## Run locally with direct Claude credits (PowerShell, Python 3.11+)
+## Setup and a minimal Claude test
 
-From this `backend` directory:
+Run these commands in Google Cloud SDK Shell on this Windows workspace:
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -c constraints.txt -e '.[test]'
-.\.venv\Scripts\python.exe -m money_coach.ingest --source ../Data/tx_junction_transactions.csv --mapping config/s-pankki.json --output data/finance.duckdb
-
-# Set your real key only in the server environment. Never put it in frontend source.
-$env:CLAUDE_PROVIDER = 'anthropic'
-$env:ANTHROPIC_API_KEY = '<your Claude API key>'
-$env:DEMO_MODE = 'true'
-$demoToken = .\.venv\Scripts\python.exe -c 'import secrets; print(secrets.token_urlsafe(32))'
-$env:DEMO_TOKENS_JSON = @{ $demoToken = 'CUST00207' } | ConvertTo-Json -Compress
-$env:CORS_ORIGINS = 'http://127.0.0.1:4173'
-.\.venv\Scripts\python.exe -m uvicorn money_coach.api:app --host 127.0.0.1 --port 8000
+```cmd
+cd /d "C:\Users\nikik\Documents\hackathon_project\spankki_hackaton_project\backend"
+set "PYTHON_EXE=C:\Users\nikik\Documents\hackathon_project\.venv\Scripts\python.exe"
+"%PYTHON_EXE%" -m pip install -c constraints.txt -e ".[test]"
+"%PYTHON_EXE%" -m money_coach.smoke
 ```
 
-The import writes a new snapshot and refuses existing output paths. For refreshes, write
-`data/finance-v2.duckdb`, stop/restart the server with `DUCKDB_PATH` pointing at it, and retain
-the previous file for rollback. CSV source files are never modified. API workers never import data.
-`.env.example` documents settings; it is not automatically loaded.
+The test reads `ANTHROPIC_API_KEY` or asks for it with a hidden prompt; the prompted key is not saved.
+It sends one `hi` to Haiku with no tools or financial records and at most 32 output tokens, then prints
+text and usage. It performs a real billable API request using the key's Anthropic workspace credits.
+Tests under `tests/` use mocked HTTP and never make paid requests.
 
-Use a second terminal with the same generated demo token (or stop the server and run it separately):
+For a fresh checkout, use Python 3.11+ to create an environment (`python -m venv .venv`) and install
+with `.venv\Scripts\python.exe -m pip install -c constraints.txt -e ".[test]"` from this directory.
 
-```powershell
-$headers = @{ Authorization = "Bearer $demoToken" }
-Invoke-RestMethod http://127.0.0.1:8000/v1/data-context -Headers $headers
-Invoke-RestMethod http://127.0.0.1:8000/v1/chat -Method Post -Headers $headers -ContentType 'application/json' -Body '{"message":"How much did I spend on Restaurants in September 2026, and what would a 20% reduction save?"}'
+**Cloud deployment:** follow [DEPLOYMENT.md](DEPLOYMENT.md). It contains SDK Shell commands for
+Secret Manager, a private Cloud Run service and a deployed chat test. Google CLI login is only for
+managing hosting; Claude itself requires the Anthropic key. No Google model quota is involved.
+
+The existing cloud service can now be updated with `deploy.cmd` from this directory. It preserves
+its saved key binding and demo settings, packages current code/data and checks readiness automatically.
+Use `deploy.cmd --check` to check the server, or `deploy.cmd --chat "hi"` for a billable chat test;
+both retrieve the service URL and Google authentication automatically.
+
+## Run the API locally
+
+Set `ANTHROPIC_API_KEY` in the backend process environment. The `.env.example` lists the supported
+settings but is not auto-loaded. For a synthetic local demo, also set `DEMO_MODE=true` and
+`DEMO_TOKENS_JSON` to a JSON object mapping a random bearer secret (24+ characters) to a customer ID.
+For example, the structure is `{"<random-demo-token>":"CUST00207"}`. Never use the Anthropic key as
+the demo token. Set `CORS_ORIGINS=http://127.0.0.1:4173` if the local webapp calls the API.
+
+```cmd
+"%PYTHON_EXE%" -m money_coach.ingest --source ..\Data\tx_junction_transactions.csv --mapping config\s-pankki.json --output data\finance.duckdb
+"%PYTHON_EXE%" -m uvicorn money_coach.api:app --host 127.0.0.1 --port 8000
 ```
 
-Interactive API schema: `http://127.0.0.1:8000/docs`. `GET /healthz` is liveness;
-`GET /readyz` checks the snapshot, model client and configured authentication without making a paid call.
-`GET /v1/data-context` works without a Claude key once demo authentication is configured.
-`POST /v1/chat` requires configured model credentials. All financial endpoints require a bearer session.
-Readiness does not test remote IAM permissions, model access or available credit.
+Skip import if that snapshot already exists. To refresh, create a new versioned output path and
+restart the server with `DUCKDB_PATH` pointing to it. Source files are never modified or imported
+by API workers. The current workspace already has a synthetic snapshot in `data/finance.duckdb`.
 
-The current workspace also has dependencies installed in `../../.venv`; its Python can run these
-commands without creating another environment.
+The API schema is at `http://127.0.0.1:8000/docs`. Financial endpoints require
+`Authorization: Bearer <random-demo-token>`:
 
-## Use Claude through Google Cloud
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /healthz` | Process liveness. |
+| `GET /readyz` | Snapshot, model client and authentication configuration; no paid call. |
+| `GET /v1/data-context` | Customer-scoped data coverage; works without a model key. |
+| `POST /v1/chat` | Send `{"message":"hi"}`; requires `ANTHROPIC_API_KEY`. |
 
-The provider is explicit; failures never switch billing routes automatically. Both cloud routes keep
-the same tools and agent code. Install cloud dependencies, then select one configuration:
-
-```powershell
-python -m pip install -c constraints.txt -e '.[cloud,test]'
-gcloud auth application-default login
-$env:GOOGLE_CLOUD_PROJECT = '<your-project-id>'
-$env:CLAUDE_MODEL = 'claude-haiku-5-5'
-```
-
-For the Google-managed route, use:
-
-```powershell
-$env:CLAUDE_PROVIDER = 'vertex'
-$env:GOOGLE_CLOUD_REGION = 'global'
-```
-
-This selects `AnthropicVertex`. Enable `aiplatform.googleapis.com`, activate Claude access in Model
-Garden, and give the calling service identity the required prediction permissions. No Anthropic
-workspace ID or API key is used. Haiku 5.5 uses the same model ID as the direct API. `global` offers
-flexible routing; `eu` is the multi-region alternative if EU inference placement is needed. Confirm
-model availability and endpoint pricing for your project in the
-[Google-managed guide](https://platform.claude.com/docs/en/build-with-claude/claude-models-on-google-cloud/google-managed).
-
-For the Anthropic-managed route, use:
-
-```powershell
-$env:CLAUDE_PROVIDER = 'google_cloud'
-$env:ANTHROPIC_GOOGLE_CLOUD_WORKSPACE_ID = '<wrkspc_...>'
-```
-
-This selects `AnthropicGoogleCloud` with a global endpoint. Complete the Marketplace subscription
-and organization setup, enable `claude.googleapis.com` and
-`anthropic-managed-claude.cloudpartnerservices.goog`, and grant the runtime identity
-`roles/claude.user`. Copy the workspace ID from that organization's Claude Console. See the
-[Anthropic-managed setup guide](https://platform.claude.com/docs/en/build-with-claude/claude-models-on-google-cloud/anthropic-managed).
-
-On Cloud Run, use the attached service account through Application Default Credentials (ADC);
-do not bake credential files into the image. Local development uses the gcloud ADC login above.
-These credentials authenticate the backend to Claude; end-user banking authentication is separate.
-Both cloud offerings charge the Google Cloud bill, according to the
-[provider comparison](https://platform.claude.com/docs/en/build-with-claude/claude-models-on-google-cloud/overview).
-Do not assume the existing direct Anthropic API promotional credits cover cloud usage; retain
-`CLAUDE_PROVIDER=anthropic` when using those credits. Cloud provisioning has not been performed.
+Readiness does not verify remote model access or remaining Anthropic credit. Authentication defaults
+to deny-all. A key is only used on the server, never returned to the browser.
 
 ## Adapt to the final database
 
@@ -103,7 +73,7 @@ Edit a JSON mapping to configure customer/date/category/amount columns, date for
 expense/income categories and basket rules. `config/normalized-example.json` demonstrates different
 column names and an already-positive `expense_eur` field.
 
-```powershell
+```cmd
 python -m money_coach.ingest --source C:/path/customer-data.duckdb --source-kind duckdb --mapping config/normalized-example.json --output data/finance-v2.duckdb
 ```
 
@@ -191,25 +161,20 @@ map for synthetic local demos. For a deployed service, implement a verifier that
 session/identity token (signature, issuer, audience and expiration), maps its subject to customer ownership
 server-side, and inject it using `create_app(authenticate=verify_session)`. Demo auth is not a banking login.
 
-The Dockerfile is ready for a later Cloud Run build with this directory as the build context:
+The standard Dockerfile installs the direct Anthropic SDK and contains application code only.
+Cloud Run injects `ANTHROPIC_API_KEY` from a versioned Secret Manager secret. The API uses the same
+client configuration locally and on Cloud Run. Model usage is billed by Anthropic; hosting is billed
+by Google Cloud. Provider-selection settings and cloud model authentication are no longer supported.
 
-```powershell
-docker build -t money-coach-backend .
-```
-
-It binds `0.0.0.0` on the injected `PORT`, as required by the
-[Cloud Run container contract](https://cloud.google.com/run/docs/container-contract).
-No deployment or cloud resources have been created. Keep the web frontend and backend as separate
-deployment components. Use Google ADC for cloud inference (or Secret Manager for a direct Claude key), allow only the actual frontend origin,
-and supply a versioned DuckDB snapshot from private Cloud Storage to local instance storage before
-starting the API. The image deliberately excludes CSV data, database snapshots, secrets and tests.
-Snapshot download/startup wiring and production session verification remain deployment integration work.
-Do not treat Cloud Run's writable filesystem as durable storage or share a writable DuckDB across replicas.
-Generate snapshots in a separate import job; each serving instance reads an immutable local copy.
+For the synthetic hackathon demo, `scripts/prepare_cloud_run.py` creates a separate, gitignored build
+containing a validated snapshot. Its generated demo credentials stay outside the uploaded source.
+[DEPLOYMENT.md](DEPLOYMENT.md) has the complete preparation, deployment and test steps.
+For production, supply private versioned snapshots to local instance storage during startup and
+implement verified user sessions. Do not share a writable DuckDB database across serving replicas.
 
 ## Verification
 
-```powershell
+```cmd
 python -m pytest -q
 python scripts/verify_snapshot.py
 ```
@@ -218,7 +183,7 @@ Tests run offline with synthetic fixtures and mocked HTTP transport through the 
 They exercise alternate schemas/sign conventions/date formats, decimal totals, refund/transfer exclusion,
 monthly/daily reconciliation, customer isolation under concurrent calls, SQL injection attempts, read-only
 connections, atomic import failures, mixed currencies, tool-result protocol, model limits, API authentication,
-request validation and rate limits. Live Claude responses and an actual Cloud Run deployment require
+request validation, rate limits, direct API routing, smoke-test errors and secret-free build packaging. Live Claude responses and an actual Cloud Run deployment require
 credentials and are separate integration checks.
 
 The supplied dataset was imported locally: **3,626,755 rows / 5,100 customers**, covering

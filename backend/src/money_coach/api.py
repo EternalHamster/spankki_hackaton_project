@@ -19,33 +19,31 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from .agent import AgentLimitError, CoachAgent
 from .repository import DuckDBRepository
-from .providers import ProviderSettings, create_model_client
+from .client import DEFAULT_MODEL, create_client
 from .tools import FinanceTools
 
 
 @dataclass
 class Settings:
     database: Path = Path("data/finance.duckdb")
-    model: str = "claude-haiku-5-5"
+    model: str = DEFAULT_MODEL
     demo_mode: bool = False
     # Secret bearer token -> customer ID; never sent to the model.
     demo_tokens: dict[str, str] = field(default_factory=dict)
     origins: list[str] = field(default_factory=list)
     requests_per_minute: int = 10
     process_chat_limit: int = 500
-    provider: ProviderSettings = field(default_factory=ProviderSettings)
 
     @classmethod
     def from_env(cls):
         value = cls(
             database=Path(os.getenv("DUCKDB_PATH", "data/finance.duckdb")),
-            model=os.getenv("CLAUDE_MODEL", "claude-haiku-5-5"),
+            model=os.getenv("CLAUDE_MODEL", DEFAULT_MODEL),
             demo_mode=os.getenv("DEMO_MODE", "false").lower() == "true",
             demo_tokens=json.loads(os.getenv("DEMO_TOKENS_JSON", "{}")),
             origins=[o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()],
             requests_per_minute=int(os.getenv("REQUESTS_PER_MINUTE", "10")),
             process_chat_limit=int(os.getenv("PROCESS_CHAT_LIMIT", "500")),
-            provider=ProviderSettings.from_env(),
         )
         if not isinstance(value.demo_tokens, dict) or any(
             not isinstance(k, str) or len(k) < 24 or not isinstance(v, str) or not v
@@ -110,7 +108,7 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
         client = None
         app.state.agent = agent
         if agent is None:
-            client = create_model_client(settings.provider)
+            client = create_client()
             if client:
                 app.state.agent = CoachAgent(client, model=settings.model)
         try:
@@ -165,7 +163,7 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
     @app.post("/v1/chat", response_model=ChatResponse)
     def chat(body: ChatRequest, customer_id: str = Depends(customer)):
         if not app.state.agent:
-            raise HTTPException(503, "Claude provider not configured")
+            raise HTTPException(503, "ANTHROPIC_API_KEY is not configured on the server")
         if not slots.acquire(blocking=False):
             raise HTTPException(429, "Agent busy; retry shortly", headers={"Retry-After": "5"})
         try:
