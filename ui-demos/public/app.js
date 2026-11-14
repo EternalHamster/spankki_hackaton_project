@@ -73,7 +73,7 @@ function showTransactions(kind='all'){
 function showBaskets(selected){const totals=basketTotals(m.categories);modal(selected===undefined?'Kolme menokoria':basketInfo[selected][0],`<p>Menokorit auttavat hahmottamaan, mihin rahat menevät.</p>${basketInfo.map(([title,copy,glyph],i)=>selected!==undefined&&selected!==i?'':`<section class="basket-summary">${icon(glyph)}<div><h3>${title}</h3><p>${copy}.</p><strong>${euro(totals[i])}</strong></div></section>`).join('')}<p class="fine-print">Luokittelu on esimerkki. Aineistosta ei voi päätellä, mitkä yksittäiset ostokset olivat sinulle välttämättömiä. Matkailu sisältyy arjen valintoihin.</p>`);}
 const showChat = createChatDialog({ modal, detail, icon });
 // The year-in-review story; its "ask the coach" buttons open the chat with the question filled in.
-const wrapped = createWrapped({ onAsk: question => showChat(question) });
+const wrapped = createWrapped({ onAsk: question => showChat(question, { send: true })});
 // Deep link, e.g. from a push notification: #rahavuosi opens the story, #rahavuosi/3 opens card 3.
 function openFromLink(){const match=location.hash.match(/^#rahavuosi(?:\/(\d+))?$/);if(match)wrapped.open(profile.customer_id,null,Math.max(0,(+match[1]||1)-1));}
 function action(name){

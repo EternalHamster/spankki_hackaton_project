@@ -51,7 +51,8 @@ export function createChatDialog({ modal, detail, icon }) {
     }
   }
 
-  return function showChat(question = '') {
+  // send: true sends the question right away (e.g. from Rahavuotesi's "Kysy valmentajalta" buttons).
+  return function showChat(question = '', { send = false } = {}) {
     if (question && !pending) draft = question;
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>Keskustele tekoälyn kanssa</span></div></div>
@@ -79,5 +80,6 @@ export function createChatDialog({ modal, detail, icon }) {
       messages = []; draft = ''; error = ''; input.value = ''; update(); input.focus();
     });
     update();
+    if (send && question && !pending) detail.querySelector('#chat-form').requestSubmit();
   };
 }
