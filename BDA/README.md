@@ -240,6 +240,7 @@ last complete month. "Today" is the last date in the data (2026-09-30), so the n
 
 ## Known limitations
 
+- Salary sweeps to another bank are currently read as saving, so customers who bank elsewhere look like heavy savers; next step is to detect that.
 - The synthetic data has identical amount distributions across MCC codes within a category, so for example taxi
   rides cost the same as fuel payments. Only frequencies differ.
 - Seasonality is mild (± 5–10 %; travel peaks in June–August, home & tech in November). Trend detection and
