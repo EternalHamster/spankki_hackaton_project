@@ -80,7 +80,7 @@ def validation(v):
     fig, ax = plt.subplots(figsize=(8, 5))
     ax.barh([LABEL[l] for l in d["line"]], d["pct"], color=BLUE, height=0.6, edgecolor=SURFACE, linewidth=2)
     for y, p in enumerate(d["pct"]):
-        if p >= 15 or y == 0:
+        if p >= 15:
             ax.text(p + 0.5, y, f"{p:.0f} %", va="center", color=INK2, fontsize=9)
     ax.axvline(overall, color=INK2, linewidth=1, linestyle="--")
     ax.text(overall + 0.4, len(d) - 0.6, f"all lines: {overall:.0f} %", color=INK2, fontsize=9)
@@ -112,8 +112,10 @@ def safe_to_spend(s):
 def insight_reach(ins):
     """Share of customers who get each kind of insight."""
     names = {"safe_to_spend": "Safe to spend", "surprise_fund": "Surprise fund", "baskets": "Three baskets",
-             "savings": "Savings habit", "peer_gap": "Spends more than peers", "trend_down": "Spending dropped",
-             "trend_up": "Spending rose", "unusual_payment": "Unusual payment"}
+             "savings": "Safe to save / savings habit", "peer_gap": "Spends more than peers",
+             "trend_down": "Spending really dropped", "trend_up": "Spending really rose",
+             "unusual_payment": "Unusual payment", "overspending": "Spends more than comes in",
+             "month_high": "Biggest month for an extra"}
     d = (ins.groupby("kind")["customer_id"].nunique() / ins["customer_id"].nunique() * 100).sort_values()
     fig, ax = plt.subplots(figsize=(8, 4.2))
     ax.barh([names.get(k, k) for k in d.index], d, color=BLUE, height=0.6, edgecolor=SURFACE, linewidth=2)
@@ -126,6 +128,26 @@ def insight_reach(ins):
     _save(fig, "5_insight_reach.png")
 
 
+def calibration(c):
+    """How often the customer really had at least the promised room until the salary arrived."""
+    short = {"full model": "This model", "without late-salary model": "... ignoring late salaries",
+             "without burstiness or late salary (old model)": "... and ignoring bursty months\n(first version)"}
+    d = c[c["as_of"].astype(str) == "ALL"].iloc[::-1]
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    colors = [BLUE if v.startswith("full") else "#b9b8b2" for v in d["variant"]]
+    ax.barh([short.get(v, v) for v in d["variant"]], 100 * d["coverage"], color=colors, height=0.6,
+            edgecolor=SURFACE, linewidth=2)
+    for y, p in enumerate(100 * d["coverage"]):
+        ax.text(p + 1, y, f"{p:.0f} %", va="center", color=INK2, fontsize=9)
+    ax.axvline(90, color=ORANGE, linewidth=1.5, linestyle="--")
+    ax.text(89, len(d) - 0.42, "target 90 %", color=ORANGE, fontsize=9, ha="right")
+    ax.set_xlim(0, 108)
+    ax.set_xlabel("% of months the promised amount held (backtest)")
+    ax.set_title("Is safe-to-spend really safe?")
+    ax.grid(axis="y", visible=False)
+    _save(fig, "6_safe_to_spend_calibration.png")
+
+
 def run():
     OUT.mkdir(parents=True, exist_ok=True)
     con = duckdb.connect(str(C.DB_PATH), read_only=True)
@@ -133,12 +155,13 @@ def run():
     cl = con.sql("select * from customer_line").df()
     ins = con.sql("select customer_id, kind from insights").df()
     con.close()
-    v = pd.read_csv(C.OUTPUT_DIR / "validation.csv")
     baskets(s)
     vs_finland(cl)
-    validation(v)
+    validation(pd.read_csv(C.OUTPUT_DIR / "validation.csv"))
     safe_to_spend(s)
     insight_reach(ins)
+    if (C.OUTPUT_DIR / "calibration.csv").exists():
+        calibration(pd.read_csv(C.OUTPUT_DIR / "calibration.csv"))
 
 
 if __name__ == "__main__":

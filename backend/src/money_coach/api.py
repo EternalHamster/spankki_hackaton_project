@@ -6,6 +6,7 @@ import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 from typing import Callable
 from uuid import uuid4
@@ -33,6 +34,8 @@ class Settings:
     origins: list[str] = field(default_factory=list)
     requests_per_minute: int = 10
     process_chat_limit: int = 500
+    # The coach's "today". None = last transaction date in the snapshot (falls back to the real date).
+    as_of: date | None = None
 
     @classmethod
     def from_env(cls):
@@ -44,6 +47,7 @@ class Settings:
             origins=[o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()],
             requests_per_minute=int(os.getenv("REQUESTS_PER_MINUTE", "10")),
             process_chat_limit=int(os.getenv("PROCESS_CHAT_LIMIT", "500")),
+            as_of=date.fromisoformat(os.environ["COACH_AS_OF"]) if os.getenv("COACH_AS_OF") else None,
         )
         if not isinstance(value.demo_tokens, dict) or any(
             not isinstance(k, str) or len(k) < 24 or not isinstance(v, str) or not v
@@ -103,6 +107,14 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
     budget = RequestBudget(settings)
     slots = threading.BoundedSemaphore(4)
 
+    def coach_as_of() -> date | None:
+        if settings.as_of:
+            return settings.as_of
+        try:
+            return repository.latest_date()
+        except (duckdb.Error, ValueError, OSError, AttributeError):
+            return None  # snapshot missing at startup: agent falls back to the real date
+
     @asynccontextmanager
     async def lifespan(app):
         client = None
@@ -110,7 +122,7 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
         if agent is None:
             client = create_client()
             if client:
-                app.state.agent = CoachAgent(client, model=settings.model)
+                app.state.agent = CoachAgent(client, model=settings.model, as_of=coach_as_of())
         try:
             yield
         finally:

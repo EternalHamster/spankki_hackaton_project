@@ -104,6 +104,10 @@ currency is inferred and no conversion is performed. The adapter does not dedupl
 contains overlapping exports, deduplicate by a trusted transaction ID upstream. Unmapped categories
 are reported, never guessed. Mapping rules and a snapshot version are recorded alongside the data.
 
+The coach's "today" is the last transaction date in the snapshot (2026-09-30 for the supplied data), so
+relative questions such as "last month" resolve to months that have data. Set `COACH_AS_OF=YYYY-MM-DD`
+to override it. If the snapshot cannot be read at startup, the real Europe/Helsinki date is used.
+
 Tools return exact decimal strings. Date ranges use an exclusive end and are limited to 366 days.
 Full calendar months use precomputed category summaries; partial months query canonical transactions.
 Customer-specific observed date coverage accompanies results; observed endpoints cannot prove that

@@ -34,6 +34,11 @@ class DuckDBRepository:
             con.execute("SELECT customer_id, expense_eur FROM transactions LIMIT 0")
             con.execute("SELECT customer_id, total_eur FROM monthly_spending LIMIT 0")
 
+    def latest_date(self) -> date | None:
+        """Last transaction date in the snapshot; the coach's 'today' for historical data."""
+        with self.connection() as con:
+            return con.execute("SELECT MAX(tx_date) FROM transactions").fetchone()[0]
+
     def describe(self, customer_id: str) -> dict:
         with self.connection() as con:
             row = con.execute("""SELECT MIN(tx_date), MAX(tx_date), COUNT(*) FROM transactions
