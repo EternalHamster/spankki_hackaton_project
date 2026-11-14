@@ -1,4 +1,4 @@
-"""Write ui-demos/public/wrapped-data.json: recaps for the UI's demo customers and the demo personas.
+"""Write private ui-demos/server-data/wrapped-data.json: recaps for demo customers and personas.
 
 Usage (repo root):  python -m wrapped.export_ui [CUST... more ids]
 Needs wrapped/output/facts.json (python wrapped/build_facts.py).
@@ -8,9 +8,9 @@ import sys
 
 from .cards import REPO, build_recap, load_sources
 
-UI_DATA = REPO / 'ui-demos' / 'public' / 'demo-data.json'
+UI_DATA = REPO / 'ui-demos' / 'server-data' / 'demo-data.json'
 PERSONAS = REPO / 'demo' / 'personas.json'
-OUT = REPO / 'ui-demos' / 'public' / 'wrapped-data.json'
+OUT = REPO / 'ui-demos' / 'server-data' / 'wrapped-data.json'
 
 
 def default_ids():

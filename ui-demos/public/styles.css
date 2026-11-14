@@ -10,11 +10,11 @@ dialog{width:calc(100% - 24px);max-width:456px;max-height:calc(100dvh - 48px);pa
 @media(max-width:340px){.mint-content{padding-left:15px;padding-right:15px}.section-title h2{font-size:21px}.text-button{font-size:11px}.period-row select{font-size:12px;max-width:150px}.period-row>span>.icon{height:17px;width:17px}.sample-button{font-size:9px;gap:3px}.sample-button>.icon{height:14px;width:14px}.month-amount{font-size:40px}.category-row,.basket-row{gap:7px;padding-left:13px;padding-right:13px}.basket-row strong{font-size:13px}.basket-row>b{font-size:14px}.account-row>b{font-size:17px}.account-row>span>strong{font-size:14px}.category-row>b{font-size:14px}.category-copy>strong{font-size:14px}.transaction-row>b{font-size:12px}.nav-item{font-size:10px}.chat-fab>span{display:none}.chat-fab{height:52px;width:52px;padding:0}.financial-summary{padding:8px 12px}.financial-summary>span{font-size:12px;gap:10px}.financial-summary strong{font-size:14px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 
-/* Live text-only chat */
-.chat-dialog .dialog-content{display:flex;flex-direction:column;max-height:calc(100dvh - 150px);overflow-y:auto}
+/* Live general and insight chat */
+.chat-dialog .dialog-content{display:flex;flex-direction:column;max-height:none;overflow:visible}
 .chat-dialog .chat-intro{margin:18px 0 14px}.chat-dialog .chat-greeting{font-size:20px;padding:17px}
 .chat-dialog .chat-intro p{font-size:12px;margin-top:10px}
-.chat-messages{overflow-y:auto;min-height:0;max-height:38dvh;flex:1 0 auto;scroll-behavior:smooth}
+.chat-messages{overflow:visible;min-height:0;flex:1 0 auto}
 .chat-message{max-width:92%;padding:13px 15px;margin:10px 0;border-radius:0 14px 14px;background:var(--mint);overflow-wrap:anywhere}
 .chat-message.user{margin-left:auto;background:var(--green);color:#fff;border-radius:14px 0 14px 14px}
 .chat-message>span{display:block;font-size:10px;font-weight:700;opacity:.75;margin-bottom:5px}
@@ -25,3 +25,13 @@ dialog{width:calc(100% - 24px);max-width:456px;max-height:calc(100dvh - 48px);pa
 .chat-footer{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:10px;color:#718178;line-height:1.5}
 .chat-footer>span{flex:1}.chat-footer>button{color:var(--green);font-size:12px;min-height:36px;text-decoration:underline}
 .chat-dialog [hidden]{display:none!important}
+
+/* Snapshot insight cards */
+.key-insights{display:grid;gap:12px}.insights-caption,.insights-footnote{font-size:12px;line-height:1.6;color:#64796a;margin:0 0 2px}.insights-footnote{font-size:10px;margin:2px 2px 0}
+.insight-card{display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:20px;text-align:left;gap:10px;border:1px solid #d7e5da;transition:border-color .15s,box-shadow .15s}
+.insight-card:hover{border-color:var(--green);box-shadow:0 3px 12px #004b2810}.insight-card:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.insight-heading{display:flex;gap:10px;align-items:baseline;line-height:1.35}.insight-heading>strong{font-size:16px}.insight-number{font-size:11px;font-weight:700;color:#6b8774}
+.insight-value{font-size:27px;line-height:1.2;letter-spacing:-.035em;color:var(--green);font-weight:700;overflow-wrap:anywhere}
+.insight-action{font-size:13px;line-height:1.55;color:#5d6b62}.insight-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding-top:7px;color:var(--green);font-weight:700;font-size:12px}.insight-link>.icon{height:17px;width:17px}
+.insights-loading,.insights-error{padding:20px;border-radius:12px;background:#fff;color:#64796a;font-size:14px}.insights-error>p{margin:0 0 10px}
+.chat-insight{background:var(--mint);padding:15px;border-radius:12px;margin:16px 0 8px}.chat-insight>span{display:block;font-size:10px;color:#64796a}.chat-insight>strong{display:block;font-size:15px;margin:7px 0}.chat-insight>b{display:block;font-size:21px;color:var(--green)}.chat-insight>p{font-size:12px;line-height:1.6;margin:8px 0 0}.chat-context-note{font-size:11px;color:#64796a;margin:4px 0 10px}

@@ -5,7 +5,7 @@ import { prepareDataset, periodStats, breakdown, annualSpending, spendingRhythm,
 import { projectFinanceData } from '../public/adapters/project-finance.js';
 import { metrics } from '../public/model.js';
 
-const raw = JSON.parse(fs.readFileSync(new URL('../public/demo-data.json',import.meta.url)));
+const raw = JSON.parse(fs.readFileSync(new URL('../server-data/demo-data.json',import.meta.url)));
 const near=(a,b)=>assert.ok(Math.abs(a-b)<.00001,`${a} != ${b}`);
 const fixture=prepareDataset({coverage:{from:'2024-01-01',to:'2024-03-31'},transactions:[
   {date:'2024-02-01',time:'08:00:00',category:'Salary',kind:'income',amount:1000},

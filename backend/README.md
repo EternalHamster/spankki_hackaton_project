@@ -5,7 +5,7 @@ The webapp sends requests to FastAPI. Claude chooses approved tools, Python/Duck
 financial results, and Claude explains the returned aggregates.
 
 The source database schema stays configurable. Customer isolation, decimal calculations and the
-existing webapp are unchanged. The frontend now has a separate text-only Claude chat endpoint. It does not call this financial backend or use project data yet.
+existing webapp are unchanged. The frontend has a separate Claude chat endpoint. Its insight chats use an offline-prepared summary for one server-configured synthetic customer and group-level peer statistics; it does not call this financial backend at runtime.
 
 ## Setup and a minimal Claude test
 

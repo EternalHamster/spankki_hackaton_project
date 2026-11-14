@@ -33,9 +33,9 @@ Data/ (raw CSVs)
  │                                 ├─► coach_context/   profile card (~650 tokens) + insight context (~1,500 tokens)
  │                                 │        └─► backend /v1/insights (three key insights, dry run by default)
  │                                 └─► wrapped/cards.py
- ├─ wrapped/build_facts.py ───► wrapped/output/facts.json ─► ui-demos/public/wrapped-data.json
+ ├─ wrapped/build_facts.py ───► wrapped/output/facts.json ─► ui-demos/server-data/wrapped-data.json
  ├─ backend ingest ───────────► DuckDB snapshot ─► backend /v1/chat (Claude + customer-scoped tools)
- └─ ui-demos/scripts ─────────► ui-demos/public/demo-data.json ─► Oma talous UI ─► /api/chat (Claude, text only)
+ └─ ui-demos/scripts ─────────► ui-demos/server-data/demo-data.json ─► Oma talous UI ─► /api/chat (Claude; optional server-selected insight context)
 ```
 
 ## The data in one paragraph
@@ -87,7 +87,7 @@ A mobile-first **Oma talous** tab in S-mobiili's style. It shows:
 - the three baskets,
 - a savings slider.
 
-**Kysy** sends questions to Claude through the Node server (`/api/chat`, text only, with no customer data yet).
+**Kysy** sends questions to Claude through the Node server (`/api/chat`). Three clickable front-page insights start a chat with the configured synthetic customer's dated summary and aggregate peer statistics. General chat has no financial context. The server selects one synthetic customer for all public visitors, rejects customer/context overrides, and scopes transaction data, insights and Rahavuotesi to that customer. Source bundles remain outside the public directory; authenticated sessions are required before real customer data is connected.
 Plain JavaScript ES modules with a strict CSP and no build step.
 
 ### Rahavuotesi (`wrapped/`)
@@ -115,8 +115,7 @@ The tone rules (never shame, essentials are never a "favourite") are tested for 
 | Sanni, 32 | `CUST03711` | Saving steadily towards a first home |
 | Pekka, 59 | `CUST04971` | A surprise bill a week before payday |
 
-Their Rahavuotesi recaps are already in `wrapped-data.json`. The UI's customer selector still lists its
-original three sample customers.
+Their Rahavuotesi recaps are in the private source bundle. The public UI exposes only its server-configured synthetic customer (`CUST00207` by default); there is no public customer switcher.
 
 ## Run it
 
@@ -127,7 +126,7 @@ cd ui-demos && node server.mjs              # chat needs ANTHROPIC_API_KEY in th
 # Regenerate derived data (stdlib Python unless noted)
 python scripts/build_features.py            # Features/, ~2.5 min
 python wrapped/build_facts.py               # wrapped/output/facts.json, ~3 min
-python -m wrapped.export_ui                 # ui-demos/public/wrapped-data.json
+python -m wrapped.export_ui                 # ui-demos/server-data/wrapped-data.json
 cd BDA && .venv/Scripts/python -m engine    # spending model, ~4 min (see BDA/README.md for setup)
 ```
 
@@ -148,12 +147,12 @@ No test makes a paid API call.
 
 ## Not done yet
 
-- **The chat doesn't use customer data yet.** The UI's Kysy calls Claude with text only. Next steps:
+- **Live tools are not connected to the UI chat.** Insight chats use a prepared single-customer summary. Next steps:
   - point it at the backend's `/v1/chat`,
   - put the profile card in the system prompt,
   - give the backend BDA's tools for safe-to-spend, safe-to-save, peers and surprise fund. The backend's own
     `calculate_safe_to_spend` is still a placeholder.
-- **The demo personas aren't in the UI's customer selector yet.**
+- **Authenticated multi-customer sessions are not implemented.** The public demo deliberately exposes one synthetic customer to all visitors.
 - **Rahavuotesi is Finnish only.** A language button is planned.
 - **The touch gestures haven't been tested on a real phone.**
 - **Banking login:** demo tokens only. A real deployment needs verified S-mobiili sessions.

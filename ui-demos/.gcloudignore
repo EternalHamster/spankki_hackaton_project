@@ -6,6 +6,11 @@
 !package.json
 !server.mjs
 !chat.mjs
+!insights.mjs
+!server-data/
+!server-data/insights.json
+!server-data/demo-data.json
+!server-data/wrapped-data.json
 !public/
 !public/**
 !scripts/

@@ -1,6 +1,6 @@
 # Google Cloud Run package
 
-This folder is the complete deployment root for the **UI demo**. It serves the prepared synthetic samples and reusable analytics module. The same Node service also handles text-only Claude chat at `POST /api/chat`. The separate `../backend/` Python coach and project data are not used by chat. The server requires `ANTHROPIC_API_KEY`, injected from Secret Manager; no key is sent to the browser. No database, Google Cloud SDK, service-account key or source CSV is needed at runtime.
+This folder is the complete deployment root for the **UI demo**. It serves one configured synthetic customer, three prepared insight cards and the reusable analytics module. The same Node service handles Claude chat at `POST /api/chat`. Insight chats include that customer's prepared summary and aggregate peer statistics; general chat has no financial context. The separate `../backend/` Python coach is used by the offline card generator, not called at runtime. The server requires `ANTHROPIC_API_KEY`, injected from Secret Manager; no key is sent to the browser. No database, Google Cloud SDK, service-account key or source CSV is needed at runtime.
 
 The standalone release ZIP contains this deployment folder, documentation and tests. It excludes source CSVs, the Python backend, old UI archives and local validation artifacts. Extract it and run the commands below inside the extracted `oma-talous-ui/` directory.
 
@@ -19,10 +19,10 @@ This reuses the existing secret without reading its value locally. The deploy sc
 environment settings and binds the selected secret version. Future key rotations should update
 `ChatSecretVersion` before redeploying. Model calls incur Anthropic usage charges.
 
-The UI sends only text conversation, never project data. The Node endpoint limits input/history,
+The browser sends conversation text and optionally an insight ID. The server supplies only its configured synthetic customer's context; request-supplied customer IDs and context are rejected. The Node endpoint limits input/history,
 allows four simultaneous calls and 30 requests/minute per instance, and bounds each reply to 800 tokens.
 These in-memory limits reset on restart and are not a durable quota. Requests time out after 35 seconds.
-The site remains a public hackathon demo. Customer-data integration will require authentication.
+The site remains a public hackathon demo. Real customer accounts require authenticated sessions and server-side ownership checks. Every public demo visitor sees the same synthetic customer.
 
 ## 1. Check locally
 
@@ -54,7 +54,7 @@ docker compose logs ui
 docker compose down
 ```
 
-Open `http://127.0.0.1:8080/`. Compose binds the host port to localhost, runs the image with a read-only filesystem and drops Linux capabilities. Set `LOCAL_PORT` in `.env` to change the host port. The image runs as the unprivileged `node` user, uses an exec-form Node command, handles SIGTERM, and needs no writable files. Its first Docker stage runs syntax and integration tests; the final image contains only the server, package metadata and `public/` assets. The Node 24 Alpine base tag receives updates, so rebuild for patches; pin a reviewed digest if reproducible base-image bytes are required.
+Open `http://127.0.0.1:8080/`. Compose binds the host port to localhost, runs the image with a read-only filesystem and drops Linux capabilities. Set `LOCAL_PORT` in `.env` to change the host port. The image runs as the unprivileged `node` user, uses an exec-form Node command, handles SIGTERM, and needs no writable files. Its first Docker stage runs syntax and integration tests; the final image contains only the server modules, package metadata, private `server-data/` files and `public/` assets. The Node 24 Alpine base tag receives updates, so rebuild for patches; pin a reviewed digest if reproducible base-image bytes are required.
 
 ## 3. Choose cloud settings
 
@@ -101,7 +101,7 @@ For an intentionally public hackathon demo, use:
 .\deploy\deploy.ps1 -ProjectId YOUR_PROJECT_ID -Setup -Public
 ```
 
-All files in `public/`, including all four prepared sample profiles, are downloadable by anyone who can access the service. The customer selector only controls the display. This is appropriate for these synthetic samples; it is not customer authorization.
+Static files in `public/` are downloadable. Multi-customer source data and insight context live in `server-data/`, outside the static root. `/demo-data.json` returns only the configured profile, and `/api/insights` only its three cards. `/wrapped-data.json` returns only the configured customer's recap. All three reject query parameters; chat rejects customer/context overrides. `PUBLIC_DEMO_CUSTOMER_ID` defaults to `CUST00207`. Changing it is a deployment operation and requires regenerating matching cards first. This is a single-customer public synthetic demo, not an authenticated multi-customer service.
 
 `-Setup` enables the Cloud Run, Cloud Build, Artifact Registry and IAM APIs; creates the two identities if missing; and grants only the build identity `roles/run.builder`. It grants no project roles to the runtime identity. The deploy script validates locally, uploads only the allowlisted UI sources, and calls `gcloud run deploy --source=.` with the bundled Dockerfile. Cloud Build builds the image, so **local Docker is not required for cloud deployment**. The regional `cloud-run-source-deploy` image repository is created by the source-deployment flow if needed. See Google's [source deployment guide](https://docs.cloud.google.com/run/docs/deploying-source-code).
 
@@ -127,7 +127,7 @@ For an IAM-protected service, use a local authenticated proxy, then open `http:/
 gcloud run services proxy oma-talous-ui --project YOUR_PROJECT_ID --region europe-north1 --port 8080
 ```
 
-Your account needs Cloud Run Invoker access for the protected service. In the UI, switch customers/months, inspect the income/spending rings, open Menohistoria, move the period slider, open transactions and try the savings slider. The standalone analytics example is at `/finance-analytics/example.html`.
+Your account needs Cloud Run Invoker access for the protected service. In the UI, change months, click an insight to start a contextual chat, inspect the income/spending rings, open Menohistoria, move the period slider, open transactions and try the savings slider. The standalone analytics example is at `/finance-analytics/example.html`.
 
 View logs:
 
@@ -135,7 +135,7 @@ View logs:
 gcloud run services logs read oma-talous-ui --project YOUR_PROJECT_ID --region europe-north1 --limit 50
 ```
 
-Cloud Run provides HTTPS and request logs. Startup/error/shutdown messages are JSON on stdout. `/healthz` checks the process; `/readyz` checks that every core UI runtime asset exists. Cloud Run probes are configured explicitly because Docker HEALTHCHECK alone does not configure Cloud Run health checks. See the [container contract](https://docs.cloud.google.com/run/docs/container-contract) and [health-check guide](https://docs.cloud.google.com/run/docs/configuring/healthchecks).
+Cloud Run provides HTTPS and request logs. Startup/error/shutdown messages are JSON on stdout. `/healthz` checks the process; `/readyz` checks the configured customer, its insight bundle and every core UI runtime asset. Cloud Run probes are configured explicitly because Docker HEALTHCHECK alone does not configure Cloud Run health checks. See the [container contract](https://docs.cloud.google.com/run/docs/container-contract) and [health-check guide](https://docs.cloud.google.com/run/docs/configuring/healthchecks).
 
 ## 6. Update, roll back or stop
 
@@ -156,4 +156,4 @@ Deletion of the service does not delete stored images/build artifacts or the ser
 
 ## Future coach/backend integration
 
-`public/adapters/project-finance.js` maps the sample data to the analytics contract documented in `INTEGRATION.md`. Keep identity verification and customer scoping in the backend. Before connecting chat to customer data, add authenticated user sessions and customer-scoped API access. The current chat is text-only and already handles loading/errors with a server-side provider key. The current Content Security Policy allows same-origin scripts and API calls; an intentional cross-origin API would require matching `connect-src` and backend CORS changes. The separate Python backend also needs its database snapshot, model-provider configuration and authentication configuration; the UI container does not supply those.
+`public/adapters/project-finance.js` maps the sample data to the analytics contract documented in `INTEGRATION.md`. Keep identity verification and customer scoping in the backend. Before connecting real customer data, add authenticated user sessions and map each session to its customer server-side for every data, insight and chat endpoint. The current insight chat is scoped to one public synthetic customer and handles loading/errors with a server-side provider key. The current Content Security Policy allows same-origin scripts and API calls; an intentional cross-origin API would require matching `connect-src` and backend CORS changes. The separate Python backend also needs its database snapshot, model-provider configuration and authentication configuration; the UI container does not supply those.

@@ -12,7 +12,7 @@ button opens the chat with a ready-made question about that card.
 
 ```bash
 python wrapped/build_facts.py      # ~3 min: one pass over Data/, writes wrapped/output/facts.json (all 5,100 customers)
-python -m wrapped.export_ui        # writes ui-demos/public/wrapped-data.json (UI demo customers + demo personas)
+python -m wrapped.export_ui        # writes ui-demos/server-data/wrapped-data.json (UI demo customers + demo personas)
 python -m wrapped.export_ui CUST00042   # ...plus any extra customers
 python -m unittest discover -s wrapped/tests -t .
 ```
@@ -54,8 +54,9 @@ concrete, positive goal. Tests check these rules for all 5,100 customers.
 
 With reduced motion requested by the device, there is no auto-advance and no animation. The deep link
 `#rahavuosi` opens the story (`#rahavuosi/3` opens card 3), e.g. from a push notification.
-`wrapped-data.json` is about 30 kB for 8 customers and is loaded with the page; customers without a recap
-simply don't see the teaser.
+`server-data/wrapped-data.json` holds the source recaps. On page load, the server returns only the configured customer's recap through `/wrapped-data.json`.
 
 Text is Finnish for now. The cards carry plain strings, so a language switch means building the cards in
 another language in `cards.py`.
+
+The source recap bundle is private. The UI server exposes `/wrapped-data.json` filtered to its configured synthetic customer and rejects customer query parameters. It never serves the multi-customer source as a static file.

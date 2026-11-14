@@ -21,6 +21,7 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
   for (const [route, type] of [
     ['/', 'text/html'], ['/app.js', 'text/javascript'], ['/model.js', 'text/javascript'],
     ['/styles.css', 'text/css'], ['/adapters/project-finance.js', 'text/javascript'],
+    ['/wrapped.js', 'text/javascript'], ['/wrapped.css', 'text/css'],
     ['/finance-analytics/index.js', 'text/javascript'], ['/finance-analytics/model.js', 'text/javascript'],
     ['/finance-analytics/styles.css', 'text/css'], ['/finance-analytics/example.js', 'text/javascript'],
     ['/finance-analytics/example.html', 'text/html'],
@@ -34,7 +35,11 @@ test('HTTP serves the entry page and every app/analytics runtime asset', async (
   }
   const response = await fetch(base + '/demo-data.json');
   const data = await response.json();
-  assert.equal(data.profiles.length, 4);
+  assert.equal(data.profiles.length, 1);
+  assert.equal(data.profiles[0].customer_id, 'CUST00207');
+  assert.equal(data.mortgage, undefined);
+  assert.equal(data.history, undefined);
+  assert.doesNotMatch(JSON.stringify(data), /CUST00127|CUST00103|CUST04457/);
   assert.equal(data.summary.count, 3626755);
 });
 
