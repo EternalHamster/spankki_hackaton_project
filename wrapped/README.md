@@ -54,8 +54,7 @@ concrete, positive goal. Tests check these rules for all 5,100 customers.
 
 With reduced motion requested by the device, there is no auto-advance and no animation. The deep link
 `#rahavuosi` opens the story (`#rahavuosi/3` opens card 3), e.g. from a push notification.
-`wrapped-data.json` is about 30 kB for 8 customers and is loaded with the page; customers without a recap
-simply don't see the teaser.
+`server-data/wrapped-data.json` holds the source recaps. On page load, the server returns only the configured customer's recap through `/wrapped-data.json`.
 
 Text is Finnish for now. The cards carry plain strings, so a language switch means building the cards in
 another language in `cards.py`.
