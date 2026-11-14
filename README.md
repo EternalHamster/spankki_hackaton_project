@@ -18,8 +18,8 @@ which figures to fetch and explains them in plain language, in Finnish or Englis
 | [`BDA/`](BDA/README.md) | Hierarchical Bayesian spending model with Statistics Finland priors; insights and LLM tools | Done, validated |
 | [`backend/`](backend/README.md) | FastAPI + Claude (direct Anthropic API) + DuckDB coach, Cloud Run deployment | Running; chat tools not yet BDA-backed |
 | [`coach_context/`](coach_context/README.md) | Profile card and insight context: compact per-customer summaries for the model's prompt | Connected to web insights and every chat |
-| [`ui-demos/`](ui-demos/README.md) | **Oma talous** web app: three demo customers, prepared Claude insights/summaries, live chat, private DuckDB tools and Rahavuotesi | Local and Cloud Run runtime |
-| [`wrapped/`](wrapped/README.md) | **Rahavuotesi**: Spotify Wrapped-style year in money, in the UI | Done (Finnish) |
+| [`ui-demos/`](ui-demos/README.md) | **Oma talous** web app: AI insights and summaries, live coach chat with data tools, purchase planning, coach memory, three answer levels, Finnish/English, Rahavuotesi | Local and Cloud Run runtime |
+| [`wrapped/`](wrapped/README.md) | **Rahavuotesi**: Spotify Wrapped-style year in money, plus the previous year and what changed | Done (Finnish) |
 | [`demo/`](demo/PERSONAS.md) | Four narrative personas with stories and demo questions | Separate from the three live UI selections |
 | [`scripts/`](scripts/) | `build_features.py` (Features/), `select_personas.py` (demo/) | Done |
 
@@ -39,7 +39,7 @@ Data/ (raw CSVs)
                                       ├─► selected-customer chart bootstrap ─► Oma talous UI
                                       ├─► prepare-coach.mjs + Claude ─► private coach-answers.json
                                       │                                    └─► /api/insights + /api/summaries (prepared reads)
-                                      └─► compact profile + seven scoped tools ─► /api/chat (Claude)
+                                      └─► compact profile + eight scoped tools ─► /api/chat (Claude)
 ```
 
 ## The data in one paragraph
@@ -85,38 +85,64 @@ Deploys to Cloud Run with `deploy.cmd`.
 The web worker caches both contexts per customer and database snapshot. Every web chat includes the compact profile; detailed transaction questions use bounded tools instead of putting the full customer history into each prompt.
 
 ### Web app (`ui-demos/`)
-A mobile-first **Oma talous** tab in S-mobiili's style. It shows:
-- income, spending and balance per month,
-- category rings and transactions,
-- spending history from a single day up to several years,
-- weekday versus weekend spending,
-- the three baskets,
-- a savings slider.
+A mobile-first **Oma talous** tab in S-mobiili's style, for three synthetic demo customers. Claude Sonnet 5.5
+writes the text; Python/DuckDB calculates every number.
 
-The front-page selector offers three synthetic demo customers. Node signs the selection in an HttpOnly cookie and checks a fresh selection nonce on every data, insight, summary, recap and chat request. Switching customers clears the old display and conversation; late responses cannot populate the new selection. Spending, saving and transactions have independent month selectors, with no global calendar; transaction filtering preserves the selected category. The original Rahavuotesi card remains below the key insights.
+**Home screen**
+- An open question field and four topics: **Onko minulla varaa tähän?** (purchase planning), **Mihin rahani
+  menivät?**, **Paljonko voin käyttää tällä viikolla?** and **Miten voisin säästää enemmän?**. Each has its own
+  charts, a short AI summary and a button to continue in the chat.
+- Three AI insight cards: one weekly, one monthly and one yearly, each with a concrete first step and a
+  planning chat.
+- A local **Loppuviikon suunnitelma** (rest-of-week plan) and savings tips for a weekly, monthly or yearly
+  timeframe.
+- Charts: income, spending and balance per month, category rings and transactions, spending history from a
+  day to several years, and month comparisons.
+- The **Rahavuotesi** card.
 
-The coach prepares three actionable, dated insights for each customer: a weekly allowance estimate, the latest recorded month and the last 12 months, plus concise Finnish section summaries, before deployment. The private tracked bundle contains spending and saving answers for all 24 recorded months for each of the three customers (144 monthly answers), three weekly answers dated to the snapshot, and nine insight cards. Page load preloads the default month's three topic answers. Startup, page loads, section expansion and month changes only read prepared content; they do not call the model. The bundle is checked against the database hash, prompt version, model and complete customer/month coverage. Missing or stale content blocks deployment and readiness; regenerate it when the database, prompts or model change.
+**Coach chat**
+- Live Claude chat with the customer's profile and eight read-only tools: spending, cash flow, transactions,
+  safe-to-spend, `afford` (purchase plan), what-if, peer comparison and model details.
+- **Purchase planning:** describe something you want; the coach asks for the missing price or timing,
+  calculates a plan and offers to open a simulated **Tavoitetili** (goal account) with progress, tips and a
+  "simulate monthly saving" button. Up to three goals per customer are kept in the browser.
+- **Coach memory:** the coach remembers up to 12 lasting preferences (for example "I don't want to cut
+  restaurant visits") and respects them in later answers. **Valmentajan muisti** shows and deletes them.
+- **Answer levels:** **Selkeä**, **Perus** or **Syvällinen**, set in **Minä → Asetukset**. The level applies to
+  chat, insights and summaries. **Selitä yksinkertaisemmin** and **Kerro tarkemmin** rewrite the latest answer
+  one level down or up. The level is a short prompt block after the cached part, so facts, tools and safety
+  rules are the same at every level and prompt caching keeps working.
+- **Languages:** Finnish and English, chosen from the bottom navigation. AI text follows the chosen language.
 
-**Kysy** and insight follow-up chats remain live Claude calls. Both receive the selected customer's compact, dated profile. Seven bounded tools query that customer's historical spending, cash flow, transactions, safe-to-spend, scenarios, model details and group peer comparisons. The worker runs Python/DuckDB 2 read-only inside the same container; the visitor needs only a browser. Anthropic prompt caching reuses eligible chat prefixes. Exact selected-month scenarios use that month's transaction totals; the BDA context summarizes the 23 complete training months, recent trends and last-12-month figures within the 24-month recorded snapshot.
+**Prepared content and cost**
+Insights and the Finnish month summaries for all 24 months are written in advance into
+`server-data/coach-answers.json`, so page loads, section openings and month changes make no model calls. The
+bundle is checked against the database, prompt version and model before the server starts. Other levels,
+English and savings timeframes are adapted from it on demand and cached.
 
-The public selector intentionally exposes all three synthetic personas. Server scoping prevents a chat/tool request from switching identity; other people appear only as group aggregates. Real customer data still requires verified authentication and a server-side ownership mapping. Database/context sources and the multi-customer prepared bundle stay outside the public directory. The frontend uses plain JavaScript ES modules with a strict CSP and no build step. Cloud Run uses 1 GiB, zero minimum instances and one maximum instance; cold starts rebuild local data caches and validate the packaged answers without generating new text.
+**Privacy and scope**
+The server picks the customer from a signed session, never from the prompt or a tool argument. Other people
+appear only as group averages. Database files, prepared answers and recap sources stay outside `public/`.
+Real customer data would need verified S-mobiili login. Plain JavaScript modules with a strict CSP and no
+build step. Runs locally or on Cloud Run.
 
 ### Rahavuotesi (`wrapped/`)
-A full-screen, swipeable story of the customer's last 12 months (Oct 2025 – Sep 2026), in Finnish and in the
-app's green. The cards include:
-- the year in numbers and the top 5 categories,
-- the favourite category and regular place,
+A full-screen, swipeable story of the customer's last 12 months (Oct 2025 – Sep 2026), in the app's green.
+Each customer gets 9–13 cards, including:
+- the year in numbers, and the same figures next to their age-and-area group's averages,
+- the top 5 categories, the favourite category and regular place,
 - your time of week and the small purchases that add up,
 - the biggest purchase and the biggest month,
-- days in the green,
-- savings and the comparison with last year,
+- days in the green and savings,
+- **Mikä muuttui:** up to four big changes since the previous year, with a button to the previous year's story
+  (Oct 2024 – Sep 2025),
 - spending personality,
 - one positive goal for next year, from BDA's safe-to-save, budget gap or surprise fund.
 
 Every number is precomputed and reconciled with `Features/`, so no AI is needed to show it. Each card has a
-"Kysy valmentajalta tästä" button that opens the chat with a ready-made question. The story auto-advances and
-supports tap, swipe and hold, keyboard controls and reduced motion. The link `#rahavuosi` opens it directly.
-The tone rules (never shame, essentials are never a "favourite") are tested for all 5,100 customers.
+"Kysy valmentajalta" button that sends a ready-made question to the coach. The story auto-advances and supports
+tap, swipe and hold, keyboard controls and reduced motion. The link `#rahavuosi` opens it directly. The tone
+rules (never shame, essentials are never a "favourite") are tested for all 5,100 customers.
 
 ### Demo personas (`demo/`)
 | Persona | Customer | Story |
@@ -174,12 +200,8 @@ No test makes a paid API call.
 
 ## Not done yet
 
-- **Real-customer authentication is not implemented.** Signed demo sessions select from three public synthetic personas; a production bank integration must map verified users to their own records.
+- **Real-customer authentication is not implemented.** Signed demo sessions select from three public synthetic personas; a production bank integration needs verified S-mobiili login mapped to the user's own records.
 - **The separate FastAPI backend has its own integration work.** The live UI uses its local DuckDB worker and BDA-backed tools; it does not call `/v1/chat`. The backend's `calculate_safe_to_spend` remains a placeholder.
-- **Rahavuotesi is Finnish only.** A language button is planned.
-- **The touch gestures haven't been tested on a real phone.**
-- **Banking login:** demo tokens only. A real deployment needs verified S-mobiili sessions.
-
-## Team
-
-Michael Essine · GeraldoLamp (spending model) · hampter (backend, UI, deployment) · EternalHamster
+- **Rahavuotesi is Finnish only,** even when the app is in English.
+- **Goal accounts and transfers are simulated.** Tavoitetili creates no real account or transfer.
+- **Coach memory and goals live in one browser.** They don't sync between devices.
