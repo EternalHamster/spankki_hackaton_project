@@ -4,6 +4,11 @@ A Spotify Wrapped-style story of the customer's last 12 months of money (Oct 202
 Shown in the UI as full-screen swipeable cards: open it from the green **Rahavuotesi on valmis** card on the
 home screen of `ui-demos`.
 
+The latest story has a **Mikä muuttui** card with the drastic changes since the previous year. Its
+**Katso edellinen rahavuotesi** button opens a second story for the year before (Oct 2024 – Sep 2025), which
+ends with a button back to the comparison card. That button is the only way in: a customer with no drastic
+changes has no comparison card and so no route to the older story.
+
 Every number is precomputed from the data: the raw transactions and the BDA spending model's outputs.
 No AI is needed to show the story. Each card's **Kysy valmentajalta tästä** ("ask the coach about this")
 button opens the chat with a ready-made question about that card.
@@ -37,9 +42,16 @@ Each person gets 9–12 cards in story order (intro and tip always; the rest onl
 | Biggest month | Most and least expensive months |
 | Days in the green | Days with a positive balance, longest streak, recoveries |
 | Saver | Amount saved and in how many months |
-| Vs last year | Spending change over the same 11 months a year earlier |
+| What changed | Up to 4 drastic changes since the previous year, biggest first. Income, spending or saving must move by 20 % and €300, a purchase category by 50 % and €500, the number of purchases by 20 %; days in the green are listed only when up by 10 points. No card when nothing changed that much |
 | Spending personality | BDA's spender type, translated, with the peer group |
 | Next year's goal | BDA's safe-to-save, or how much less spending balances the budget, or a surprise fund |
+
+The previous-year story (`build_cards(customer_id, src, year='previous')`) uses the same cards for
+Oct 2024 – Sep 2025. It leaves out three things: the spending personality and the goal,
+because BDA's outputs describe the customer today; the changes card, which belongs to the latest story; and
+the "ask the coach" buttons on the cards, because the coach's ready-made questions are about the latest year.
+The data starts in October 2024 (97 % of accounts by 4 Oct,
+all by 23 Oct), so the previous year can be a few days short of a full year.
 
 Tone rules: never shame. Overdrafts are shown as progress ("palasit plussalle joka kerta", "you got back
 into the green every time"), essential spending is never a "favourite", and every story ends with one

@@ -44,6 +44,32 @@ explanations and financial jargon. Say "arvio", "rahaa jäi" or "rahaa varalle" 
 median, liquidity or cash-flow terminology. Keep uncertainty, but explain it in ordinary words.
 When the application requests JSON insight cards or summaries, obey that exact output format without tools.`;
 
+// Answer depth the user picks in the chat. Only this block and the output limit change between levels: the
+// shared prompt, profile and tools stay byte-identical, so the cached prefix is reused at every level.
+// Facts, tools and safety rules are the same at every level; only explanation depth and vocabulary change.
+const DEPTH_RULES = 'Answer depth chosen by the user. It replaces only the default chat length and vocabulary ' +
+  'rules above. Every factual, data, safety and tool rule above still applies at every depth. ' +
+  'Never invent or calculate numbers; use the profile or a tool result.\n';
+export const LEVELS = Object.freeze({
+  simple: { maxTokens: 600, prompt: `${DEPTH_RULES}Depth: SIMPLE. The user wants to understand what is going on, not analytics.
+Answer in two to four short sentences of plain everyday language; use a list only for steps. Mention at most two
+amounts; cents may be dropped with "noin". No percentages, group comparisons, probabilities, model terms or
+financial jargon. An everyday comparison is welcome. End with one easy, concrete next step. Use a tool only
+when the profile does not already answer the question.` },
+  standard: { maxTokens: 900, prompt: `${DEPTH_RULES}Depth: STANDARD. Two to four brief bullet points in easy language: the key
+amounts with their period, at most one comparison (the usual month or the typical group figure) and a
+one-line reason. Avoid jargon. End with one or two practical next steps.` },
+  detailed: { maxTokens: 1500, prompt: `${DEPTH_RULES}Depth: DETAILED. The user wants to understand their finances in depth and learn
+how the numbers work. Give a structured answer of at most about 250 words with short paragraphs or bullets
+(no tables or headings). Show the relevant figures with their periods and how they connect: how often versus
+how much per payment, the position within the typical group, the usual month versus this period, any trend
+evidence and the uncertainty (for example the chance of a late salary or why an estimate is cautious).
+Briefly explain how estimates such as the weekly allowance are formed. Financial terms are allowed, but
+explain each one in a few words the first time. Fetch exact evidence with the tools when it adds insight.
+End with two or three options and their trade-offs.` },
+});
+export const DEFAULT_LEVEL = 'standard';
+
 const INSIGHT_REQUEST = `Write exactly three distinct key-insight cards in Finnish, ordered by usefulness.
 Write one weekly, one monthly and one yearly card. Each needs a period field: weekly, monthly or yearly.
 These home-page insights are independent of any month selected in the app. Their periods are anchored to
@@ -538,8 +564,9 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
       as_of: snapshot.as_of, data_version: snapshot.version, retry_after_ms: 1000 };
   }
 
-  async function chat(customerId, { messages, insightId } = {}) {
+  async function chat(customerId, { messages, insightId, level = DEFAULT_LEVEL } = {}) {
     if (!validMessages(messages)) throw new CoachError(400, 'Keskustelu ei kelpaa. Aloita uusi keskustelu.');
+    if (!Object.hasOwn(LEVELS, level)) throw new CoachError(400, 'Valitse vastausten taso.');
     const snapshot = await context(customerId);
     const prompt = [...system(snapshot), { type: 'text', text: AFFORD_GUIDANCE }];
     if (insightId !== undefined) {
@@ -548,6 +575,8 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
       if (!selected) throw new CoachError(409, 'Havainto on vanhentunut. Valitse havainto uudelleen etusivulta.');
       prompt.push({ type: 'text', text: `Selected insight from this customer's snapshot:\n${JSON.stringify(selected)}\nEvidence period: ${JSON.stringify(insightPeriod(selected.period, snapshot.as_of))}\nHelp the user turn the card's action into a short practical plan. Keep this historical period distinct from current finances.` });
     }
+    // Last, so the chosen depth takes precedence; everything before it is shared by all levels.
+    prompt.push({ type: 'text', text: LEVELS[level].prompt });
     const tools = await definitions();
     const permitted = new Map(tools.map(tool => [tool.name, tool.input_schema]));
     const history = messages.map(({ role, content }) => ({ role, content: content.trim() }));
@@ -556,7 +585,7 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
     const usage = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
     let totalResultChars = 0;
     for (let round = 0; round < maxRounds; round++) {
-      const result = await request({ max_tokens: 1200, system: prompt, tools, messages: history }, 'chat', deadline);
+      const result = await request({ max_tokens: LEVELS[level].maxTokens, system: prompt, tools, messages: history }, 'chat', deadline);
       for (const key of Object.keys(usage)) usage[key] += result.usage?.[key] || 0;
       const calls = result.content.filter(block => block.type === 'tool_use');
       if (result.stop_reason === 'max_tokens') throw new CoachError(502, 'Vastaus jäi kesken. Kokeile rajatumpaa kysymystä.');
@@ -594,7 +623,7 @@ export function createCoach({ dataSource, apiKey = process.env.ANTHROPIC_API_KEY
       if (calls.length || !['end_turn', 'refusal'].includes(result.stop_reason)) throw new CoachError(502, 'Vastaus jäi kesken. Yritä uudelleen.');
       const answer = result.content.filter(block => block.type === 'text').map(block => block.text).join('\n').trim();
       if (!answer || answer.length > 6000) throw new CoachError(502, 'Vastausta ei voitu näyttää. Kokeile lyhyempää kysymystä.');
-      return { answer, as_of: snapshot.as_of, usage, tools_used: used };
+      return { answer, as_of: snapshot.as_of, level, usage, tools_used: used };
     }
     throw new CoachError(422, 'Kysymys vaati liian monta hakua. Kokeile rajatumpaa kysymystä.');
   }

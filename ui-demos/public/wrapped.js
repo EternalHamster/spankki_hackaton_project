@@ -1,4 +1,6 @@
-// "Rahavuotesi": a Spotify Wrapped-style story of the customer's last 12 months.
+// "Rahavuotesi": a Spotify Wrapped-style story of the customer's last 12 months, plus the same story
+// for the year before it. The latest story has a "Mikä muuttui" card with the drastic changes between the two;
+// its button is the only way to open the older story.
 // Cards come from wrapped-data.json (built by wrapped/export_ui.py); all numbers are precomputed.
 const AUTO_MS = 7000;
 const HOLD_MS = 220;
@@ -18,6 +20,7 @@ export function renderSlide(card, index, total) {
   const count = card.count === null || card.count === undefined ? '' :
     `<p class="wr-count wr-anim"><span data-count="${Number(card.count)}">${formatCount(card.count)}</span><small>${escape(card.suffix)}</small></p>`;
   const items = card.layout === 'list' ? `<ol class="wr-list">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-rank">${i + 1}</span><span class="wr-label">${escape(item.label)}<i class="wr-bar" style="--w:${Math.max(6, Math.round(100 * item.share / card.items[0].share))}%"></i></span><b>${escape(item.value)}</b></li>`).join('')}</ol>`
+    : card.layout === 'changes' ? `<ul class="wr-deltas">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-label">${escape(item.label)}<small>${escape(item.detail)}</small></span><b>${escape(item.value)}</b></li>`).join('')}</ul>`
     : card.layout === 'split' ? `<dl class="wr-split">${card.items.map((item, i) => `<div class="wr-anim" style="--d:${i}"><dt>${escape(item.label)}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl>` : '';
   const ask = card.ask && card.layout !== 'outro' ? `<button type="button" class="wr-ask wr-anim" data-wr-ask="${escape(card.ask)}">Kysy valmentajalta tästä<span aria-hidden="true">→</span></button>` : '';
   const outro = card.layout === 'outro' ? `<div class="wr-actions wr-anim">${card.ask ? `<button type="button" class="wr-primary" data-wr-ask="${escape(card.ask)}">Kysy valmentajalta</button>` : ''}<button type="button" class="wr-secondary" data-wr="restart">Katso alusta</button></div>` : '';
@@ -36,7 +39,7 @@ export function renderSlide(card, index, total) {
 
 export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
   let data = null, cards = [], index = 0, paused = false, elapsed = 0, last = 0, frame = 0;
-  let dialog = null, opener = null, press = null;
+  let dialog = null, opener = null, press = null, customer = null;
   let loadVersion = 0;
 
   async function load({ headers, signal, customerId, selectionId } = {}) {
@@ -45,7 +48,7 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
     if (!response.ok) throw Object.assign(new Error('Rahavuotta ei voitu ladata.'), { status: response.status });
     const result = await response.json();
     if (version !== loadVersion || signal?.aborted) return null;
-    if ((customerId && Object.keys(result.recaps || {}).some(id => id !== customerId)) ||
+    if ((customerId && [result.recaps, result.previous?.recaps].some(recaps => Object.keys(recaps || {}).some(id => id !== customerId))) ||
         (selectionId && result.selection_id && result.selection_id !== selectionId)) {
       throw Object.assign(new Error('Demoasiakas vaihtui.'), { status: 409 });
     }
@@ -58,7 +61,9 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
     data = null; cards = []; press = null; opener = null;
     if (dialog) dialog.innerHTML = '';
   }
-  const has = customerId => Boolean(data?.recaps?.[customerId]?.length);
+  // year: 'current' (the latest recap year) or 'previous' (the year before it).
+  const recapsOf = year => (year === 'previous' ? data?.previous : data)?.recaps;
+  const has = (customerId, year = 'current') => Boolean(recapsOf(year)?.[customerId]?.length);
 
   function teaser() {
     return `<button class="wrapped-teaser" data-action="wrapped"><span class="wt-shapes" aria-hidden="true"><i></i><i></i><i></i></span><span class="wt-copy"><small>Lokakuu 2025 – syyskuu 2026</small><strong>Rahavuotesi on valmis</strong><span>Katso vuotesi tarinana</span></span><span class="wt-play" aria-hidden="true">▶</span></button>`;
@@ -84,6 +89,9 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
       if (control === 'close') close();
       else if (control === 'pause') togglePause();
       else if (control === 'restart') go(0);
+      else if (control === 'previous') open(customer, opener, 0, 'previous');
+      // Back from the older story: return to the comparison card it was opened from.
+      else if (control === 'latest') open(customer, opener, Math.max(0, recapsOf('current')[customer].findIndex(card => card.id === 'changes')), 'current');
       else if (control === 'prev') go(index - 1);
       else if (control === 'next') go(index + 1);
     });
@@ -109,21 +117,29 @@ export function createWrapped({ url = 'wrapped-data.json', onAsk } = {}) {
     document.addEventListener('visibilitychange', () => { if (document.hidden && dialog?.open) { paused = true; syncPause(); } });
   }
 
-  function open(customerId, from, start = 0) {
-    if (!has(customerId)) return;
+  function open(customerId, from, start = 0, year = 'current') {
+    if (!has(customerId, year)) return;
     ensureDialog();
-    opener = from || document.activeElement;
-    cards = data.recaps[customerId];
+    if (!dialog.open) opener = from || document.activeElement;
+    customer = customerId;
+    cards = recapsOf(year)[customerId];
+    const label = year === 'previous' ? 'Edellinen rahavuotesi' : 'Rahavuotesi';
+    dialog.setAttribute('aria-label', label);
     paused = reducedMotion(); // no auto-advance for people who asked for less motion
     dialog.innerHTML = `<div class="wr-stage">
       <div class="wr-progress" aria-hidden="true">${cards.map(() => '<span><i></i></span>').join('')}</div>
-      <div class="wr-top"><span class="wr-brand">Rahavuotesi</span>
+      <div class="wr-top"><span class="wr-brand">${label}</span>
         <button type="button" class="wr-icon" data-wr="pause" aria-label="Keskeytä">❚❚</button>
         <button type="button" class="wr-icon" data-wr="close" aria-label="Sulje">✕</button></div>
       <div class="wr-slides" aria-live="polite">${cards.map((card, i) => renderSlide(card, i, cards.length)).join('')}</div>
       <div class="wr-nav"><button type="button" class="wr-icon" data-wr="prev" aria-label="Edellinen">‹</button><span class="wr-counter" aria-hidden="true"></span><button type="button" class="wr-icon" data-wr="next" aria-label="Seuraava">›</button></div>
     </div>`;
-    dialog.showModal();
+    // The comparison card is the only way into the older story, and the older story ends by handing back.
+    if (year === 'previous' && has(customerId)) dialog.querySelector('.wr-outro .wr-actions')?.insertAdjacentHTML('afterbegin',
+      '<button type="button" class="wr-primary" data-wr="latest">Takaisin tuoreimpaan rahavuoteen</button>');
+    else if (year !== 'previous' && has(customerId, 'previous')) dialog.querySelector('.wr-changes .wr-content')?.insertAdjacentHTML('beforeend',
+      '<button type="button" class="wr-ask wr-anim" data-wr="previous">Katso edellinen rahavuotesi<span aria-hidden="true">→</span></button>');
+    if (!dialog.open) dialog.showModal();
     go(start);
     syncPause();
     last = performance.now();

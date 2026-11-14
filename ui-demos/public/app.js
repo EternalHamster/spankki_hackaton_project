@@ -315,8 +315,7 @@ function action(name){
   if(name==='close'){detail.close();return;}
   if(name==='top'){window.scrollTo({top:0,behavior:'smooth'});return;}
   if(name==='chat'){showChat();return;}
-  if(name==='wrapped'){wrapped.open(profile.customer_id);return;}
-  if(name==='account'){showTransactions();return;}
+  if(name==='wrapped'){wrapped.open(profile.customer_id);return;}  if(name==='account'){showTransactions();return;}
   if(name==='income'||name==='spending'){showTransactions(name,selectedMonth);return;}
   if(name==='categories'){modal('Mihin rahani menivät?',`<p>${capitalize(monthName(selectedMonth))}</p><div class="dialog-categories">${Object.entries(m.categories).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([c,v])=>categoryRow(c,v)).join('')}</div>`);return;}
   if(name==='baskets'){showBaskets();return;}

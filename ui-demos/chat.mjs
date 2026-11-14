@@ -1,3 +1,5 @@
+import { LEVELS } from './coach.mjs';
+
 // Validates and bounds browser conversation before the customer-scoped coach runs.
 class ChatError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -18,7 +20,7 @@ async function readMessages(req) {
   try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
   catch { throw new ChatError(400, 'Kysymystä ei voitu lukea.'); }
   const messages = body?.messages;
-  if (!body || Object.keys(body).some(key => !['messages', 'insight'].includes(key)) || !Array.isArray(messages) ||
+  if (!body || Object.keys(body).some(key => !['messages', 'insight', 'level'].includes(key)) || !Array.isArray(messages) ||
       !messages.length || messages.length > 11 || messages.length % 2 !== 1 ||
       messages.some((m, i) => !m || Object.keys(m).length !== 2 ||
         m.role !== (i % 2 ? 'assistant' : 'user') || typeof m.content !== 'string' ||
@@ -30,7 +32,10 @@ async function readMessages(req) {
   if (insight !== undefined && (!insight || Object.keys(insight).length !== 1 || typeof insight.insight_id !== 'string')) {
     throw new ChatError(400, 'Valitse havainto etusivulta.');
   }
-  return { messages: messages.map(({ role, content }) => ({ role, content: content.trim() })), insight };
+  if (body.level !== undefined && !(typeof body.level === 'string' && Object.hasOwn(LEVELS, body.level))) {
+    throw new ChatError(400, 'Valitse vastausten taso.');
+  }
+  return { messages: messages.map(({ role, content }) => ({ role, content: content.trim() })), insight, level: body.level };
 }
 
 export function createChatHandler({ answer, now = Date.now, requestsPerMinute = 30, maxConcurrent = 4 } = {}) {
@@ -47,12 +52,12 @@ export function createChatHandler({ answer, now = Date.now, requestsPerMinute = 
         res.setHeader('Allow', 'POST');
         throw new ChatError(405, 'Use POST for chat.');
       }
-      const { messages, insight } = await readMessages(req);
+      const { messages, insight, level } = await readMessages(req);
       const time = now();
       recent = recent.filter(t => time - t < 60000);
       if (active >= maxConcurrent || recent.length >= requestsPerMinute) throw new ChatError(429, 'Keskustelussa on ruuhkaa. Yritä hetken kuluttua uudelleen.');
       recent.push(time); active++; claimed = true;
-      const result = await answer(req.demoSession, messages, insight);
+      const result = await answer(req.demoSession, messages, insight, level);
       if (typeof result?.answer !== 'string' || !result.answer.trim()) throw new ChatError(502, 'Vastausta ei saatu. Yritä uudelleen.');
       send(200, { ...result, selection_id: req.demoSession.selection_id });
     } catch (error) {

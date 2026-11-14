@@ -32,15 +32,17 @@ export function createAppServer({ publicRoot = defaultRoot, chatOptions = {}, da
   if (!isDemoCustomer(customerId)) throw new Error('Only an allowlisted synthetic demo customer may be public');
   const root = path.resolve(publicRoot);
   const model = coach || createPreparedCoach({ dataSource, coach: createCoach({ dataSource, ...chatOptions }) });
-  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight) =>
-    model.chat(session.customer_id, { messages, insightId: insight?.insight_id }) });
+  const chat = createChatHandler({ ...chatOptions, answer: (session, messages, insight, level) =>
+    model.chat(session.customer_id, { messages, insightId: insight?.insight_id, level }) });
   let wrappedData;
   async function scopedWrapped(id) {
     if (!wrappedData) wrappedData = fs.readFile(new URL('./server-data/wrapped-data.json', import.meta.url), 'utf8').then(JSON.parse)
       .catch(error => { wrappedData = undefined; throw error; });
     const data = await wrappedData, selected = data.recaps[id];
     if (!selected?.length) throw new Error('Configured demo recap not found');
-    return { period: data.period, recaps: { [id]: selected } };
+    const older = data.previous?.recaps?.[id];
+    return { period: data.period, recaps: { [id]: selected },
+      ...(older?.length ? { previous: { period: data.previous.period, recaps: { [id]: older } } } : {}) };
   }
   async function ready() {
     await dataSource.ready();

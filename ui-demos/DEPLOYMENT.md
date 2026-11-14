@@ -30,7 +30,7 @@ The deployment binds secret versions without reading their values locally. Updat
 
 The browser sends conversation text and optionally an insight ID. The signed HttpOnly cookie selects the customer, and `X-Demo-Selection` binds requests to the current selection. Chat and tool arguments cannot override customer identity or supply arbitrary SQL. Peers appear only as group aggregates. The public selector deliberately permits any visitor to choose one of three synthetic customers; this is not real-user authentication.
 
-The instance allows four simultaneous provider calls and 30 provider calls/minute. Chat has at most four model rounds, six tool calls and 1,200 output tokens/round. A provider call has a 35-second limit within a 75-second overall chat deadline; the browser chat timeout is 90 seconds and Cloud Run's request timeout is 120 seconds. These in-memory controls reset on restart and are not a durable quota.
+The instance allows four simultaneous provider calls and 30 provider calls/minute. Chat has at most four model rounds, six tool calls and 600 / 900 / 1,500 output tokens/round for Selkeä / Perus / Syvällinen answers. A provider call has a 35-second limit within a 75-second overall chat deadline; the browser chat timeout is 90 seconds and Cloud Run's request timeout is 120 seconds. These in-memory controls reset on restart and are not a durable quota.
 
 ## 1. Check locally
 

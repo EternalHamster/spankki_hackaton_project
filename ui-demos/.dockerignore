@@ -14,6 +14,9 @@
 !.runtime/BDA/
 !.runtime/BDA/engine/
 !.runtime/BDA/engine/config.py
+!.runtime/BDA/engine/__init__.py
+!.runtime/BDA/engine/coach.py
+!.runtime/BDA/engine/insights.py
 !.runtime/BDA/output/
 !.runtime/BDA/output/coach.duckdb
 !.runtime/coach_context/
