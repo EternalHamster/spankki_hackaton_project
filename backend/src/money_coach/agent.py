@@ -24,9 +24,12 @@ class AgentLimitError(RuntimeError):
 
 class CoachAgent:
     def __init__(self, client, model=DEFAULT_MODEL, max_rounds=4, max_tokens=900, max_tool_calls=8,
-                 as_of: date | None = None):
+                 as_of: date | None = None, effort: str = "low"):
         self.client, self.model = client, model
         self.max_rounds, self.max_tokens, self.max_tool_calls = max_rounds, max_tokens, max_tool_calls
+        # Haiku 5.5 thinks by default and thinking counts toward max_tokens; low effort keeps short chat
+        # answers inside the per-round limit and makes them faster and cheaper.
+        self.effort = effort
         # Historical snapshots end before the real date; relative dates ("last month") must use the data's end.
         self.as_of = as_of
 
@@ -47,6 +50,7 @@ class CoachAgent:
         for _ in range(self.max_rounds):
             response = self.client.messages.create(
                 model=self.model, max_tokens=self.max_tokens,
+                output_config={"effort": self.effort},
                 system=system,
                 messages=messages, tools=definitions(),
             )

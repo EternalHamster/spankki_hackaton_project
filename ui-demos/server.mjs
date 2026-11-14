@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createChatHandler } from './chat.mjs';
 const defaultRoot = fileURLToPath(new URL('./public/', import.meta.url));
 const requiredFiles = ['index.html', 'app.js', 'chat.js', 'model.js', 'styles.css', 'demo-data.json',
+  'wrapped.js', 'wrapped.css', 'wrapped-data.json',
   'adapters/project-finance.js', 'finance-analytics/index.js', 'finance-analytics/model.js', 'finance-analytics/styles.css'];
 const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',

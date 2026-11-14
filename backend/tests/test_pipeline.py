@@ -181,6 +181,18 @@ def test_today_is_the_end_of_the_data(repository, monkeypatch):
         assert client.app.state.agent.as_of == date(2026, 9, 30)  # explicit override wins
 
 
+def test_low_effort_is_sent_and_configurable(repository, monkeypatch):
+    requests = []
+    with sdk_client([{"stop_reason": "end_turn", "content": [{"type": "text", "text": "ok"}]}], requests) as client:
+        CoachAgent(client).run("hi", FinanceTools(repository, "A"))
+    assert requests[0]["output_config"] == {"effort": "low"}
+    monkeypatch.setenv("CLAUDE_EFFORT", "medium")
+    assert Settings.from_env().effort == "medium"
+    monkeypatch.setenv("CLAUDE_EFFORT", "turbo")
+    with pytest.raises(ValueError):
+        Settings.from_env()
+
+
 @pytest.mark.parametrize("response", [
     {"stop_reason": "max_tokens", "content": [{"type": "text", "text": "partial"}]},
     {"stop_reason": "tool_use", "content": [tool_call()]},

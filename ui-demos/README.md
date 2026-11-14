@@ -26,6 +26,7 @@ The project includes a tested web server with a text-only chat endpoint, a multi
 - Compare weekday/weekend spending with the customer's own previous month, including daily averages.
 - Explore three illustrative spending baskets.
 - Adjust the restaurant-spending reduction slider to calculate a possible monthly saving.
+- Open **Rahavuotesi on valmis** for a swipeable year-in-review story of the last 12 months (see [../wrapped/README.md](../wrapped/README.md)). `#rahavuosi` in the URL opens it directly.
 - Open **Kysy**, type a question and send it to Claude. Follow-up messages retain recent conversation context. Enter sends; Shift+Enter adds a line break.
 
 **Chat is live when the server has `ANTHROPIC_API_KEY` configured.** The browser calls same-origin `POST /api/chat`; Node calls Claude with text messages only. No customer ID, project data, financial tools or database is sent. The server key stays in Secret Manager on Cloud Run. Conversations live in page memory, can be cleared with **Uusi keskustelu**, and reset on reload. Only the last five exchanges are included as context, within a 14,000-character budget.

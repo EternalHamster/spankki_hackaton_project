@@ -51,7 +51,8 @@ export function createChatDialog({ modal, detail, icon }) {
     }
   }
 
-  return function showChat() {
+  return function showChat(question = '') {
+    if (question && !pending) draft = question;
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>Keskustele tekoälyn kanssa</span></div></div>
       <div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa yleisissä raha-asioissa. Tilitietojasi tai tämän demon aineistoa ei ole vielä yhdistetty keskusteluun.</p></div>

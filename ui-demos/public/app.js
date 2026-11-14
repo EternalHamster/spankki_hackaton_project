@@ -1,4 +1,5 @@
 import { createChatDialog } from './chat.js';
+import { createWrapped } from './wrapped.js';
 import { metrics, basketTotals, scenarioSavings, transactionKind } from './model.js';
 import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
@@ -39,13 +40,14 @@ let data,profile,m,selectedMonth='2026-09',lastFocus,analytics;
 const months=[];
 const basketInfo=[['Säännölliset tarpeet','Asuminen, ruoka, laskut ja liikkuminen','home'],['Yllättävät tarpeet','Terveys sekä koti ja tekniikka','shield'],['Arjen valinnat','Ravintolat, ostokset ja vapaa-aika','coffee']];
 
-async function init(){try{const res=await fetch('demo-data.json');if(!res.ok)throw new Error('Aineisto ei latautunut.');data=await res.json();profile=data.profiles[0];selectedMonth=data.summary.to.slice(0,7);for(let month=selectedMonth;month>=data.summary.from.slice(0,7);month=moveMonth(month,-1))months.push(month);render();}catch(error){root.innerHTML=`<div class="load-error"><h1>Demo ei latautunut</h1><p>${esc(error.message)}</p><button data-action="reload">Yritä uudelleen</button></div>`;}}
+async function init(){try{const res=await fetch('demo-data.json');if(!res.ok)throw new Error('Aineisto ei latautunut.');data=await res.json();await wrapped.load().catch(()=>{});profile=data.profiles[0];selectedMonth=data.summary.to.slice(0,7);for(let month=selectedMonth;month>=data.summary.from.slice(0,7);month=moveMonth(month,-1))months.push(month);render();openFromLink();}catch(error){root.innerHTML=`<div class="load-error"><h1>Demo ei latautunut</h1><p>${esc(error.message)}</p><button data-action="reload">Yritä uudelleen</button></div>`;}}
 function section(title,action='',label='Näytä kaikki'){return `<div class="section-title"><h2>${title}</h2>${action?`<button class="text-button" data-action="${action}">${label}</button>`:''}</div>`;}
 function render(){
   analytics?.destroy();m=metrics(profile,selectedMonth);const baskets=basketTotals(m.categories);
   root.innerHTML=`<div class="app-shell"><header class="topbar"><span class="demo-pill">DEMO</span><h1>Oma talous</h1><button class="icon-button" data-action="about" aria-label="Tietoa demoaineistosta">${icon('info')}</button></header>
     <main id="main-content" class="mint-content"><div class="period-row"><span>${icon('calendar')}<label class="sr-only" for="month">Tarkasteltava kuukausi</label><select id="month">${months.map(d=>`<option value="${d}" ${d===selectedMonth?'selected':''}>${capitalize(monthName(d))}</option>`).join('')}</select></span><button class="sample-button" data-action="dataset" aria-label="Vaihda demoasiakasta">${icon('person')}<span>Demoasiakas ${data.profiles.indexOf(profile)+1}</span></button></div>
     ${section('Kuukauden yhteenveto')}<section class="white-card month-card"><div class="month-head"><span class="month-symbol">${icon('chart')}</span><div><h3>Tuloista jäljellä</h3><p>Arjen menojen jälkeen</p></div><button class="icon-button" data-action="cashflow" aria-label="Miten summa lasketaan?">${icon('info')}</button></div><strong class="month-amount ${m.margin<0?'negative':''}">${euro(m.margin)}</strong><div class="income-expenses"><button data-action="income"><span>Tulot</span><strong>${euro(m.income)}</strong></button><button data-action="spending"><span>Menot</span><strong>${euro(m.spending)}</strong></button></div><button class="card-footer" data-action="cashflow">Katso yhteenveto ${icon('chevron')}</button></section>
+    ${wrapped.has(profile.customer_id)?wrapped.teaser():''}
     <button class="account-row white-card" data-action="account"><span class="account-icon">${icon('account')}</span><span><strong>Tilin saldo</strong><small>Viimeisin aineiston saldo</small></span><b>${euro(m.balance)}</b>${icon('chevron')}</button>
     <div id="financial-analytics"></div>
     ${section('Kolme menokoria','baskets','Mitä nämä ovat?')}<section class="white-card basket-card">${basketInfo.map(([name,copy,glyph],i)=>`<button class="basket-row" data-basket="${i}"><span class="basket-icon">${icon(glyph)}</span><span><strong>${name}</strong><small>${Math.round(baskets[i]/Math.max(1,m.spending)*100)} % menoista</small></span><b>${euro(baskets[i])}</b>${icon('chevron')}</button>`).join('')}</section>
@@ -70,11 +72,16 @@ function showTransactions(kind='all'){
 }
 function showBaskets(selected){const totals=basketTotals(m.categories);modal(selected===undefined?'Kolme menokoria':basketInfo[selected][0],`<p>Menokorit auttavat hahmottamaan, mihin rahat menevät.</p>${basketInfo.map(([title,copy,glyph],i)=>selected!==undefined&&selected!==i?'':`<section class="basket-summary">${icon(glyph)}<div><h3>${title}</h3><p>${copy}.</p><strong>${euro(totals[i])}</strong></div></section>`).join('')}<p class="fine-print">Luokittelu on esimerkki. Aineistosta ei voi päätellä, mitkä yksittäiset ostokset olivat sinulle välttämättömiä. Matkailu sisältyy arjen valintoihin.</p>`);}
 const showChat = createChatDialog({ modal, detail, icon });
+// The year-in-review story; its "ask the coach" buttons open the chat with the question filled in.
+const wrapped = createWrapped({ onAsk: question => showChat(question) });
+// Deep link, e.g. from a push notification: #rahavuosi opens the story, #rahavuosi/3 opens card 3.
+function openFromLink(){const match=location.hash.match(/^#rahavuosi(?:\/(\d+))?$/);if(match)wrapped.open(profile.customer_id,null,Math.max(0,(+match[1]||1)-1));}
 function action(name){
   if(name==='reload'){location.reload();return;}
   if(name==='close'){detail.close();return;}
   if(name==='top'){window.scrollTo({top:0,behavior:'smooth'});return;}
   if(name==='chat'){showChat();return;}
+  if(name==='wrapped'){wrapped.open(profile.customer_id);return;}
   if(name==='account'){showTransactions();return;}
   if(name==='income'||name==='spending'){showTransactions(name);return;}
   if(name==='categories'){modal('Mihin rahani menivät?',`<p>${capitalize(monthName(selectedMonth))}</p><div class="dialog-categories">${Object.entries(m.categories).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([c,v])=>categoryRow(c,v)).join('')}</div>`);return;}

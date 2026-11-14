@@ -39,6 +39,8 @@ class Settings:
     as_of: date | None = None
     # False = /v1/insights is a dry run: it returns the request it would send and never calls the model.
     insights_live: bool = False
+    # Reasoning effort per model round: low | medium | high | xhigh | max.
+    effort: str = "low"
 
     @classmethod
     def from_env(cls):
@@ -52,7 +54,10 @@ class Settings:
             process_chat_limit=int(os.getenv("PROCESS_CHAT_LIMIT", "500")),
             as_of=date.fromisoformat(os.environ["COACH_AS_OF"]) if os.getenv("COACH_AS_OF") else None,
             insights_live=os.getenv("INSIGHTS_LIVE", "false").lower() == "true",
+            effort=os.getenv("CLAUDE_EFFORT", "low"),
         )
+        if value.effort not in {"low", "medium", "high", "xhigh", "max"}:
+            raise ValueError("CLAUDE_EFFORT must be low, medium, high, xhigh or max")
         if not isinstance(value.demo_tokens, dict) or any(
             not isinstance(k, str) or len(k) < 24 or not isinstance(v, str) or not v
             for k, v in value.demo_tokens.items()
@@ -136,7 +141,8 @@ def create_app(settings: Settings | None = None, *, repository=None, agent=None,
         if agent is None:
             client = create_client()
             if client:
-                app.state.agent = CoachAgent(client, model=settings.model, as_of=coach_as_of())
+                app.state.agent = CoachAgent(client, model=settings.model, as_of=coach_as_of(),
+                                             effort=settings.effort)
         # In dry-run mode the writer needs no client (and no API key) at all.
         app.state.insight_writer = insight_writer or InsightWriter(
             client or getattr(agent, "client", None), model=settings.model, live=settings.insights_live)

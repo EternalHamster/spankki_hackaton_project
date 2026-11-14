@@ -108,6 +108,10 @@ The coach's "today" is the last transaction date in the snapshot (2026-09-30 for
 relative questions such as "last month" resolve to months that have data. Set `COACH_AS_OF=YYYY-MM-DD`
 to override it. If the snapshot cannot be read at startup, the real Europe/Helsinki date is used.
 
+Every model round is sent with reasoning effort `low` (`CLAUDE_EFFORT`, default `low`). Claude Haiku 5.5
+thinks by default, and thinking counts toward the 900-token output limit per round; low effort keeps chat
+answers inside it and makes them faster and cheaper. Raise it only together with the token limit.
+
 Tools return exact decimal strings. Date ranges use an exclusive end and are limited to 366 days.
 Full calendar months use precomputed category summaries; partial months query canonical transactions.
 Customer-specific observed date coverage accompanies results; observed endpoints cannot prove that
