@@ -140,7 +140,7 @@ function render(){
   root.innerHTML=`<div class="app-shell"><header class="topbar"><span class="demo-pill">DEMO</span><h1>Oma talous</h1><button class="icon-button" data-action="about" aria-label="Tietoa demoaineistosta">${icon('info')}</button></header>
     <main id="main-content" class="mint-content"><label class="customer-picker" for="customer-selector"><span>${icon('person')}Valittu demoasiakas</span><select id="customer-selector">${customerSession.customers.map(customer=>`<option value="${esc(customer.id)}" ${customer.id===customerSession.customer_id?'selected':''}>${esc(customer.label)}</option>`).join('')}</select></label>
     <section class="trainer-intro" aria-label="Kysy talousvalmentajalta"><form id="explore-form" class="explore-composer"><label class="sr-only" for="explore-question">Kysy omasta taloudestasi</label><input id="explore-question" type="text" placeholder="Kysy omasta taloudestasi…" maxlength="2000" required><button type="submit" aria-label="Lähetä kysymys valmentajalle">${icon('arrow')}</button></form><span class="trainer-note">AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin</span></section>
-    <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3>${topic.id === 'afford' ? '<section id="afford-projects" class="afford-projects" aria-label="Omat hankintatavoitteet" hidden></section>' : ''}<div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
+    <section class="explore-topics" aria-label="Tutki talouttasi kysymys kerrallaan">${explorationTopics.map(topic=>`<section class="explore-topic"><h3><button type="button" id="topic-${topic.id}" class="topic-toggle" data-topic="${topic.id}" aria-expanded="false" aria-controls="${topic.id === 'afford' ? 'afford-projects ' : ''}panel-${topic.id}"><span class="topic-icon">${icon(topic.icon)}</span><span><strong>${topic.title}</strong><small>${topic.hint}</small></span>${icon('plus','topic-indicator')}</button></h3>${topic.id === 'afford' ? '<section id="afford-projects" class="afford-projects" aria-label="Omat hankintatavoitteet" hidden></section>' : ''}<div id="panel-${topic.id}" class="topic-panel" role="region" aria-labelledby="topic-${topic.id}" hidden></div></section>`).join('')}</section>
     <div class="section-title insights-title"><h2>Tärkeimmät havainnot</h2><span class="ai-label">AI:n tuottama</span></div><section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät AI-havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
     <div id="recap-teaser">${recapTeaser()}</div>
     <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small id="transactions-period">${capitalize(monthName(selectedMonths.transactions))}</small></span>${icon('chevron')}</button><button class="utility-row" data-action="settings">${icon('person')}<span><strong>Valmentajan asetukset</strong><small id="answer-depth-summary">Vastausten taso: ${LEVELS[levelIndex(getAnswerLevel())].label}</small></span>${icon('chevron')}</button></div>
@@ -193,6 +193,7 @@ function openTopic(topicId, toggle = true) {
   } else previousAnalytics?.destroy();
   document.querySelectorAll('[data-topic]').forEach(button=>button.setAttribute('aria-expanded', 'false'));
   activeTopic = close ? null : topicId;
+  renderProjects();
   if (close) return;
   const month = topicMonth(topicId);
   m = metrics(profile, month);
@@ -354,10 +355,14 @@ function showBaskets(selected){const totals=basketTotals(m.categories);modal(sel
 const showChat = createChatDialog({ modal, detail, icon,
   getSelection: () => customerSession ? { ...customerSession, label: customerLabel() } : null,
   onSelectionStale: () => { void loadCustomer(); },
-  onProjectsChanged: () => renderProjects(),
+  onProjectsChanged: ({ reveal = false } = {}) => {
+    if (reveal) openTopic('afford', false);
+    else renderProjects();
+  },
 });
 const projectUI = createProjectUI({ getContainer: () => document.querySelector('#afford-projects'),
-  getSelection: () => customerSession, icon, onAsk: question => showChat(question, { autoSend: true }) });
+  getSelection: () => customerSession, isExpanded: () => activeTopic === 'afford',
+  icon, onAsk: question => showChat(question, { autoSend: true }) });
 function renderProjects() { if (profile && customerSession) projectUI.render(); }
 // The year-in-review story; its "ask the coach" buttons open the chat with the question filled in.
 const wrapped = createWrapped({ onAsk: question => showChat(question, { autoSend: true })});

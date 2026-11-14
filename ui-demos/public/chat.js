@@ -294,8 +294,11 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
           return;
         }
         current.projectProposal = null;
-        onProjectsChanged(); if (host.isConnected) detail.close();
-        document.querySelector('#afford-projects')?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        onProjectsChanged({ reveal: host.isConnected });
+        if (host.isConnected) {
+          detail.close();
+          document.querySelector('#afford-projects')?.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+        }
       } finally {
         if (current === session) { current.projectSaving = false; update(); }
       }

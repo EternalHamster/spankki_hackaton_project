@@ -5,7 +5,7 @@ const esc = value => String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<'
 const euro = value => new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR', maximumFractionDigits: Number.isInteger(value) ? 0 : 2 }).format(value);
 const dateLabel = value => new Date(value + 'T12:00:00Z').toLocaleDateString('fi-FI', { timeZone: 'UTC' });
 
-export function createProjectUI({ getContainer, getSelection, onAsk, icon }) {
+export function createProjectUI({ getContainer, getSelection, onAsk, icon, isExpanded = () => true }) {
   const store = createPurchaseProjects();
   const memory = createCustomerMemory();
   let notice = '', noticeCustomer = null, noticeRevision = null, warning = false;
@@ -14,7 +14,13 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon }) {
   function tipHTML(project, tip) {
     const impact = projectHint(project, tip);
     if (impact.extra_eur <= 0) return '';
-    return `<li><div><strong>${esc(tip.label)}</strong><span>+ ${euro(impact.extra_eur)} tavoitteeseen</span></div><p>${esc(tip.text)}</p>${impact.days_faster > 0 ? `<small>Jos säästät tämän kuukausitavoitteen lisäksi, noin ${impact.days_faster} päivää nopeammin samalla kuukausivauhdilla.</small>` : '<small>Lisäsäästö auttaa eteenpäin, kun varaat sen kuukausitavoitteen lisäksi.</small>'}</li>`;
+    const time = project.monthly_eur <= 0 ? 'Aika-arvio odottaa säästövauhtia'
+      : impact.days_faster === 0 ? 'Alle päivä aiemmin'
+      : `Noin ${impact.days_faster} ${impact.days_faster === 1 ? 'päivä' : 'päivää'} aiemmin`;
+    const condition = project.monthly_eur > 0
+      ? 'Arvio nykyisellä säästövauhdilla, kun siirrät säästyvän summan tavoitteeseen kuukausisäästön lisäksi.'
+      : 'Sovitaan ensin kuukausittainen säästövauhti, jotta ajansäästö voidaan arvioida. Varaa tämä säästö kuukausitavoitteen lisäksi.';
+    return `<li><div><strong>${esc(tip.label)}</strong><span>${time}</span></div><p>${esc(tip.text)}</p><small>${condition}</small></li>`;
   }
 
   function cardHTML(project, remembered) {
@@ -63,7 +69,7 @@ export function createProjectUI({ getContainer, getSelection, onAsk, icon }) {
     if (noticeCustomer !== selected.customer_id || (notice && noticeRevision !== state.revision)) {
       notice = ''; warning = false; noticeCustomer = selected.customer_id; noticeRevision = state.revision;
     }
-    target.hidden = state.available && state.projects.length === 0 && !notice;
+    target.hidden = !isExpanded() || (state.available && state.projects.length === 0 && !notice);
     target.innerHTML = `${state.projects.length ? `<div class="project-list-title"><span>Tavoitteesi</span><small>${state.projects.length} / 3</small></div>${state.projects.map(project => cardHTML(project, remembered)).join('')}` : ''}
       ${!state.available ? '<p class="project-status project-status-warning" role="status">Tallennettuja tavoitteita ei voitu avata tässä selaimessa.</p>' : ''}
       <p class="project-status${warning ? ' project-status-warning' : ''}" role="status" ${notice ? '' : 'hidden'}>${esc(notice)}</p>`;
