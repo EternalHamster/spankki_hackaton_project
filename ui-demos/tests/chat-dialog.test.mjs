@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createChatDialog } from '../public/chat.js';
 import { LEVEL_KEY } from '../public/answer-depth.js';
 import { LANGUAGE_KEY } from '../public/language.js';
+import { translate } from '../public/translations.js';
 
 function dialogFixture(t, preference = 'standard', { proposal, projects = [], beforeResponse, respond } = {}) {
   const replaceGlobal = (key, value) => {
@@ -11,9 +12,11 @@ function dialogFixture(t, preference = 'standard', { proposal, projects = [], be
     t.after(() => descriptor ? Object.defineProperty(globalThis, key, descriptor) : delete globalThis[key]);
   };
   const stored = new Map([[LEVEL_KEY, preference]]), requests = [], nodes = new Map();
+  let storageWritesFail = false, projectChanges = 0;
   replaceGlobal('addEventListener', () => {});
   replaceGlobal('localStorage', { getItem: key => stored.get(key) ?? null,
-    setItem: (key, value) => stored.set(key, value) });
+    setItem: (key, value) => { if (storageWritesFail) throw new Error('Storage unavailable'); stored.set(key, value); } });
+  replaceGlobal('navigator', { locks: { request: async (_key, _options, callback) => callback() } });
   const selection = { customer_id: 'CUST00207', selection_id: 'selected-a', as_of: '2026-09-30' };
   let selected = selection, staleSelections = 0;
   const projectKey = 'oma-talous-projects-v1:' + selection.customer_id;
@@ -40,7 +43,7 @@ function dialogFixture(t, preference = 'standard', { proposal, projects = [], be
   const detail = { open: true, querySelector: node, querySelectorAll: () => [] };
   let modalHTML = '';
   const show = createChatDialog({ detail, modal(_title, html) { modalHTML = html; }, icon: () => '', getSelection: () => selected,
-    onSelectionStale() { staleSelections++; } });
+    onSelectionStale() { staleSelections++; }, onProjectsChanged() { projectChanges++; } });
   const open = level => show.openExploration({ question: 'Miten voisin säästää?', displayQuestion: 'Säästövinkki',
     answer: 'Alkuperäinen vastaus.', bullets: ['Ensimmäinen havainto.', 'Toinen havainto.'],
     selectionId: selection.selection_id, level });
@@ -63,6 +66,7 @@ function dialogFixture(t, preference = 'standard', { proposal, projects = [], be
   };
   return { open, show, disabled, rewrite, requests, node, stored, typeDraft, send,
     changeSelection(value) { selected = value; }, get staleSelections() { return staleSelections; },
+    failStorageWrites() { storageWritesFail = true; }, get projectChanges() { return projectChanges; },
     get modalHTML() { return modalHTML; } };
 }
 
@@ -153,6 +157,123 @@ test('the first goal shows its own monthly amount without an empty existing-goal
   assert.equal(rows['Tähän tavoitteeseen'], '5,00 € / kk');
   assert.equal(rows['Muille tavoitteille jo suunniteltu'], undefined);
   assert.equal(rows['Tavoitteisiin yhteensä'], undefined);
+});
+
+const projectKey = 'oma-talous-projects-v1:CUST00207';
+async function confirmProposal(view) {
+  const host = view.node('#chat-project-proposal');
+  await host.listeners.get('click')({ currentTarget: host,
+    target: { closest: selector => selector === '[data-project-confirm]' ? {} : null } });
+}
+const chatResponse = (request, result) => ({ ok: true, status: 200,
+  json: async () => ({ answer: 'The bike goal was removed.', selection_id: 'selected-a', language: request.language, ...result }) });
+
+test('replacing the bike with a car clearly reviews the change and preserves its account on confirmation', async t => {
+  const bike = savedGoal({ title: 'Pyörä', price_eur: 1500, monthly_eur: 170, saved_eur: 300 });
+  const proposal = goalProposal({ title: 'Auto', price_eur: 7000, requested_months: 48, projected_months: 47, monthly_eur: 145 });
+  const view = dialogFixture(t, 'standard', { proposal, projects: [bike] });
+  view.show();
+  await view.send('En tarvitse enää pyörää, haluan auton.');
+  const html = view.node('#chat-project-proposal').innerHTML;
+  assert.match(html, /Tämä korvaa tavoitteen ”Pyörä”, kun vahvistat muutoksen\./);
+  assert.match(html, /uusi kuukausisumma korvaa aiemman/);
+  assert.match(html.replace(/\s/g, ' '), /demosaldo säilyy: 300,00 €/);
+  assert.deepEqual(JSON.parse(view.stored.get(projectKey)).projects, [bike], 'review does not change the goal');
+  await confirmProposal(view);
+  const projects = JSON.parse(view.stored.get(projectKey)).projects;
+  assert.equal(projects.length, 1);
+  assert.equal(projects[0].id, bike.id);
+  assert.equal(projects[0].title, 'Auto');
+  assert.equal(projects[0].monthly_eur, 145);
+  assert.equal(projects[0].saved_eur, 300);
+  assert.equal(projects[0].created_at, bike.created_at);
+  assert.equal(view.node('#chat-project-proposal').innerHTML, '');
+  assert.equal(translate('Tämä korvaa tavoitteen ”Bike”, kun vahvistat muutoksen.', 'en'),
+    'This replaces your goal “Bike” when you confirm the change.');
+});
+
+test('a successful coach deletion persists before showing success and releases the goal on the next request', async t => {
+  const bike = savedGoal({ title: 'Bike', price_eur: 1500, monthly_eur: 170 });
+  const other = savedGoal({ id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', title: 'Trip', price_eur: 1000 });
+  let replies = 0;
+  const view = dialogFixture(t, 'standard', { projects: [bike, other],
+    respond: request => chatResponse(request, { project_removals: replies++ === 0 ? [bike.id] : [] }) });
+  view.show();
+  await view.send('Delete my bike goal.');
+  assert.deepEqual(JSON.parse(view.stored.get(projectKey)).projects, [other]);
+  assert.match(view.node('#chat-messages').innerHTML, /The bike goal was removed/);
+  assert.match(view.node('#chat-messages').innerHTML, /Poistettu tämän selaimen tallennetuista tavoitteista: “Bike”/);
+  assert.equal(view.projectChanges, 1);
+  await view.send('Now plan a car.');
+  assert.deepEqual(view.requests[1].projects, [other]);
+});
+
+test('deleting a goal and proposing a new one uses the new revision and remaining commitments for confirmation', async t => {
+  const bike = savedGoal({ title: 'Bike', price_eur: 1500, monthly_eur: 170 });
+  const proposal = goalProposal({ id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', title: 'Car',
+    price_eur: 7000, monthly_eur: 150, requested_months: 48, projected_months: 47 });
+  const view = dialogFixture(t, 'standard', { projects: [bike],
+    respond: request => chatResponse(request, { project_removals: [bike.id], project_proposal: proposal }) });
+  view.show();
+  await view.send('Delete the bike goal and plan a car.');
+  assert.deepEqual(JSON.parse(view.stored.get(projectKey)).projects, []);
+  const rows = savingsRows(view.node('#chat-project-proposal').innerHTML);
+  assert.equal(rows['Muille tavoitteille jo suunniteltu'], undefined);
+  assert.equal(rows['Tähän tavoitteeseen'], '150,00 € / kk');
+  await confirmProposal(view);
+  const projects = JSON.parse(view.stored.get(projectKey)).projects;
+  assert.equal(projects.length, 1);
+  assert.equal(projects[0].id, proposal.id);
+  assert.equal(projects[0].title, 'Car');
+  assert.equal(projects[0].saved_eur, 0);
+});
+
+test('a deletion receipt stays visible through rewrites without extending bounded model history or applying twice', async t => {
+  const bike = savedGoal({ title: '<Bike>', price_eur: 1500, monthly_eur: 170 });
+  const answer = 'x'.repeat(6000);
+  let replies = 0;
+  const view = dialogFixture(t, 'standard', { projects: [bike], respond: request => chatResponse(request,
+    replies++ === 0 ? { answer, project_removals: [bike.id] }
+      : { answer: 'A shorter answer.', ...(request.rewrite ? { project_removals: [bike.id] } : {}) }) });
+  view.stored.set(LANGUAGE_KEY, 'en');
+  view.show();
+  await view.send('Delete my bike goal.');
+  assert.match(view.node('#chat-messages').innerHTML, /Removed from your saved goals in this browser: “&lt;Bike&gt;”/);
+  assert.doesNotMatch(view.node('#chat-messages').innerHTML, /<Bike>/);
+  const savedRevision = JSON.parse(view.stored.get(projectKey)).revision;
+  await view.rewrite('simpler');
+  assert.equal(view.requests[1].rewrite.answer, answer);
+  assert.equal(view.requests[1].rewrite.answer.length, 6000);
+  assert.match(view.node('#chat-messages').innerHTML, /A shorter answer/);
+  assert.match(view.node('#chat-messages').innerHTML, /Removed from your saved goals in this browser/);
+  assert.equal(JSON.parse(view.stored.get(projectKey)).revision, savedRevision);
+  assert.equal(view.projectChanges, 1, 'a rewrite cannot repeat removal');
+  await view.send('Thanks.');
+  assert.equal(view.requests[2].messages[1].content, 'A shorter answer.');
+  assert.equal(view.requests[2].messages[1].projectRemovalReceipt, undefined);
+  assert.equal(view.node('#chat-error').textContent, '');
+});
+
+test('failed or stale coach deletions retain goals and suppress claimed success and a new proposal', async t => {
+  for (const failure of ['conflict', 'unavailable', 'invalid']) {
+    await t.test(failure, async subtest => {
+      const bike = savedGoal({ title: 'Bike', price_eur: 1500, monthly_eur: 170 });
+      const view = dialogFixture(subtest, 'standard', { projects: [bike],
+        beforeResponse(stored, key) {
+          if (failure === 'conflict') stored.set(key, JSON.stringify({ version: 1, revision: 'changed', projects: [bike] }));
+        },
+        respond: request => chatResponse(request, { project_removals: failure === 'invalid' ? ['not-an-id'] : [bike.id],
+          project_proposal: goalProposal({ title: 'Car' }) }) });
+      view.show();
+      if (failure === 'unavailable') view.failStorageWrites();
+      await view.send('Delete my bike goal.');
+      assert.deepEqual(JSON.parse(view.stored.get(projectKey)).projects, [bike]);
+      assert.doesNotMatch(view.node('#chat-messages').innerHTML, /The bike goal was removed/);
+      assert.equal(view.node('#chat-project-proposal').innerHTML, '');
+      assert.ok(view.node('#chat-error').textContent);
+      assert.equal(view.projectChanges, 0);
+    });
+  }
 });
 
 test('the latest summary keeps both depth controls available at every level', t => {

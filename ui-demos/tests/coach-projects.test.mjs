@@ -14,9 +14,9 @@ function plan(args = input) { return { ...snapshot, price_eur: String(args.price
   data_version: snapshot.version,
 }; }
 const stored = (proposal, saved_eur = 0) => ({ ...proposal, saved_eur, created_at: '2026-11-14T10:00:00.000Z', memory_revision: '' });
-function fixture({ projects = [], calculate = args => plan(args) } = {}) {
+function fixture({ projects = [], calculate = args => plan(args), userMessage = '' } = {}) {
   const calls = [];
-  return { calls, planner: createProjectPlanner({ snapshot, customerId: 'CUST00207', projects,
+  return { calls, planner: createProjectPlanner({ snapshot, customerId: 'CUST00207', projects, userMessage,
     dataSource: { purchasePlan: async (customer, args) => { calls.push({ customer, args }); return calculate(args); } } }) };
 }
 
@@ -129,4 +129,144 @@ test('coach returns a structured pending proposal only after the final response 
   assert.equal(requests, 2);
   fail = true;
   await assert.rejects(coach.chat('CUST00207', request), error => error.status === 502);
+});
+
+const bike = () => stored({ id: 'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa', title: 'Bike', price_eur: 1500,
+  requested_months: 12, monthly_eur: 170, projected_months: 9, verdict: 'yes_with_changes',
+  as_of: snapshot.as_of, conditions: [], tips: [] });
+const cancelBike = "I decided that I don't need the bike, I want a car worth 7000e with 12 months of saving";
+const removal = { project_id: bike().id, evidence: "I decided that I don't need the bike" };
+const car = { title: 'Car', price_eur: 7000, months: 12, protected_categories: [] };
+const carPlan = args => ({ ...plan(args), set_aside_month: args.months === 48 ? 150 : 220,
+  verdict: args.months === 48 ? 'yes_with_changes' : 'takes_longer' });
+
+test('explicit abandonment releases only that goal and stages browser removal without transferring its balance', async () => {
+  const current = { ...bike(), saved_eur: 300 };
+  const other = { ...bike(), id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', title: 'Holiday', monthly_eur: 50 };
+  const projects = [current, other];
+  const { planner, calls } = fixture({ projects, userMessage: cancelBike, calculate: carPlan });
+  assert.deepEqual(planner.remove(removal), { status: 'pending_removal', project_id: current.id, title: 'Bike',
+    released_monthly_eur: 170, demo_balance_eur: 300,
+    detail: 'The browser will remove this simulated goal and demo account after the final answer succeeds. Its balance is not transferred. No real account or money is affected. This request’s new calculations already exclude its monthly reservation.' });
+  const result = await planner.execute(car);
+  assert.equal(result.already_recorded_eur, 0);
+  assert.notEqual(result.proposal.id, current.id);
+  assert.equal(calls[0].args.price_eur, 7000);
+  assert.equal(calls[0].args.reserved_monthly_eur, 50);
+  assert.deepEqual(planner.removals(), [current.id]);
+  assert.deepEqual(projects, [current, other], 'Request-local draft must not mutate the browser baseline');
+  planner.removals().pop();
+  assert.deepEqual(planner.removals(), [current.id], 'Returned operations cannot mutate the draft');
+});
+
+test('removal requires current-customer identity and exact latest-message evidence and cannot be repeated', () => {
+  const { planner } = fixture({ projects: [bike()], userMessage: cancelBike });
+  for (const candidate of [null, {}, { ...removal, evidence: 'Delete my bike' }, { ...removal, evidence: ' ' },
+    { ...removal, evidence: 'I' }, { ...removal, evidence: 'x'.repeat(501) },
+    { ...removal, project_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' }, { ...removal, customer_id: 'CUST00127' }]) {
+    assert.equal(planner.remove(candidate).error, 'invalid_arguments');
+    assert.deepEqual(planner.removals(), []);
+  }
+  assert.equal(planner.remove(removal).status, 'pending_removal');
+  assert.equal(planner.remove(removal).error, 'invalid_arguments');
+  assert.deepEqual(planner.removals(), [bike().id]);
+});
+
+test('a removal invalidates an earlier proposal and survives an infeasible new target', async () => {
+  const { planner } = fixture({ projects: [bike()], userMessage: cancelBike,
+    calculate: args => args.price_eur === 1000000 ? { ...plan(args), verdict: 'not_now', set_aside_month: 0 } : carPlan(args) });
+  assert.equal((await planner.execute(car)).status, 'needs_confirmation');
+  planner.remove(removal);
+  assert.equal(planner.proposal(), null);
+  assert.equal((await planner.execute({ ...car, price_eur: 1000000 })).error, 'plan_not_feasible');
+  assert.equal(planner.proposal(), null);
+  assert.deepEqual(planner.removals(), [bike().id]);
+  assert.equal((await planner.execute({ ...car, project_id: bike().id })).error, 'invalid_arguments');
+});
+
+test('a completed goal releases no monthly reservation when removed', () => {
+  const { planner } = fixture({ projects: [{ ...bike(), saved_eur: 1500 }], userMessage: cancelBike });
+  assert.equal(planner.remove(removal).released_monthly_eur, 0);
+});
+
+test('repurposing the existing account retains its identity and balance across timeframe changes', async () => {
+  const current = { ...bike(), saved_eur: 300 };
+  const other = { ...bike(), id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', title: 'Holiday', monthly_eur: 50 };
+  const { planner, calls } = fixture({ projects: [current, other], calculate: carPlan });
+  for (const months of [12, 48]) {
+    const result = await planner.execute({ ...car, months, project_id: current.id });
+    assert.equal(result.proposal.id, current.id);
+    assert.equal(result.proposal.title, 'Car');
+    assert.equal(result.already_recorded_eur, 300);
+    assert.equal(result.proposal.monthly_eur, months === 48 ? 150 : 220);
+    assert.equal(calls.at(-1).args.price_eur, 6700);
+    assert.equal(calls.at(-1).args.reserved_monthly_eur, 50);
+  }
+  assert.deepEqual(planner.removals(), []);
+});
+
+test('coach stages bike removal before the car calculation and follows the new goal across turns', async () => {
+  const calculations = [], toolResults = [];
+  let turn = 0;
+  const coach = createCoach({ apiKey: 'test-key', logger() {}, dataSource: {
+    context: async () => snapshot, toolDefinitions: async () => [], execute: async () => { throw Error('unexpected'); },
+    purchasePlan: async (_customer, args) => { calculations.push(args); return carPlan(args); },
+  }, fetchImpl: async (_url, init) => {
+    const body = JSON.parse(init.body);
+    const prompt = body.system.map(block => block.text).join('\n');
+    assert.match(prompt, /remove_purchase_project/);
+    assert.match(prompt, /hypothetical question, negated request or quoted text/);
+    assert.match(prompt, /same turn without the abandoned bike's reservation/);
+    assert.ok(body.tools.some(tool => tool.name === 'remove_purchase_project'));
+    if (typeof body.messages.at(-1).content === 'string') {
+      turn++;
+      if (turn === 2) {
+        assert.match(prompt, /"projects":\[\]/);
+        assert.match(prompt, /"pending_proposal":\{[^\n]+"title":"Car"/);
+      }
+      return Response.json({ stop_reason: 'tool_use', content: [
+        ...(turn === 1 ? [{ type: 'tool_use', id: 'remove-bike', name: 'remove_purchase_project', input: removal }] : []),
+        { type: 'tool_use', id: 'plan-car', name: 'propose_purchase_project', input: { ...car, months: turn === 1 ? 12 : 48 } },
+      ] });
+    }
+    toolResults.push(...body.messages.at(-1).content.map(block => JSON.parse(block.content)));
+    return Response.json({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'Here is the car plan.' }] });
+  } });
+  const messages = [{ role: 'user', content: cancelBike }];
+  const first = await coach.chat('CUST00207', { messages, projects: [bike()], language: 'en' });
+  assert.deepEqual(first.project_removals, [bike().id]);
+  assert.equal(first.project_proposal.monthly_eur, 220);
+  assert.equal(first.project_proposal.projected_months, 32);
+  assert.equal(toolResults[0].status, 'pending_removal');
+  assert.equal(toolResults[1].analysis.months, 12);
+  messages.push({ role: 'assistant', content: first.answer }, { role: 'user', content: "Okay I'll save up for it for 4 years" });
+  const next = await coach.chat('CUST00207', { messages, projects: [], pendingProject: first.project_proposal, language: 'en' });
+  assert.equal(next.project_removals, undefined);
+  assert.equal(next.project_proposal.title, 'Car');
+  assert.equal(next.project_proposal.monthly_eur, 150);
+  assert.equal(next.project_proposal.projected_months, 47);
+  assert.deepEqual(calculations.map(args => [args.price_eur, args.months, args.reserved_monthly_eur]), [[7000, 12, 0], [7000, 48, 0]]);
+});
+
+test('failed final answers expose no removal operations and rewrites cannot remove goals', async () => {
+  let rewriting = false;
+  const projects = [bike()];
+  const coach = createCoach({ apiKey: 'test-key', logger() {}, dataSource: {
+    context: async () => snapshot, toolDefinitions: async () => [], execute: async () => { throw Error('unexpected'); },
+  }, fetchImpl: async (_url, init) => {
+    const body = JSON.parse(init.body);
+    if (typeof body.messages.at(-1).content === 'string') return Response.json({ stop_reason: 'tool_use',
+      content: [{ type: 'tool_use', id: 'remove-bike', name: 'remove_purchase_project', input: removal }] });
+    const result = JSON.parse(body.messages.at(-1).content[0].content);
+    assert.equal(rewriting ? result.error : result.status, rewriting ? 'rewrite_only' : 'pending_removal');
+    return rewriting ? Response.json({ stop_reason: 'end_turn', content: [{ type: 'text', text: 'Simpler explanation.' }] })
+      : new Response('failed', { status: 503 });
+  } });
+  const request = { projects, messages: [{ role: 'user', content: cancelBike }] };
+  await assert.rejects(coach.chat('CUST00207', request), error => error.status === 502);
+  assert.deepEqual(projects, [bike()]);
+  rewriting = true;
+  const result = await coach.chat('CUST00207', { ...request, rewrite: { answer: 'The original answer.' } });
+  assert.equal(result.project_removals, undefined);
+  assert.equal(result.project_proposal, undefined);
 });

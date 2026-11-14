@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPurchaseProjects, validProjectProposal, validProjectContext, projectProgress, projectHint,
+import { createPurchaseProjects, validProjectProposal, validProjectContext, validProjectRemovals, projectProgress, projectHint,
   MAX_PURCHASE_PROJECTS } from '../public/purchase-projects.js';
 
 const customer = 'CUST00207', other = 'CUST00127', prefix = 'oma-talous-projects-v1:';
@@ -153,6 +153,41 @@ test('three-project limit never silently evicts an ongoing project', async () =>
   assert.deepEqual(store.read(customer).projects.map(item => item.id), [id(1), id(2), id(3)]);
   const removed = await store.remove(customer, id(2), state.revision);
   assert.equal((await store.confirm(customer, proposal(4), removed.revision)).saved, true);
+});
+
+test('coach removals are atomic, scoped and revision checked before saving a new goal', async () => {
+  const storage = storageFixture(), store = create({ storage });
+  let state = await store.confirm(customer, proposal(1), '');
+  state = await store.confirm(customer, proposal(2), state.revision);
+  const otherState = await store.confirm(other, proposal(3), '');
+  const original = store.read(customer);
+  assert.equal((await store.removeMany(customer, [id(1), id(3)], state.revision)).reason, 'not_found');
+  assert.deepEqual(store.read(customer), original, 'unknown or other-customer IDs cannot partially delete a batch');
+  assert.equal((await store.removeMany(customer, [id(1)], '')).reason, 'conflict');
+  const removed = await store.removeMany(customer, [id(1)], state.revision);
+  assert.equal(removed.saved, true);
+  assert.deepEqual(removed.projects.map(item => item.id), [id(2)]);
+  assert.deepEqual(store.read(other).projects, otherState.projects);
+  assert.equal(store.read(other).revision, otherState.revision);
+  const car = await store.confirm(customer, proposal(4, { title: 'Car', price_eur: 7000 }), removed.revision);
+  assert.equal(car.saved, true);
+  assert.deepEqual(car.projects.map(item => item.id), [id(2), id(4)]);
+  assert.equal((await store.confirm(customer, proposal(1), original.revision)).reason, 'conflict', 'stale confirmation cannot restore deleted bike');
+});
+
+test('coach removal validation and cancellation leave stored goals untouched', async () => {
+  const store = create({ storage: storageFixture() });
+  const state = await store.confirm(customer, proposal(), '');
+  for (const invalid of [null, {}, ['bad'], [id(1), id(1).toUpperCase()], Array(1), [id(1), id(2), id(3), id(4)]]) {
+    assert.equal(validProjectRemovals(invalid), false);
+    assert.equal((await store.removeMany(customer, invalid, state.revision)).reason, 'invalid');
+  }
+  assert.equal(validProjectRemovals([]), true);
+  assert.equal(validProjectRemovals([id(1)]), true);
+  assert.equal((await store.removeMany(customer, [], state.revision)).revision, state.revision);
+  const controller = new AbortController(); controller.abort();
+  assert.equal((await store.removeMany(customer, [id(1)], state.revision, { signal: controller.signal })).reason, 'cancelled');
+  assert.deepEqual(store.read(customer).projects, state.projects);
 });
 
 test('proposal and saved-context validation reject extra identity fields and malformed financial values', () => {

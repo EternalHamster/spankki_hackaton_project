@@ -190,6 +190,8 @@ Aiempi vastaus säilytettiin.|Your previous answer has been kept.
 Tehdään tästä tavoite?|Make this a goal?
 Avataanko tavoitteellesi Tavoitetili?|Open a Goal Account for your goal?
 Päivitetäänkö tavoitettasi?|Update your goal?
+Tavoitteen poistamista ei voitu vahvistaa. Yritä uudelleen.|The goal removal could not be verified. Try again.
+Tavoitteen poistamista ei voitu tallentaa tähän selaimeen. Yritä uudelleen.|The goal removal could not be saved in this browser. Try again.
 Avaa Tavoitetili|Open Goal Account
 Tavoitesumma|Target amount
 Säästövauhti|Saving pace
@@ -613,6 +615,7 @@ export const ENGLISH_PATTERNS = [
   [/^Tili kävi miinuksella (\d+) kertaa\.$/, 'Your account went overdrawn $1 times.'],
   [/^Tili kävi miinuksella kerran\.$/, 'Your account went overdrawn once.'],
   [/^Tavoitetilisi demosaldo säilyy: (.+?)\.$/, 'Your demo Goal Account balance is kept: $1.'],
+  [/^Tämä korvaa tavoitteen ”(.+?)”, kun vahvistat muutoksen\.$/, 'This replaces your goal “$1” when you confirm the change.'],
   [/^Arvio perustuu (.+?) tietoihin\. Demo: simuloitu tili tallentuu tähän selaimeen, eikä oikeaa pankkitiliä avata\.$/, 'Estimate based on data from $1. Demo: the simulated account is saved in this browser; no real bank account is opened.'],
   [/^Ennen tämän tavoitteen säästöä on katettava (.+?)\/kk vajetta muiden tavoitteiden ja arjen menojen rahoituksessa\.$/, 'Before saving for this goal, cover the $1/month shortfall for other goals and everyday spending.'],
   [/^Ennen tämän tavoitteen säästöä arjen kuukausibudjetissa on katettava (.+?)\/kk vaje\.$/, 'Before saving for this goal, cover the $1/month shortfall in your everyday budget.'],

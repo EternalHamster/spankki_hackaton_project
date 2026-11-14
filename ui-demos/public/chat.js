@@ -5,7 +5,7 @@ import { formatCoachText, formatInline, roundEuroText } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { affordTemplate } from './exploration.js';
 import { createCustomerMemory } from './customer-memory.js';
-import { createPurchaseProjects, validProjectProposal } from './purchase-projects.js';
+import { createPurchaseProjects, validProjectProposal, validProjectRemovals } from './purchase-projects.js';
 import { LEVELS, levelIndex, getAnswerLevel } from './answer-depth.js';
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -51,6 +51,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const busy = session.pending || session.projectSaving;
     target.innerHTML = `<section class="chat-project-proposal" aria-labelledby="project-proposal-title">
       <span class="project-proposal-label">${previous ? 'Päivitetäänkö tavoitettasi?' : 'Avataanko tavoitteellesi Tavoitetili?'}</span><h3 id="project-proposal-title">${escape(proposal.title)}</h3>
+      ${previous && previous.title !== proposal.title ? `<p class="project-proposal-note">Tämä korvaa tavoitteen ”${escape(previous.title)}”, kun vahvistat muutoksen.</p>` : ''}
       <dl class="project-proposal-figures"><div><dt>Tavoitesumma</dt><dd>${euros(proposal.price_eur)}</dd></div><div><dt>Aikaa tällä vauhdilla</dt><dd>${proposal.projected_months} kk</dd></div></dl>
       <div class="project-proposal-savings">
         <h4>Kuukausisäästösi</h4><p>${savingsNote}</p>
@@ -122,7 +123,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
         <button type="button" data-depth="simpler" data-answer-index="${i}" ${busy ? 'disabled' : ''}>Selitä yksinkertaisemmin</button>
         <button type="button" data-depth="deeper" data-answer-index="${i}" ${busy ? 'disabled' : ''}>Kerro tarkemmin</button>
         ${session.rewriting === i ? '<span class="chat-rewrite-status" role="status">Muokataan vastausta…</span>' : ''}</div>` : '';
-      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content, { keepCents: Boolean(m.keepCents || m.accountReceipt) })}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${m.accountReceipt ? `<button type="button" class="chat-account-link" data-project-view="${escape(m.accountReceipt)}">Näytä Tavoitetili ${icon('arrow')}</button>` : ''}${actions}</div>`;
+      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content, { keepCents: Boolean(m.keepCents || m.accountReceipt) })}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${m.projectRemovalReceipt ? `<p class="project-removal-receipt">${escape(m.projectRemovalReceipt)}</p>` : ''}${m.accountReceipt ? `<button type="button" class="chat-account-link" data-project-view="${escape(m.accountReceipt)}">Näytä Tavoitetili ${icon('arrow')}</button>` : ''}${actions}</div>`;
     }).join('');
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending && session.rewriting === null ? 'Valmentaja vastaa…' : '';
@@ -153,6 +154,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     while (history.reduce((n, m) => n + m.content.length, 0) + content.length > 14000) history = history.slice(2);
     const memoryBefore = memory.read(current.selection.customer_id);
     const projectsBefore = projects.read(current.selection.customer_id);
+    let projectsAfter = projectsBefore;
     let expectedMemoryRevision = memoryBefore.revision;
     const body = { messages: [...history, { role: 'user', content }], level: depth, language: getLanguage(),
       ...(memoryBefore.available ? { memory: memoryBefore.facts } : {}),
@@ -178,7 +180,27 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       if (!response.ok) throw new Error(result.error || 'Vastausta ei saatu. Yritä uudelleen.');
       if (typeof result.answer !== 'string' || !result.answer.trim() || (result.language ?? 'fi') !== body.language) throw new Error('Vastausta ei saatu. Yritä uudelleen.');
-      current.messages.push({ role: 'assistant', content: result.answer, level: depth, keepCents: validProjectProposal(result.project_proposal) });
+      let projectRemovalReceipt;
+      if (result.project_removals !== undefined) {
+        if (!validProjectRemovals(result.project_removals)) throw new Error('Tavoitteen poistamista ei voitu vahvistaa. Yritä uudelleen.');
+        if (result.project_removals.length) {
+          const removed = await projects.removeMany(current.selection.customer_id, result.project_removals, projectsBefore.revision,
+            { signal: current.controller.signal });
+          if (current !== session || current.selection.selection_id !== getSelection()?.selection_id) return;
+          if (!removed.saved) throw new Error(removed.reason === 'conflict'
+            ? 'Tavoitteesi muuttuivat. Pyydä valmentajaa päivittämään suunnitelma.'
+            : 'Tavoitteen poistamista ei voitu tallentaa tähän selaimeen. Yritä uudelleen.');
+          projectsAfter = removed;
+          const names = projectsBefore.projects.filter(project => result.project_removals.some(id => id.toLowerCase() === project.id.toLowerCase()))
+            .map(project => `“${project.title}”`).join(', ');
+          projectRemovalReceipt = getLanguage() === 'en'
+            ? `Removed from your saved goals in this browser: ${names}.`
+            : `Poistettu tämän selaimen tallennetuista tavoitteista: ${names}.`;
+          onProjectsChanged();
+        }
+      }
+      current.messages.push({ role: 'assistant', content: result.answer, level: depth,
+        projectRemovalReceipt, keepCents: validProjectProposal(result.project_proposal) });
       if (result.memory_updates !== undefined && !(Array.isArray(result.memory_updates) && result.memory_updates.length === 0)) {
         const saved = await memory.apply(current.selection.customer_id, result.memory_updates, memoryBefore.revision,
           { signal: current.controller.signal });
@@ -189,8 +211,8 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       if (validProjectProposal(result.project_proposal)) {
         current.projectProposal = result.project_proposal;
-        current.projectBaseline = projectsBefore.projects;
-        current.projectRevision = projectsBefore.revision;
+        current.projectBaseline = projectsAfter.projects;
+        current.projectRevision = projectsAfter.revision;
         current.projectMemoryRevision = expectedMemoryRevision;
       }
     } catch (failure) {

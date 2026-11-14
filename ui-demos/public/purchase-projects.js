@@ -46,6 +46,11 @@ export function validProjectContext(value) {
     new Set(value.map(project => project.id.toLowerCase())).size === value.length;
 }
 
+export function validProjectRemovals(value) {
+  return Array.isArray(value) && value.length <= MAX_PURCHASE_PROJECTS && Array.from(value).every(uuid) &&
+    new Set(value.map(id => id.toLowerCase())).size === value.length;
+}
+
 export function projectProgress(project) {
   if (!validProject(project)) throw new TypeError('Invalid purchase project');
   const target = cents(project.price_eur), saved = cents(project.saved_eur), monthly = cents(project.monthly_eur);
@@ -173,6 +178,18 @@ export function createPurchaseProjects(options = {}) {
     }, mutationOptions);
   }
 
+  // Apply a successful coach reply as one revision-checked change. Unknown IDs
+  // invalidate the whole batch; another customer's projects cannot be removed.
+  async function removeMany(customerId, ids, expectedRevision, mutationOptions) {
+    if (!validProjectRemovals(ids)) return { ...read(customerId), saved: false, reason: 'invalid' };
+    const removed = new Set(ids.map(id => id.toLowerCase()));
+    return write(customerId, expectedRevision, projects => {
+      if ([...removed].some(id => !projects.some(project => project.id.toLowerCase() === id))) return { error: 'not_found' };
+      return removed.size ? { changed: true, projects: projects.filter(project => !removed.has(project.id.toLowerCase())) }
+        : { changed: false };
+    }, mutationOptions);
+  }
+
   // A demo deposit, never a bank transfer or a time-based balance forecast.
   async function simulateMonthlyDeposit(customerId, id, expectedRevision, mutationOptions) {
     if (!uuid(id)) return { ...read(customerId), saved: false, reason: 'invalid' };
@@ -187,5 +204,5 @@ export function createPurchaseProjects(options = {}) {
     }, mutationOptions);
   }
 
-  return { read, confirm, setSaved, simulateMonthlyDeposit, remove };
+  return { read, confirm, setSaved, simulateMonthlyDeposit, remove, removeMany };
 }
