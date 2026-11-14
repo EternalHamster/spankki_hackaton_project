@@ -25,8 +25,15 @@ t = time.time()
 build_db.build()
 model.run()
 ins, _ = insights.run()
-validate.holdout().to_csv(OUTPUT_DIR / "validation.csv", index=False)
-validate.backtest(n_back=3, n_sim=400).to_csv(OUTPUT_DIR / "calibration.csv", index=False)
+holdout, backtest = validate.holdout(), validate.backtest(n_back=3, n_sim=400)
+holdout.to_csv(OUTPUT_DIR / "validation.csv", index=False)
+backtest.to_csv(OUTPUT_DIR / "calibration.csv", index=False)
+con = duckdb.connect(str(DB_PATH))                    # the test results live in the database too
+for name, df in [("validation", holdout), ("calibration", backtest.assign(as_of=backtest["as_of"].astype(str)))]:
+    con.register("tmp_df", df)
+    con.sql(f"create or replace table {name} as select * from tmp_df")
+    con.unregister("tmp_df")
+con.close()
 
 con = duckdb.connect(str(DB_PATH), read_only=True)
 for name in EXPORT_TABLES:

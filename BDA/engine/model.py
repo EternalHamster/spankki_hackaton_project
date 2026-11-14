@@ -315,7 +315,7 @@ def trend_model(con, months, season, rng, lines=C.EVERYDAY_LINES):
                      order by customer_id, line, month""").df()
     recent = np.arange(T) >= T - R
     perms = [rng.permutation(T) for _ in range(C.TREND_PERMUTATIONS)]
-    out = []
+    out, nulls = [], []
     for line in lines:
         Y = df[df["line"] == line].pivot(index="customer_id", columns="month", values="amount").sort_index()
         f = np.array([season[line][pd.Timestamp(m).month] for m in Y.columns])
@@ -328,6 +328,9 @@ def trend_model(con, months, season, rng, lines=C.EVERYDAY_LINES):
             z[elig] = _trend_z(Ae, recent)
             null = np.sort(np.concatenate([_trend_z(Ae[:, p], recent) for p in perms]))
             p_up[elig] = _fdr_prob(z[elig], null)
+            grid = np.round(np.concatenate([[0.0001, 0.001], np.arange(0.005, 1.0, 0.005), [0.999, 0.9999]]), 4)
+            nulls.append(pd.DataFrame({"line": line, "quantile": grid, "null_z": np.quantile(null, grid),
+                                       "n_customers": int(elig.sum()), "n_null": len(null)}))
             p_down[elig] = _fdr_prob(-z[elig], -null[::-1])
         raw = Y.to_numpy()
         out.append(pd.DataFrame({
@@ -338,7 +341,9 @@ def trend_model(con, months, season, rng, lines=C.EVERYDAY_LINES):
             # last complete month against the customer's own earlier months (a fact, not a trend claim)
             "last_month_eur": raw[:, -1], "usual_month_eur": raw[:, :-1].mean(1),
             "last_month_is_record": raw[:, -1] > raw[:, :-1].max(1)}))
-    return pd.concat(out, ignore_index=True)
+    null_table = (pd.concat(nulls, ignore_index=True) if nulls else
+                  pd.DataFrame(columns=["line", "quantile", "null_z", "n_customers", "n_null"]))
+    return pd.concat(out, ignore_index=True), null_table
 
 
 # ------------------------------------------------------------------ monthly normal model
@@ -400,7 +405,11 @@ def payday_model(con, customers):
     else:
         mu, k = 0.1, 10.0
     g["p_late"] = np.where(month_end, 0.0, (mu * k + g["late"]) / (k + g["n_sal"]))
-    return g[["payday_dom", "p_late", "n_sal"]]
+    out = g[["payday_dom", "p_late", "n_sal", "late", "usual"]].rename(
+        columns={"n_sal": "n_salaries", "late": "n_late", "usual": "usual_salary_day"})
+    # Beta(alpha, beta) prior of the late-salary probability, estimated from all mid-month customers
+    out.attrs["prior"] = {"prior_mean": mu, "prior_strength": k, "alpha": mu * k, "beta": (1 - mu) * k}
+    return out
 
 
 def next_payday(as_of, day):
@@ -530,7 +539,10 @@ def run(db_path=C.DB_PATH, as_of=None, write=True, verbose=True, n_sim=C.N_SIM, 
 
     customer_line = pd.concat([post, reg], ignore_index=True)
     if trend:
-        customer_line = customer_line.merge(trend_model(con, months, season, rng), on=["customer_id", "line"], how="left")
+        trend_rows, trend_null = trend_model(con, months, season, rng)
+        customer_line = customer_line.merge(trend_rows, on=["customer_id", "line"], how="left")
+    else:
+        trend_null = None
     customer_line = customer_line.sort_values(["customer_id", "line"]).reset_index(drop=True)
 
     # ---- safe to spend: simulate until the salary arrives (usual day, or late with probability p_late)
@@ -558,7 +570,8 @@ def run(db_path=C.DB_PATH, as_of=None, write=True, verbose=True, n_sim=C.N_SIM, 
     room_usual, days_usual = weekly_room(pay_usual)
     room_late, _ = weekly_room(pay_late)
     is_late = rng.random((len(ids), n_sim)) < pay["p_late"].to_numpy()[:, None]
-    cash_week = np.quantile(np.where(is_late, room_late, room_usual), C.SAFE_QUANTILE, axis=1)
+    room = np.where(is_late, room_late, room_usual)
+    cash_week = np.quantile(room, C.SAFE_QUANTILE, axis=1)
 
     pv = post.pivot(index="customer_id", columns="line", values="expected_month").reindex(ids)
     essentials_month = pv[C.ESSENTIAL_EVERYDAY].sum(axis=1)
@@ -585,7 +598,7 @@ def run(db_path=C.DB_PATH, as_of=None, write=True, verbose=True, n_sim=C.N_SIM, 
     summary = pd.DataFrame({
         "income_month": monthly["income"], "income_sd": monthly_sd["income"],
         "peer_income_median": cust["peer_group"].map(peer_income),
-        "payday_dom": pay["payday_dom"], "p_late_payday": pay["p_late"],
+        "payday_dom": pay["payday_dom"], "p_late_payday": pay["p_late"],  # counts behind it: customer_payday
         "next_payday": pd.Series(pay_usual), "days_to_payday": pd.Series(days_usual, index=ids),
         "balance": balance, "regular_month": regular_month, "housing_month": monthly["housing"],
         "utilities_month": monthly["utilities"], "shock_month": pv["shock"], "essentials_month": essentials_month,
@@ -651,7 +664,29 @@ def run(db_path=C.DB_PATH, as_of=None, write=True, verbose=True, n_sim=C.N_SIM, 
     summary["surprise_fund_gap"] = (summary["surprise_fund"] + C.SAFE_CUSHION_EUR - summary["balance"]).clip(lower=0)
 
     if write:
-        for name, df in [("model_hyper", hyper), ("customer_line", customer_line), ("customer_summary", summary)]:
+        # ---- the rest of the model, so the database is self-contained (see README "What is in coach.duckdb")
+        qs = [0.01, 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95, 0.99]
+        sim = pd.DataFrame({"customer_id": ids, "n_draws": n_sim})
+        for name, draws in [("room_week", room), ("room_week_if_on_time", room_usual),
+                            ("room_week_if_late", room_late), ("shocks_year_eur", year_total)]:
+            for q, col in zip(qs, np.quantile(draws, qs, axis=1)):
+                sim[f"{name}_q{round(100 * q):02d}"] = col
+        payday = pay.reset_index().rename(columns={"index": "customer_id"})
+        payday.insert(0, "customer_id", payday.pop("customer_id"))
+        season_rows = pd.DataFrame([(l, m, f) for l, d in sorted(season.items()) for m, f in sorted(d.items())],
+                                   columns=["line", "month_of_year", "factor"])
+        priors = pd.concat([statfin_spend.assign(kind="spending_eur_month"),
+                            statfin_income.assign(line="income", kind="income_eur_month")], ignore_index=True)
+        settings = {k: getattr(C, k) for k in dir(C) if k.isupper() and isinstance(getattr(C, k), (int, float, str))}
+        settings.update({"CPI_FACTOR": cpi, "N_COMPLETE_MONTHS": len(months), "FIRST_MONTH": str(first.date()),
+                         "LAST_MONTH": str(last.date()), "AS_OF": str(as_of.date()),
+                         **{f"PAYDAY_{k.upper()}": v for k, v in pay.attrs["prior"].items()}})
+        config = pd.DataFrame({"setting": list(settings), "value": [str(v) for v in settings.values()]})
+        extra = [("customer_monthly_model", mon), ("customer_payday", payday), ("customer_simulation", sim),
+                 ("model_season", season_rows), ("statfin_priors", priors), ("model_config", config)]
+        if trend_null is not None:
+            extra.append(("model_trend_null", trend_null))
+        for name, df in [("model_hyper", hyper), ("customer_line", customer_line), ("customer_summary", summary)] + extra:
             con.register("tmp_df", df)
             con.sql(f"create or replace table {name} as select * from tmp_df")
             con.unregister("tmp_df")

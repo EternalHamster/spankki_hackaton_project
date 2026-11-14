@@ -43,6 +43,25 @@ def check_tables(con):
     ok("basket shares add up to 100 %", np.allclose(s[["basket1_share", "basket2_share", "basket3_share"]].sum(axis=1), 1))
     ok("surprise fund covers at least one typical surprise", (s["surprise_fund"] >= s["typical_shock_eur"]).all())
     ok("payday is in the future", (pd.to_datetime(s["next_payday"]) > pd.to_datetime(s["as_of"])).all() and (s["days_to_payday"] >= 1).all())
+    tables = {t[0] for t in con.sql("show tables").fetchall()}
+    need_tables = {"model_hyper", "customer_monthly_model", "customer_payday", "customer_simulation", "model_season",
+                   "model_trend_null", "statfin_priors", "model_config", "validation", "calibration"}
+    ok("the database holds every part of the model", need_tables <= tables, sorted(need_tables - tables))
+    if need_tables <= tables:
+        m = con.sql("select customer_id, line, post_mean from customer_monthly_model").df().pivot(
+            index="customer_id", columns="line", values="post_mean").reindex(s["customer_id"])
+        sim = con.sql("select customer_id, room_week_q10, shocks_year_eur_q90 from customer_simulation").df().set_index(
+            "customer_id").reindex(s["customer_id"])
+        pd_ = con.sql("select * from customer_payday").df().set_index("customer_id").reindex(s["customer_id"])
+        prior = dict(con.sql("select setting, value from model_config where setting like 'PAYDAY_%'").fetchall())
+        a, b = float(prior["PAYDAY_ALPHA"]), float(prior["PAYDAY_BETA"])
+        mid = (pd_["payday_dom"] < 31).to_numpy()
+        ok("stored model parts reproduce the results",
+           np.allclose(m["income"], s["income_month"]) and np.allclose(m["housing"] + m["utilities"], s["regular_month"])
+           and np.allclose(sim["room_week_q10"], s["safe_week_cash"])
+           and (np.ceil(np.maximum(sim["shocks_year_eur_q90"].to_numpy(), s["typical_shock_eur"].to_numpy()) / 50) * 50
+                == s["surprise_fund"].to_numpy()).all()
+           and np.allclose(((a + pd_["n_late"]) / (a + b + pd_["n_salaries"])).to_numpy()[mid], s["p_late_payday"].to_numpy()[mid]))
     ok("probabilities are between 0 and 1", cl["p_up"].dropna().between(0, 1).all() and cl["p_down"].dropna().between(0, 1).all()
        and s["p_late_payday"].between(0, 1).all())
 
