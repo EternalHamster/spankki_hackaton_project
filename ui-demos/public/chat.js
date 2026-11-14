@@ -288,16 +288,12 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const date = !simple && customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' }) : '';
     const privacy = 'Viestit, muistetut toiveet ja kysymykseen tarvittavat valitun demoasiakkaan tiedot lähetetään Claudelle. Keskustelu tyhjenee, kun vaihdat asiakasta, aloitat uuden keskustelun tai päivität sivun. Muistetut asiat säilyvät tässä selaimessa, kunnes poistat ne.';
     modal('Talousvalmentaja', `
-      <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${escape(customer.label || 'Demoasiakas')}${date ? ' · aineisto ' + escape(date) : ''}</span></div></div>
-      <details id="chat-memory" class="chat-memory"><summary><span>Valmentajan muisti</span><small id="chat-memory-count"></small>${icon('chevron')}</summary>
-        <div id="chat-memory-facts"></div><button type="button" class="chat-memory-clear" data-memory-clear hidden>Tyhjennä muisti</button>
-      </details>
+      <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong>${date ? `<span>aineisto ${escape(date)}</span>` : ''}</div></div>
       ${selected ? `<div class="chat-insight"><span>${escape(period.label)}${simple ? '' : ' · ' + escape(period.detail)}</span><strong>${escape(roundEuroText(selected.card.title))}</strong><b>${escape(roundEuroText(selected.card.headline_number))}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div>${simple ? '' : '<p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>'}` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>${simple ? 'Kysy menoista, säästämisestä tai omasta tavoitteestasi.' : 'Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.'}</p></div>`}
       <div id="chat-messages" class="chat-messages" role="log" aria-label="Keskustelu" aria-live="polite" aria-relevant="additions text"></div>
       <div id="chat-project-proposal" aria-live="polite"></div>
       <div class="chat-suggestions">${SUGGESTIONS.map(q => `<button type="button" data-chat-question="${escape(q.text)}"><span>${escape(q.label || q.text)}${q.hint ? `<small>✎ ${escape(q.hint)}</small>` : ''}</span>${icon('arrow')}</button>`).join('')}</div>
       <p id="chat-progress" class="chat-progress" role="status"></p>
-      <p id="chat-memory-status" class="chat-memory-status" role="status" hidden></p>
       <p id="chat-error" class="chat-error" role="alert" hidden></p>
       <form id="chat-form" class="chat-composer"><label class="sr-only" for="chat-question">Kirjoita kysymyksesi</label><textarea id="chat-question" rows="2" placeholder="Kirjoita kysymyksesi…" maxlength="2000" required>${escape(session.draft)}</textarea><button type="submit" class="chat-send" aria-label="Lähetä kysymys">${icon('arrow')}</button></form>
       <p id="chat-hint" class="chat-hint" hidden>Lisää [tuote], [hinta] ja [kuukaudet] ennen lähettämistä. Sarkain siirtää seuraavaan kohtaan.</p>
@@ -345,7 +341,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
         if (current === session) { current.projectSaving = false; update(); }
       }
     });
-    detail.querySelector('#chat-memory').addEventListener('click', async event => {
+    detail.querySelector('#chat-memory')?.addEventListener('click', async event => {
       const button = event.target.closest('[data-memory-forget], [data-memory-clear]');
       const current = session, shown = displayedMemory;
       if (!button || current.pending || current.memoryPending || !shown) return;

@@ -68,7 +68,7 @@ model estimates as a yearly comparison. Group averages are descriptive, not spen
 
 ## UI
 
-`ui-demos/public/wrapped.js` and `wrapped.css`. Stories auto-advance every 7 s. Controls:
+`ui-demos/public/wrapped.js` and `wrapped.css`. Stories auto-advance every 14 s. Controls:
 - **Navigate:** tap the right or left side, swipe, or use the arrow keys.
 - **Pause:** hold the screen, or use the pause button or the space bar.
 - **Close:** swipe down, press Esc or use the close button.

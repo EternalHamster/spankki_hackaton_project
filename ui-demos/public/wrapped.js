@@ -5,7 +5,7 @@ import { translate } from './translations.js';
 // for the year before it. The latest story has a "Mikä muuttui" card with the drastic changes between the two;
 // its button is the only way to open the older story.
 // Cards come from wrapped-data.json (built by wrapped/export_ui.py); all numbers are precomputed.
-const AUTO_MS = 7000;
+const AUTO_MS = 14000;
 const HOLD_MS = 220;
 const SWIPE_PX = 45;
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -23,7 +23,7 @@ export function renderSlide(card, index, total) {
   const count = card.count === null || card.count === undefined ? '' :
     `<p class="wr-count wr-anim"><span data-count="${Number(card.count)}">${formatCount(card.count)}</span><small>${escape(card.suffix)}</small></p>`;
   const items = card.layout === 'list' ? `<ol class="wr-list">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-rank">${i + 1}</span><span class="wr-label">${escape(item.label)}<i class="wr-bar" style="--w:${Math.max(6, Math.round(100 * item.share / card.items[0].share))}%"></i></span><b>${escape(item.value)}</b></li>`).join('')}</ol>`
-    : card.layout === 'changes' ? `<ul class="wr-deltas">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-label">${escape(item.label)}${item.detail ? `<small>${escape(item.detail)}</small>` : ''}</span><b>${escape(item.value)}</b></li>`).join('')}</ul>`
+    : card.layout === 'changes' ? `<ul class="wr-deltas">${card.items.map((item, i) => `<li class="wr-anim" style="--d:${i}"><span class="wr-label">${escape(item.label)}</span><b>${escape(item.value)}</b></li>`).join('')}</ul>`
     : card.layout === 'split' ? `<dl class="wr-split">${card.items.map((item, i) => `<div class="wr-anim" style="--d:${i}"><dt>${escape(item.label)}</dt><dd>${escape(item.value)}</dd></div>`).join('')}</dl>`
     : card.layout === 'comparison' ? `<table class="wr-comparison-table wr-anim"><thead><tr><th scope="col">Vuoden luvut</th><th scope="col">Sinä</th><th scope="col">Ryhmän keskiarvo</th></tr></thead><tbody>${card.items.map(item => `<tr><th scope="row">${escape(item.label)}</th><td>${escape(item.own)}</td><td>${escape(item.peer)}</td></tr>`).join('')}</tbody></table>` : '';
   const ask = card.ask && card.layout !== 'outro' ? `<button type="button" class="wr-ask wr-anim" data-wr-ask="${escape(card.ask)}">Kysy valmentajalta<span aria-hidden="true">→</span></button>` : '';

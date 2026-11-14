@@ -229,7 +229,7 @@ def build_cards(customer_id, src, year='current'):
                           f"{eur(v['eur'])} yhteensä · keskimäärin {eur(v['eur'] / v['n'])}/ostos",
                           count=v['n'], suffix=' kertaa',
                           ask=f'Kerro {CATEGORY_ASK[c]} viime vuonna. Miten voisin säästää niissä?',
-                          note=(f'Sama ikä ja alue: keskimäärin {eur(peers["categories"].get(c, 0))}/vuosi.' if peers else None),
+                          note=(f'Ikäisesi lähialueella käyttävät tähän keskimäärin {eur(peers["categories"].get(c, 0))} vuodessa.' if peers else None),
                           priority=85))
 
     # 5. Go-to place
@@ -264,7 +264,7 @@ def build_cards(customer_id, src, year='current'):
     if b and b['eur'] >= 300:
         d = date.fromisoformat(b['date'])
         cards.append(card('biggest', 'hero', 'Vuoden isoin ostos', CATEGORY_FI.get(b['category'], b['category']),
-                          f"{d.day}.{d.month}.{d.year} · {MCC_FI.get(b['mcc'], 'kauppa').lower()}",
+                          f"{d.day}.{d.month}.{d.year}",
                           count=b['eur'], suffix=' €', priority=62))
 
     # 9. Biggest and quietest month

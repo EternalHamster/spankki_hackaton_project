@@ -36,6 +36,8 @@ test('interface translation covers labels, dated copy, weekly plans and recap am
   assert.equal(translate('Tärkeimmät havainnot', 'en'), 'Key insights');
   assert.equal(translate('Tilisi ei käynyt kertaakaan miinuksella. Hieno saavutus!', 'en'), 'Your account never went overdrawn. Well done!');
   assert.equal(translate('Seuraavat askeleesi · tiedot 30/09/2026 asti', 'en'), 'Your next steps · data through 30/09/2026');
+  assert.equal(translate('aineisto 30/09/2026', 'en'), 'data from 30/09/2026');
+  assert.equal(translate('aineisto 30.9.2026', 'fi'), 'aineisto 30.9.2026');
   assert.equal(translate('A < B & C', 'en'), 'A < B & C');
   assert.equal(translate('May', 'en'), 'May');
   assert.equal(translate('S-Pankki Tavoitetili', 'en'), 'S-Pankki Goal Account');

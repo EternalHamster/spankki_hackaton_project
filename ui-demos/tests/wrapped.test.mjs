@@ -42,7 +42,9 @@ test('every demo customer also has the previous year, and the latest story lists
     }
     const html = renderSlide(changes, 0, cards.length);
     assert.match(html, /wr-deltas/);
-    assert.ok(changes.items.every(item => html.includes(item.detail)));
+    assert.ok(changes.items.every(item => html.includes(item.label) && html.includes(item.value)));
+    assert.doesNotMatch(html, /<small>/);
+    assert.ok(changes.items.every(item => !item.detail || !html.includes(item.detail)));
   }
   assert.ok(seen > 0, 'no demo customer has a changes card');
 });
