@@ -1,5 +1,14 @@
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
+// Suggested questions. A template's [gaps] must be filled in by the user before it can be sent.
+const SUGGESTIONS = [
+  { text: 'Miten aloitan budjetoinnin?' },
+  { text: 'Onko minulla varaa ostaa [tuote], joka maksaa [hinta] €?', label: 'Onko minulla varaa…?', hint: 'Lisää tuote ja hinta itse' },
+  { text: 'Anna kolme säästövinkkiä arkeen.' },
+];
+const GAP = /\[(?:tuote|hinta)\]/;
+const ready = draft => Boolean(draft.trim()) && !GAP.test(draft);
+
 export function createChatDialog({ modal, detail, icon }) {
   const fresh = () => ({ messages: [], draft: '', pending: false, error: '', insight: null, controller: null });
   let session = fresh();
@@ -16,14 +25,15 @@ export function createChatDialog({ modal, detail, icon }) {
     alert.textContent = session.error;
     alert.hidden = !session.error;
     detail.querySelector('#chat-question').disabled = session.pending;
-    detail.querySelector('.chat-send').disabled = session.pending || !session.draft.trim();
+    detail.querySelector('.chat-send').disabled = session.pending || !ready(session.draft);
+    detail.querySelector('#chat-hint').hidden = !GAP.test(session.draft);
     detail.querySelector('.chat-suggestions').hidden = session.messages.length > 0 || Boolean(session.insight);
     log.scrollTop = log.scrollHeight;
   }
 
   async function send() {
     const current = session;
-    if (current.pending || !current.draft.trim()) return;
+    if (current.pending || !ready(current.draft)) return;
     const content = current.draft.trim();
     let history = current.messages.slice(-10);
     while (history.reduce((n, m) => n + m.content.length, 0) + content.length > 14000) history = history.slice(2);
@@ -67,22 +77,26 @@ export function createChatDialog({ modal, detail, icon }) {
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${selected ? 'Keskustellaan havainnostasi' : 'Keskustele tekoälyn kanssa'}</span></div></div>
       ${selected ? `<div class="chat-insight"><span>Valittu havainto · ${escape(selected.asOf)}</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${escape(selected.card.explanation)}</p></div><p class="chat-context-note">Valmentaja näkee tämän demoasiakkaan havainnon ja sen taustaluvut. Tiedot ovat historiallisia.</p>` : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa yleisissä raha-asioissa. Avaa etusivun havainto, jos haluat keskustella demoasiakkaan tilanteesta.</p></div>`}
       <div id="chat-messages" class="chat-messages" role="log" aria-label="Keskustelu" aria-live="polite" aria-relevant="additions text"></div>
-      <div class="chat-suggestions">${['Miten aloitan budjetoinnin?', 'Mikä on puskurirahasto?', 'Anna kolme säästövinkkiä arkeen.'].map(q => `<button type="button" data-chat-question="${escape(q)}">${escape(q)}${icon('arrow')}</button>`).join('')}</div>
+      <div class="chat-suggestions">${SUGGESTIONS.map(q => `<button type="button" data-chat-question="${escape(q.text)}"><span>${escape(q.label || q.text)}${q.hint ? `<small>✎ ${escape(q.hint)}</small>` : ''}</span>${icon('arrow')}</button>`).join('')}</div>
       <p id="chat-progress" class="chat-progress" role="status"></p>
       <p id="chat-error" class="chat-error" role="alert" hidden></p>
       <form id="chat-form" class="chat-composer"><label class="sr-only" for="chat-question">Kirjoita kysymyksesi</label><textarea id="chat-question" rows="2" placeholder="Kirjoita kysymyksesi…" maxlength="2000" required>${escape(session.draft)}</textarea><button type="submit" class="chat-send" aria-label="Lähetä kysymys">${icon('arrow')}</button></form>
+      <p id="chat-hint" class="chat-hint" hidden>Kirjoita ostoksen nimi ja hinta kohtiin [tuote] ja [hinta] ennen lähettämistä. Sarkain siirtää seuraavaan kohtaan.</p>
       <div class="chat-footer"><span>Viestit${selected ? ' ja valitun demoasiakkaan taustatiedot' : ''} lähetetään Claudelle. Keskustelu tyhjenee, kun aloitat uuden keskustelun tai päivität sivun.</span><button type="button" id="chat-reset">Uusi keskustelu</button></div>
     `, 'chat-dialog');
     const input = detail.querySelector('#chat-question');
     detail.querySelector('#chat-form').addEventListener('submit', event => { event.preventDefault(); void send(); });
-    input.addEventListener('input', () => { session.draft = input.value; detail.querySelector('.chat-send').disabled = session.pending || !session.draft.trim(); });
+    // Select the next [gap] so typing replaces it.
+    const selectGap = () => { const gap = input.value.match(GAP); if (gap) input.setSelectionRange(gap.index, gap.index + gap[0].length); return Boolean(gap); };
+    input.addEventListener('input', () => { session.draft = input.value; update(); });
     input.addEventListener('keydown', event => {
+      if (event.key === 'Tab' && !event.shiftKey && GAP.test(input.value)) { event.preventDefault(); selectGap(); return; }
       if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); detail.querySelector('#chat-form').requestSubmit(); }
     });
     detail.querySelectorAll('[data-chat-question]').forEach(button => button.addEventListener('click', () => {
       if (session.pending) return;
       input.value = session.draft = button.dataset.chatQuestion;
-      update(); input.focus();
+      update(); input.focus(); selectGap();
     }));
     detail.querySelector('#chat-reset').addEventListener('click', () => { reset(); showChat(); detail.querySelector('#chat-question').focus(); });
     update();
