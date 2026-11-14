@@ -3,20 +3,27 @@ const copy = `
 Oma talous|My finances
 Tietoa demoaineistosta|About the demo data
 Valittu demoasiakas|Selected demo customer
+Demoasiakas|Demo customer
 Demoasiakas 1 · Arjen valinnat|Demo customer 1 · Everyday choices
 Demoasiakas 2 · Menot ja tulot|Demo customer 2 · Spending and income
 Demoasiakas 3 · Säästäminen|Demo customer 3 · Saving
 Kysy talousvalmentajalta|Ask your financial coach
+Avaa talousvalmentaja|Open the financial coach
 Kysy omasta taloudestasi|Ask about your finances
 Lähetä kysymys valmentajalle|Send your question to the coach
 AI-valmentaja · vastaukset perustuvat demoasiakkaan tietoihin|AI coach · answers use the demo customer's data
 Tutki talouttasi kysymys kerrallaan|Explore your finances one question at a time
 Onko minulla varaa tähän?|Can I afford this?
 Kerro haaveestasi – tehdään siitä suunnitelma|Tell us your goal – let's make a plan
-Mihin rahani menivät?|Where did my money go?
+Mihin rahani menivät?|Where does my money go?
 Ymmärrä menojasi ja niiden muutoksia|Understand your spending and how it changes
 Paljonko voin käyttää tällä viikolla?|How much can I spend this week?
-Arvio käytettävissä olevasta rahasta|Estimated spending allowance
+Arvio käytettävissä olevasta rahasta|Make room for what matters
+Arvio aiempien menojesi pohjalta.|Estimate based on past spending.
+Arvio aiemmista tiedoista. Tavoite ja demosaldo säilyvät selaimessa.|Based on past data. Your goal and demo balance stay in this browser.
+Arvio aiemmista tiedoista. Demotili tallentuu selaimeen; oikeaa tiliä ei avata.|Based on past data. The demo account stays in this browser; no real account is opened.
+Kysy menoista, säästämisestä tai omasta tavoitteestasi.|Ask about spending, saving or your goal.
+Tietoa keskustelusta|About this chat
 Miten voisin säästää enemmän?|How could I save more?
 Löydä arkeesi sopiva pieni muutos|Find a small change that works for you
 Omat hankintatavoitteet|My savings goals
@@ -114,6 +121,7 @@ Avataan omaa taloutta|Opening your finances
 Haetaan valitun demoasiakkaan tietoja.|Loading the selected demo customer's data.
 Demo ei latautunut|The demo could not be loaded
 Demoasiakasta ei voitu avata. Yritä uudelleen.|The demo customer could not be opened. Try again.
+Demoasiakkaan tiedot eivät kelpaa.|The demo customer details are invalid.
 Aineisto ei latautunut.|The data could not be loaded.
 Asuminen|Housing
 Laskut ja palvelut|Bills and services
@@ -151,6 +159,7 @@ Unohda kaikki|Forget everything
 Unohda|Forget
 Ei käytettävissä|Unavailable
 Ei vielä muistettuja asioita. Voit kertoa esimerkiksi, mistä menoista et halua tinkiä.|Nothing remembered yet. For example, tell your coach which spending you do not want to cut.
+Ei vielä muistettuja asioita. Kerro esimerkiksi ostotavoistasi, tavoitteistasi tai menoista, joista et halua tinkiä.|Nothing remembered yet. For example, share your spending habits, goals or spending you do not want to cut.
 Selaimen muisti ei ole käytettävissä. Voit silti jatkaa keskustelua.|Browser storage is unavailable. You can still chat.
 Päivitetään valmentajan muistia|Updating coach memory
 Valmentajan muisti ei ole käytettävissä tässä selaimessa. Uusia asioita ei voida muistaa keskustelujen välillä.|Coach memory is unavailable in this browser. New preferences cannot be remembered between chats.
@@ -159,6 +168,8 @@ Valmentajan muisti päivitetty. Muistetut asiat säilyvät myös seuraavassa kes
 Muisti muuttui toisessa välilehdessä. Tätä muutosta ei tallennettu. Tarkista muisti ja yritä uudelleen.|Memory changed in another tab. This change was not saved. Review the memory and try again.
 Muisti on täynnä. Poista ensin tarpeeton asia, jotta uusi toive voidaan tallentaa.|Memory is full. Remove an unwanted note before saving a new preference.
 Muistiin ehdotettua muutosta ei voitu tallentaa. Voit kertoa toiveesi uudelleen.|The proposed memory change could not be saved. You can share your preference again.
+Muistetut toiveesi muuttuivat. Pyydä valmentajaa tarkistamaan suunnitelma ennen aloittamista.|Your remembered preferences changed. Ask your coach to review the plan before starting.
+Sinulla on jo kolme tavoitetta. Poista ensin yksi, jos haluat aloittaa uuden.|You already have three goals. Remove one before starting a new one.
 Muistia ei voitu tallentaa tähän selaimeen. Muutos ei säily seuraavaan keskusteluun.|Memory could not be saved in this browser. This change will not carry over to the next chat.
 Uusi keskustelu|New chat
 Kysy valmentajalta|Ask your coach
@@ -232,6 +243,7 @@ Menot|Spending
 Tulot|Income
 Kuukausi|Month
 Kategoriat kaavion vieressä.|Categories are shown next to the chart.
+Kategoriat kaavion alla.|Categories are shown below the chart.
 Kuukauden tulojen ja menojen jakauma|Monthly income and spending breakdown
 Jakauman sisältö|Breakdown content
 Piilota kategoriat|Hide categories
@@ -384,13 +396,23 @@ Demoasiakas vaihtui.|The selected demo customer changed.
 Tiedot eivät latautuneet. Yritä uudelleen.|The data could not be loaded. Try again.
 Vastaus ei latautunut. Yritä uudelleen.|The answer could not be loaded. Try again.
 Vuotesi luvuissa|Your year in numbers
+Vuotesi tärkeimmät luvut.|Your year at a glance.
+Sama ikä, alue ja vuosi. Keskiarvo ei ole tavoite.|Same age, area and year. Average, not a target.
+Alle 10 euron ostoksistakin kertyy.|Purchases under €10 add up too.
+Tilisi pysyi plussalla koko vuoden.|In credit all year.
+Menosi ovat lähellä ryhmäsi keskiarvoja.|Your spending is close to your peers’ averages.
+Tällä vähennyksellä tulot ja menot tasapainottuisivat.|This cut could balance income and spending.
+Kokoa puskuri yllättäviin menoihin.|Build a buffer for unexpected costs.
+Tulot kattavat menot ja puskuri on kunnossa.|Income covers spending. Your buffer is in place.
+Aloita puskurirahastosta.|Start with a buffer.
+Kauppojen nimiä ei ole aineistossa.|Shop names are unavailable.
 Vuoden luvut|Yearly figures
 Ryhmän keskiarvo|Group average
 Lisätiedot|Details
 Tulot, menot ja säästöt|Income, spending and savings
 Yksi vuosi, yksi tarina. Katsotaan, millainen rahavuotesi oli.|One year, one story. Let's look at your year in money.
-Vertailu omaan ryhmään|Compared with your peer group
-Sinä ja verrokkiryhmäsi|You and your peer group
+Vertailu omaan ryhmään|Your peer group
+Sinä ja verrokkiryhmäsi|You and your peers
 Sama ikäryhmä ja alue, sama rahavuosi. Ryhmän keskiarvo ei ole kulutustavoite.|The same age group and area, over the same financial year. The group average is not a spending target.
 Mihin korttiostokset menivät|Where your card spending went
 Vuoden suosikkisi|Your favourite this year
@@ -505,6 +527,8 @@ Täytä hakasulkeissa olevat kohdat ennen lähettämistä.|Fill in the bracketed
 Lyhyt kysymys riittää. Älä kirjoita oikeita henkilötietoja.|A short question is enough. Do not enter real personal details.
 Muistettu asia poistettiin.|The remembered note was removed.
 Valmentajan muisti tyhjennettiin.|Coach memory cleared.
+Asia poistettu valmentajan muistista.|The note was removed from your coach's memory.
+Valmentajan muisti tyhjennetty.|Coach memory cleared.
 Hienoa, Tavoitetililläsi on koko tavoitesumma.|Your Goal Account now holds the full target amount.
 Tavoitetilin saldo|Goal Account balance
 Tavoitetilin demosaldo suhteessa tavoitteeseen|Demo Goal Account balance against the target
@@ -564,6 +588,23 @@ for (const [source, target] of [...ENGLISH_COPY]) {
 const phrases = [...ENGLISH_COPY.keys()].sort((a, b) => b.length - a.length);
 const phrasePattern = new RegExp(`(?<![\\p{L}])(?:${phrases.map(escapePattern).join('|')})(?![\\p{L}])`, 'gu');
 export const ENGLISH_PATTERNS = [
+  [/^Paljonko voin käyttää viikossa tilanteen (.+?) mukaan\?$/, 'How much can I spend per week based on the situation as of $1?'],
+  [/^Menojen( ja säästöjen)? jälkeen jäi (.+?)\.$/, (_, saving, value) => `${value} left after spending${saving ? ' and savings' : ''}.`],
+  [/^Menot( ja säästöt)? ylittivät tulot (.+?)\.$/, (_, saving, value) => `Spending${saving ? ' and savings' : ''} exceeded income by ${value}.`],
+  [/^Korttiostokset yhteensä (.+?)\.$/, 'Total card spending: $1.'],
+  [/^(.+?) yhteensä · keskimäärin (.+?)\/ostos$/, '$1 total · $2/purchase on average'],
+  [/^Sama ikä ja alue: keskimäärin (.+?)\/vuosi\.$/, 'Age & area peers: $1/year on average.'],
+  [/^Sama ikä ja alue: nettosäästö keskimäärin (.+?)\/vuosi\.$/, 'Age & area peers: $1/year saved, net average.'],
+  [/^Asioit vuoden aikana (\d+) eri paikassa\.$/, 'You visited $1 places this year.'],
+  [/^Vilkkain tuntisi: klo (.+?)\.$/, 'Busiest hour: $1.'],
+  [/^Hiljaisin: (.+?), (.+?)\.$/, (_, month, value) => `Quietest: ${translate(month, 'en')}, ${value}.`],
+  [/^Pisin plussaputkesi: (\d+) päivää\.$/, 'Longest time in credit: $1 days.'],
+  [/^Ryhmääsi enemmän: (.+?)\.$/, (_, categories) => `Above your peers’ average: ${translate(categories, 'en')}.`],
+  [/^Säästit (\d+) kuukautena 12:sta\.$/, 'You saved in $1 of 12 months.'],
+  [/^Seuraavaksi: (.+?)\.$/, (_, period) => `Up next: ${translate(period, 'en')}.`],
+  [/^Säästä (.+?)\/kk palkkapäivänä\.( Aloita puskurirahastosta\.)?$/, (_, value, buffer) => `Save ${value}/month on payday.${buffer ? ' Start with a buffer.' : ''}`],
+  [/^Tili kävi miinuksella (\d+) kertaa\.$/, 'Your account went overdrawn $1 times.'],
+  [/^Tili kävi miinuksella kerran\.$/, 'Your account went overdrawn once.'],
   [/^Tavoitetilisi demosaldo säilyy: (.+?)\.$/, 'Your demo Goal Account balance is kept: $1.'],
   [/^Arvio perustuu (.+?) tietoihin\. Demo: simuloitu tili tallentuu tähän selaimeen, eikä oikeaa pankkitiliä avata\.$/, 'Estimate based on data from $1. Demo: the simulated account is saved in this browser; no real bank account is opened.'],
   [/^Ennen tämän tavoitteen säästöä on katettava (.+?)\/kk vajetta muiden tavoitteiden ja arjen menojen rahoituksessa\.$/, 'Before saving for this goal, cover the $1/month shortfall for other goals and everyday spending.'],
@@ -601,6 +642,9 @@ export const ENGLISH_PATTERNS = [
   [/^Lisäostoihin käytetty (.+?)\. Viikkoraja, arvio (.+?)\. Viikkorajasta jäljellä (.+?)\.(?: Raja ylittynyt (.+?)\.)?$/, (_, spent, budget, left, over) => `Optional spending: ${spent}. Estimated weekly limit: ${budget}. Remaining: ${left}.${over ? ` Limit exceeded by ${over}.` : ''}`],
   [/^Jaa jäljellä oleva (.+?) (\d+) päivälle: enintään (.+?) päivässä\.$/, 'Spread the remaining $1 over $2 days: no more than $3 a day.'],
   [/^Jaa jäljellä oleva (.+?) viimeiselle päivälle: enintään (.+?) päivässä\.$/, 'Keep spending on the final day within the remaining $1, or $2 for the day.'],
+  [/^Jaa jäljellä oleva (.+?) (\d+) päivälle: noin (.+?) päivässä\.$/, 'Spread the remaining $1 over $2 days: about $3 a day.'],
+  [/^Jaa jäljellä oleva (.+?) viimeiselle päivälle: noin (.+?) päivässä\.$/, 'Your remaining allowance for the final day is about $2.'],
+  [/^Varaa loppuviikon lisäostoihin noin (.+?) päivässä\.$/, 'Allow about $1 a day for optional spending this week.'],
   [/^Pidä loppuviikon lisäostot enintään (.+?) päivässä, niin pysyt viikon arviossa\.$/, 'Keep optional spending to $1 a day for the rest of the week to stay within the estimate.'],
   [/^Viikkoraja ylittyi (.+?)\. Siirrä uudet lisäostokset ensi viikkoon, jotta ylitys ei kasva\.$/, 'The weekly limit was exceeded by $1. Postpone new optional purchases until next week to avoid increasing the overrun.'],
   [/^Lisäostoihin meni (.+?) yli viikon arvion\. Odota seuraavien lisäostosten kanssa ensi viikkoon\.$/, 'Optional spending exceeded the weekly estimate by $1. Wait until next week for more optional purchases.'],

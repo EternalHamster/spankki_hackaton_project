@@ -1,6 +1,6 @@
 // The same response limits are checked by the model adapter and the browser.
 export const SUMMARY_LIMITS = Object.freeze({
-  simple: Object.freeze({ minBullets: 2, maxBullets: 3, maxChars: 140 }),
+  simple: Object.freeze({ minBullets: 2, maxBullets: 2, maxChars: 120 }),
   standard: Object.freeze({ minBullets: 2, maxBullets: 3, maxChars: 140 }),
   detailed: Object.freeze({ minBullets: 2, maxBullets: 3, maxChars: 500 }),
 });

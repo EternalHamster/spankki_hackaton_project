@@ -10,9 +10,11 @@ export const languageButton = () => `<button type="button" class="nav-item langu
 // User-written questions, saved personal notes and goal names remain the user's own text.
 export function localizeUI(root = document.body) {
   if (getLanguage() !== 'en' || !root) return;
-  const skip = 'script, style, textarea, [data-no-translate], .chat-message.user p, .coach-response, #chat-memory-facts li>span, .purchase-project h4, #project-proposal-title';
+  const skip = 'script, style, [data-no-translate], .chat-message.user p, .coach-response, #chat-memory-facts li>span, .purchase-project h4, #project-proposal-title';
+  // A textarea's contents belong to the user; its placeholder and ARIA labels belong to the UI.
+  const skipText = `textarea, ${skip}`;
   const translateNode = node => {
-    if (!node.parentElement?.closest(skip)) {
+    if (!node.parentElement?.closest(skipText)) {
       const value = translate(node.nodeValue, 'en');
       if (value !== node.nodeValue) node.nodeValue = value;
     }

@@ -59,17 +59,21 @@ const DEPTH_RULES = 'Answer depth chosen by the user. It replaces only the defau
   'rules above. Every factual, data, safety and tool rule above still applies at every depth. ' +
   'Never invent or calculate numbers; use the profile or a tool result.\n';
 export const LEVELS = Object.freeze({
-  simple: { maxTokens: 600, prompt: `${DEPTH_RULES}Depth: SIMPLE. The user wants to understand what is going on, not analytics.
-Answer in two to four short sentences of plain everyday language; use a list only for steps. Mention at most two
-amounts; cents may be dropped with "noin". No percentages, group comparisons, probabilities, model terms or
-financial jargon. An everyday comparison is welcome. End with one easy, concrete next step. Use a tool only
-when the profile does not already answer the question.` },
+  simple: { maxTokens: 600, prompt: `${DEPTH_RULES}Depth: SIMPLE. At most three short everyday sentences: the main takeaway and one easy next step.
+If asked to simplify further, focus on one plain point and omit optional amounts.
+Mention at most two useful amounts. No percentages, peer comparisons, tables, jargon or calculation details.
+For SIMPLE, override instructions to print exact dates/periods, including in rewrites: use plain context such as
+"in the selected month" or "based on past spending". Omit calendar dates, date ranges, snapshot labels and data
+provenance. Include an exact date only if the user asks for it or it is essential to an action deadline.
+Keep historical facts in the past, estimates uncertain, and essential conditions and goal amounts accurate.
+Use required tools for exact calculations; otherwise use the profile when it already answers.` },
   standard: { maxTokens: 900, prompt: `${DEPTH_RULES}Depth: STANDARD. Two to four brief bullet points in easy language: the key
 amounts with their period, at most one comparison (the usual month or the typical group figure) and a
 one-line reason. Avoid jargon. End with one or two practical next steps.` },
   detailed: { maxTokens: 1500, prompt: `${DEPTH_RULES}Depth: DETAILED. The user wants to understand their finances in depth and learn
-how the numbers work. Give a structured answer of at most about 250 words with short paragraphs or bullets
-(no tables or headings). Show the relevant figures with their periods and how they connect: how often versus
+how the numbers work. Give a structured answer of about 250 words by default with short paragraphs or bullets
+(no tables or headings). If explicitly asked for more detail, expand relevant reasoning beyond this default
+instead of repeating the previous reply. Show the relevant figures with their periods and how they connect: how often versus
 how much per payment, the position within the typical group, the usual month versus this period, any trend
 evidence and the uncertainty (for example the chance of a late salary or why an estimate is cautious).
 Briefly explain how estimates such as the weekly allowance are formed. Financial terms are allowed, but
@@ -305,7 +309,7 @@ const CARD_DEPTH_LIMITS = {
 };
 const PREPARED_DEPTH_RULES = {
   standard: 'STANDARD: key figures, one useful comparison and a short practical explanation. Preserve the source meaning and uncertainty.',
-  simple: 'SIMPLE: short everyday Finnish. Explain just the central meaning and one easy next step. Avoid jargon, percentages and secondary comparisons; omit secondary facts rather than changing or rounding their amounts.',
+  simple: 'SIMPLE: just the main takeaway and one easy next step in everyday language. Prefer two brief bullets; use at most one short sentence per bullet or card field. Do not repeat the headline amount in the explanation. Omit calendar dates, date ranges, snapshot labels, data provenance, calculation details, jargon, percentages and secondary comparisons. Preserve the relevant period through plain context such as "in the selected month" or "that year", and keep historical facts in the past. An exact date is needed only for an essential action deadline. Preserve essential conditions and uncertainty; omit secondary facts rather than changing or rounding their amounts.',
   detailed: 'DETAILED: explain the supplied figures, their comparison and what they mean for the next step. Explain the reasoning and limitations in complete sentences. Expand only implications of the supplied evidence; do not invent causes, transactions, calculations or new figures. Explain any financial term in ordinary words.',
 };
 

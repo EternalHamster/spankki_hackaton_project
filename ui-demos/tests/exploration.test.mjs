@@ -115,6 +115,10 @@ test('summary caches and preloading follow depth without mixing answers across l
   assert.equal(standard.level, 'standard');
   assert.equal(simple.level, 'simple');
   assert.equal(detailed.level, 'detailed');
+  assert.equal(simple.displayQuestion, 'Mihin rahani menivät?');
+  assert.equal(simple.question, standard.question);
+  assert.match(simple.question, /2026-09/);
+  assert.equal(detailed.displayQuestion, detailed.question);
   assert.notEqual(simple.answer, detailed.answer);
   assert.equal(await store.load({ ...input, level: 'simple' }), simple);
   assert.equal(urls.length, 3);
@@ -131,7 +135,7 @@ test('wrong-depth replies are rejected and detailed summaries allow a fuller exp
   await assert.rejects(store.load({ ...input, level: 'simple' }));
   assert.equal((await store.load({ ...input, level: 'simple' })).level, 'simple');
   assert.equal(calls, 2);
-  for (const [level, size, allowed] of [['standard', 220, true], ['standard', 221, false], ['simple', 141, false],
+  for (const [level, size, allowed] of [['standard', 220, true], ['standard', 221, false], ['simple', 120, true], ['simple', 121, false],
     ['detailed', 500, true], ['detailed', 501, false]]) {
     const bounded = createExplorationSummaries({ fetchImpl: async () => response('a'.repeat(size), selection.selection_id, level) });
     const result = bounded.load({ ...input, level });

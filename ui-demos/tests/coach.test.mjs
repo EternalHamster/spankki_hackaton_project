@@ -48,6 +48,9 @@ test('prepared depth adaptations use only the displayed source, preserve card id
   assert.equal(payload.tool_choice, undefined);
   assert.doesNotMatch(JSON.stringify(payload), /PRIVATE_A|stable-card|remember_customer_fact|propose_purchase_project/);
   assert.match(payload.system[0].text, /SIMPLE/);
+  assert.match(payload.system[0].text, /Omit calendar dates, date ranges, snapshot labels, data provenance/);
+  assert.match(payload.system[0].text, /Preserve the relevant period through plain context/);
+  assert.match(payload.system[0].text, /Do not repeat the headline amount in the explanation/);
   assert.match(payload.system[0].text, /Keep estimates as estimates/);
   assert.match(payload.messages[0].content, /250/);
   assert.deepEqual(execution, []);
@@ -144,6 +147,8 @@ test('answer rewrites target the supplied original answer without changing later
   assert.match(rewriteRequest.system.at(-2).text, /does not change the default/);
   assert.ok(rewriteRequest.system.at(-2).text.endsWith(JSON.stringify(original)));
   assert.ok(rewriteRequest.system.at(-1).text.startsWith(LEVELS.simple.prompt + '\n'));
+  assert.match(rewriteRequest.system.at(-1).text, /override instructions to print exact dates\/periods, including in rewrites/);
+  assert.match(rewriteRequest.system.at(-1).text, /only if the user asks for it or it is essential to an action deadline/);
   assert.match(rewriteRequest.system.at(-1).text, /APPLICATION LANGUAGE: FINNISH/);
   assert.equal(rewriteRequest.max_tokens, LEVELS.simple.maxTokens);
   const later = await coach.chat('A', { messages });
@@ -610,7 +615,13 @@ test('answer levels change only the last prompt block and the output limit, so t
   assert.deepEqual([simple, standard, detailed].map(body => body.system.at(-1).text.match(/Depth: (\w+)/)[1]), ['SIMPLE', 'STANDARD', 'DETAILED']);
   assert.deepEqual([simple, standard, detailed].map(body => body.max_tokens), [600, 900, 1500]);
   assert.equal(simple.system.at(-1).cache_control, undefined);
-  assert.ok(simple.system.at(-1).text.length < 1200, 'the level block stays small');
+  assert.ok(simple.system.at(-1).text.length < 1600, 'the level block stays small');
+  assert.match(simple.system.at(-1).text, /At most three short everyday sentences/);
+  assert.match(simple.system.at(-1).text, /If asked to simplify further, focus on one plain point and omit optional amounts/);
+  assert.match(simple.system.at(-1).text, /Keep historical facts in the past, estimates uncertain/);
+  assert.doesNotMatch(standard.system.at(-1).text, /Omit calendar dates/);
+  assert.doesNotMatch(detailed.system.at(-1).text, /Omit calendar dates/);
+  assert.match(detailed.system.at(-1).text, /If explicitly asked for more detail, expand relevant reasoning beyond this default/);
   await assert.rejects(ask('expert'), error => error.status === 400);
   await assert.rejects(ask('toString'), error => error.status === 400);
   assert.equal(requests.length, 4);

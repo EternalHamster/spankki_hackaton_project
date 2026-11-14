@@ -22,7 +22,7 @@ test('zero budget, exhausted budget and overspending give different next steps',
   const used = weeklyPlan(week({ spent_eur_week: 260, remaining_eur_week: 0, daily_remaining_eur: 0 }), selection);
   assert.match(used.bullets[0], /raja on käytetty/);
   const over = weeklyPlan(week({ spent_eur_week: 275.34, remaining_eur_week: 0, over_budget_eur_week: 15.34, daily_remaining_eur: 0 }), selection);
-  assert.match(over.bullets[0], /15,34.*ensi viikkoon/);
+  assert.match(over.bullets[0], /15\s*€.*ensi viikkoon/);
 });
 
 test('the final day and completed week never divide by zero or promise a bank balance', () => {
@@ -54,6 +54,9 @@ test('weekly plan changes explanation depth while preserving its financial facts
   assert.equal(detailed.bullets.length, 3);
   assert.match(detailed.bullets[2], /260.*52.*208.*4 päivälle.*alaspäin.*ei tilin saldo/);
   assert.equal(simple.question, detailed.question);
+  assert.equal(simple.displayQuestion, 'Miten käytän loppuviikon lisäostovaran?');
+  assert.match(simple.question, /2026-09-30/);
+  assert.match(detailed.displayQuestion, /2026-09-30/);
   assert.notDeepEqual(simple.bullets, standard.bullets);
   assert.throws(() => weeklyPlan(week(), selection, 'other'));
 });

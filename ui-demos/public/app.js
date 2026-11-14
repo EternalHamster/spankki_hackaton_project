@@ -9,7 +9,7 @@ import { createFinanceAnalytics } from './finance-analytics/index.js';
 import { moveMonth } from './finance-analytics/model.js';
 import { projectFinanceData } from './adapters/project-finance.js';
 import { explorationTopics, createExplorationSummaries } from './exploration.js';
-import { formatInline } from './coach-text.js';
+import { formatInline, roundEuroText } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { setDisclosure } from './disclosure.js';
 import { renderMonthPicker, installMonthPickers } from './month-picker.js';
@@ -42,7 +42,7 @@ const paths={
 const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.receipt}</svg>`;
 const sMark=()=>'<svg class="s-mark" viewBox="0 0 35 48" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M29 3C13 3 9 12 9 25c0 9-2 14-7 14v6c12 0 14-9 14-20 0-10 3-15 13-15Z"/><path d="M29 16c-6 0-7 3-7 12 0 12-5 17-14 17"/></svg>';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const euro=(n,digits=2)=>new Intl.NumberFormat(locale(),{style:'currency',currency:'EUR',minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n===0?0:n);
+const euro=(n,digits=0)=>new Intl.NumberFormat(locale(),{style:'currency',currency:'EUR',minimumFractionDigits:digits,maximumFractionDigits:digits}).format(n===0?0:n);
 const monthName=value=>new Date(value+'-15T12:00:00Z').toLocaleDateString(locale(),{month:'long',year:'numeric',timeZone:'UTC'});
 const capitalize=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const names={Housing:'Asuminen',Utilities:'Laskut ja palvelut',Groceries:'Ruokaostokset',Health:'Terveys','Home & Tech':'Koti ja tekniikka',Transportation:'Liikkuminen',Restaurants:'Ravintolat',Lifestyle:'Ostokset',Entertainment:'Vapaa-aika',Travel:'Matkailu',Salary:'Palkka','Other Income':'Muut tulot','Invest Deposit':'Siirto sijoituksiin','Invest Withdraw':'Nosto sijoituksista','Salary Sweep':'Palkkasiirto'};
@@ -154,11 +154,17 @@ function render(){
     <div class="section-title insights-title"><h2>Tärkeimmät havainnot</h2><span class="ai-label">AI:n tuottama</span></div><section id="key-insights" class="key-insights" aria-label="Asiakkaan tärkeimmät AI-havainnot" aria-live="polite"><p class="insights-loading" role="status">Havaintoja ladataan…</p></section>
     <div id="recap-teaser">${recapTeaser()}</div>
     <div class="explore-shortcuts"><button class="utility-row" data-action="chat" aria-label="Avaa talousvalmentaja">${icon('chat')}<span><strong>Jatka keskustelua</strong><small>Kysy lisää valmentajaltasi</small></span>${icon('chevron')}</button><button class="utility-row" data-action="account">${icon('receipt')}<span><strong>Tilin tapahtumat</strong><small id="transactions-period">${capitalize(monthName(selectedMonths.transactions))}</small></span>${icon('chevron')}</button><button class="utility-row" data-action="settings">${icon('person')}<span><strong>Valmentajan asetukset</strong><small id="answer-depth-summary">Vastausten taso: ${LEVELS[levelIndex(getAnswerLevel())].label}</small></span>${icon('chevron')}</button></div>
-    <p class="demo-note">Synteettinen demoaineisto · tiedot ${esc(dateLabel(customerSession.as_of))} asti<br>Ei yhteyttä oikeaan pankkitiliin.</p></main>
+    <p class="demo-note">Synteettinen demoaineisto<span data-coach-detail> · tiedot ${esc(dateLabel(customerSession.as_of))} asti</span><br>Ei yhteyttä oikeaan pankkitiliin.</p></main>
     <nav class="bottom-nav" aria-label="Päävalikko">${[['Koti','home'],['S-Etukortti','s'],['Pankki','wallet']].map(([label,glyph])=>`<button class="nav-item" data-context="${label}">${glyph==='s'?sMark():icon(glyph)}<span>${label}</span></button>`).join('')}<button class="nav-item active" data-action="top" aria-current="page">${icon('chart')}<span>Oma talous</span></button><button class="nav-item" data-action="settings" aria-label="Minä – asetukset">${icon('person')}<span>Minä</span></button>${languageButton()}</nav></div>`;
   void loadInsights();
   renderProjects();
   if (activeTopic) openTopic(activeTopic, false);
+  syncCoachPresentation();
+}
+function syncCoachPresentation() {
+  const simple = summaryLevel === 'simple';
+  root.querySelectorAll('[data-coach-detail]').forEach(element => { element.hidden = simple; });
+  root.querySelectorAll('[data-coach-simple]').forEach(element => { element.hidden = !simple; });
 }
 function recapTeaser() {
   return wrapped.has(profile.customer_id) ? wrapped.teaser() : '';
@@ -174,17 +180,22 @@ function weeklyAllowance() {
   const spent = allowance.spent_eur_week, budget = allowance.weekly_budget_eur;
   const remaining = allowance.remaining_eur_week, over = allowance.over_budget_eur_week;
   const maximum = budget || spent || 1;
-  const shortDate = value => new Date(value + 'T12:00:00Z').toLocaleDateString(locale(), { day: 'numeric', month: 'numeric', timeZone: 'UTC' });
-  const period = `${shortDate(allowance.week_start)}–${shortDate(allowance.week_end)}`;
-  const note = `${over > 0 ? `Viikkoraja ylittynyt ${euro(over)}. ` : budget === 0 ? 'Arviossa ei ole varaa lisäostoihin. ' : ''}Kirjaukset ${shortDate(allowance.week_start)}–${dateLabel(allowance.observed_through)}.`;
+  const markerPosition = Math.min(100, spent / maximum * 100);
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Helsinki', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+  const weekDate = new Date(today + 'T12:00:00Z');
+  weekDate.setUTCDate(weekDate.getUTCDate() + 4 - (weekDate.getUTCDay() || 7));
+  const weekNumber = Math.ceil(((weekDate - Date.UTC(weekDate.getUTCFullYear(), 0, 1)) / 86400000) / 7);
+  const period = `${getLanguage() === 'en' ? 'Week' : 'Viikko'} ${weekNumber}`;
+  const note = over > 0 ? (getLanguage() === 'en' ? `Weekly limit exceeded by ${euro(over)}.` : `Viikkoraja ylittynyt ${euro(over)}.`)
+    : budget === 0 ? (getLanguage() === 'en' ? 'The estimate leaves no room for optional spending.' : 'Arviossa ei ole varaa lisäostoihin.') : '';
   const accessible = `Lisäostoihin käytetty ${euro(spent)}. Viikkoraja, arvio ${euro(budget)}. Viikkorajasta jäljellä ${euro(remaining)}.${over > 0 ? ` Raja ylittynyt ${euro(over)}.` : ''}`;
   return `<section class="weekly-allowance${remaining === 0 ? ' weekly-allowance-empty' : ''}" aria-labelledby="weekly-allowance-title">
-    <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Viikon lisäostot</span><small>${esc(period)}</small></div>
+    <div class="weekly-allowance-heading"><span id="weekly-allowance-title">Viikon lisäostot</span><small data-coach-detail>${esc(period)}</small></div>
     <dl class="weekly-allowance-figures"><div><dt>Käytetty</dt><dd id="weekly-spent">${euro(spent)}</dd></div><div><dt>Viikkorajasta jäljellä</dt><dd id="weekly-remaining">${euro(remaining)}</dd></div></dl>
     <label class="sr-only" for="weekly-allowance-progress">Lisäostoihin käytetty suhteessa arvioituun viikkorajaan</label>
-    <div class="weekly-allowance-track"><progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(spent, maximum)}" max="${maximum}" aria-valuetext="${esc(accessible)}" aria-describedby="weekly-allowance-note weekly-demo-marker"></progress><span class="weekly-allowance-marker" aria-hidden="true"></span></div>
-    <div class="weekly-allowance-scale"><span id="weekly-demo-marker">Demomerkki 20 %</span><span>Viikkoraja (arvio) <strong>${euro(budget, 0)}</strong></span></div>
-    <p id="weekly-allowance-note" class="weekly-allowance-note">${esc(note)}</p>
+    <div class="weekly-allowance-track" style="--weekly-spent:${markerPosition}%"><progress id="weekly-allowance-progress" class="weekly-allowance-progress" value="${Math.min(spent, maximum)}" max="${maximum}" aria-valuetext="${esc(accessible)}" aria-describedby="${note ? 'weekly-allowance-note ' : ''}weekly-demo-marker"></progress><span class="weekly-allowance-marker" aria-hidden="true"></span></div>
+    <div class="weekly-allowance-scale"><span id="weekly-demo-marker">Demomerkki</span><span>Viikkoraja (arvio) <strong>${euro(budget, 0)}</strong></span></div>
+    ${note ? `<p id="weekly-allowance-note" class="weekly-allowance-note">${esc(note)}</p>` : ''}
   </section>`;
 }
 function openTopic(topicId, toggle = true) {
@@ -218,18 +229,20 @@ function openTopic(topicId, toggle = true) {
     return;
   }
   const summary = `<div class="topic-summary" aria-live="polite"></div><button class="topic-followup" data-topic-chat="${topicId}">Kysy tästä valmentajalta ${icon('arrow')}</button>`;
-  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption">Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>${weeklyAllowance()}` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
+  panel.innerHTML = `<div class="topic-body">${topicId === 'week' ? `<p class="topic-caption" data-coach-simple>Arvio aiempien menojesi pohjalta.</p><p class="topic-caption" data-coach-detail>Arvio käytettävissä olevasta rahasta · ${esc(dateLabel(customerSession.as_of))}</p>${weeklyAllowance()}` : monthPicker(topicId)}${topicId === 'spending' ? `<div id="spending-breakdown"></div>${summary}<details class="spending-details"><summary>Vertaile kuukausia ja tutki tapahtumia ${icon('chevron')}</summary><div id="spending-history"></div><button class="utility-row" data-action="baskets">${icon('bag')}<span><strong>Kolme menokoria</strong><small>Tarpeet ja arjen valinnat</small></span>${icon('chevron')}</button></details>` : summary}</div>`;
+  syncCoachPresentation();
   if (topicId === 'spending') {
     const shared = { data: projectFinanceData(profile, data.summary, names), selectedMonth: month,
       onSelectCategory: category=>showTransactions(category, topicMonth(topicId)),
       onSelectMonth: month=>changeTopicMonth(topicId, month) };
     const chart = createFinanceAnalytics(panel.querySelector('#spending-breakdown'), {
-      ...shared, sections: ['breakdown'], compactBreakdown: true,
+      ...shared, sections: ['breakdown'], compactBreakdown: true, showPercentages: summaryLevel === 'detailed',
     });
     const history = createFinanceAnalytics(panel.querySelector('#spending-history'), {
       ...shared, sections: ['annual', 'history'],
     });
-    analytics = { destroy() { chart.destroy(); history.destroy(); } };
+    analytics = { setShowPercentages(showPercentages) { chart.update({ showPercentages }); },
+      destroy() { chart.destroy(); history.destroy(); } };
   }
   void setDisclosure(panel, true, !toggle);
   void loadTopicSummary(panel.querySelector('.topic-summary'), topicId);
@@ -285,10 +298,11 @@ async function loadInsights(retry = false) {
     if (!target.isConnected || epoch !== customerEpoch || depthEpoch !== summaryEpoch || pending !== insightsPromise) return;
     activeInsights = result;
     const date = new Date(result.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' });
-    target.innerHTML = `<p class="insights-caption">Tiedot ${esc(date)} asti</p>${result.insights.map(card => {
+    target.innerHTML = `<p class="insights-caption" data-coach-detail>Tiedot ${esc(date)} asti</p>${result.insights.map(card => {
       const period = insightPeriod(card.period, result.as_of);
-      return `<details class="insight-card"><summary class="insight-preview"><span class="insight-meta"><span class="insight-period">${esc(period.label)}</span><span class="insight-value">${esc(card.headline_number)}</span></span><strong class="insight-title">${esc(card.title)}</strong><span class="insight-toggle">Lisätiedot ${icon('chevron')}</span></summary><div class="insight-details"><p class="insight-date">${esc(period.detail)}</p><p>${formatInline(card.explanation)}</p><p>${formatInline(card.action)}</p><button class="insight-cta" data-insight="${esc(card.id)}" aria-label="Kysy valmentajalta: ${esc(card.title)}">Kysy valmentajalta ${icon('arrow')}</button></div></details>`;
+      return `<details class="insight-card"><summary class="insight-preview"><span class="insight-meta"><span class="insight-period">${esc(period.label)}</span><span class="insight-value">${esc(roundEuroText(card.headline_number))}</span></span><strong class="insight-title">${esc(roundEuroText(card.title))}</strong><span class="insight-toggle">Lisätiedot ${icon('chevron')}</span></summary><div class="insight-details"><p class="insight-date" data-coach-detail>${esc(period.detail)}</p><p>${formatInline(card.explanation)}</p><p>${formatInline(card.action)}</p><button class="insight-cta" data-insight="${esc(card.id)}" aria-label="Kysy valmentajalta: ${esc(roundEuroText(card.title))}">Kysy valmentajalta ${icon('arrow')}</button></div></details>`;
     }).join('')}`;
+    syncCoachPresentation();
   } catch (error) {
     if (!target.isConnected || epoch !== customerEpoch || depthEpoch !== summaryEpoch || pending !== insightsPromise) return;
     if (error instanceof StaleSelectionError) { void loadCustomer(); return; }
@@ -352,6 +366,10 @@ function refreshSummaryDepth() {
   const level = getAnswerLevel();
   if (level === summaryLevel) return;
   summaryLevel = level; summaryEpoch++;
+  analytics?.setShowPercentages(level === 'detailed');
+  syncCoachPresentation();
+  renderProjects();
+  showChat.refreshPresentation();
   clearTimeout(summaryRefreshTimer); summaryRefreshTimer = null;
   insightController?.abort(); insightsPromise = null; activeInsights = null;
   explorationSummaries.reset(); activeTopicResult = null;
@@ -430,7 +448,7 @@ function action(name){
   if(name==='cashflow'){modal('Kuukauden yhteenveto',`<p>${capitalize(monthName(selectedMonth))}</p><div class="financial-summary">${[['Tulot',m.income],['Arjen menot',-m.spending],['Tuloista jäljellä',m.margin],['Siirrot sijoituksiin',-m.deposits],['Palkkasiirrot',-m.sweeps],['Nostot sijoituksista',m.withdrawals],...(m.otherFlow?[['Muut tilitapahtumat',m.otherFlow]]:[]),['Kaikkien tapahtumien nettomuutos',m.netFlow]].map(([label,value])=>`<span>${label}<strong>${euro(value)}</strong></span>`).join('')}</div><p class="fine-print">Tuloista jäljellä = palkka ja muut tulot − arjen menot. Summa ei ole tilin saldo eikä arvio turvallisesta käyttörahasta. Sijoitus- ja palkkasiirrot esitetään erikseen.</p>`);return;}
   if(name==='about'){modal('Tietoa demoaineistosta',`<p>Tämä on uusi <strong>Oma talous</strong> -välilehti S-mobiilin kuvakaappausten mukaisessa tyylissä. Muut alapalkin välilehdet havainnollistavat paikan nykyisessä sovelluksessa.</p><h3>Projektin aineisto</h3><p>3 626 755 synteettistä tapahtumaa ja 5 100 asiakasta. Aikaväli 1.10.2024–30.9.2026. Voit vaihtaa synteettistä esimerkkiasiakasta etusivulta. Näytämme kerrallaan vain valitun asiakkaan tiedot.</p><h3>Mitä näet?</h3><p>Tuloja, menoja, kategorioita, tapahtumia ja historiallisia saldoja. Menokorit ovat esimerkkiluokittelu. Säästölaskuri käyttää valitun kuukauden menoja.</p><h3>Talousvalmentaja</h3><p>Keskustelu käyttää Claude-tekoälyä. Claude muodostaa etusivun havainnot valitun asiakkaan tiedoista. Havainnon avaaminen aloittaa keskustelun siitä. Myös Kysy-keskustelu käyttää valitun demoasiakkaan taloustietoja. Claudelle lähetetään viestit sekä vain kysymykseen tarvittavat tämän asiakkaan tiedot. Muiden asiakkaiden yksilöllisiä tietoja ei lähetetä. Vertailut perustuvat ryhmätason lukuihin.</p><p class="fine-print">Hackathon-demo. Ei S-Pankin virallinen palvelu eikä yhteyttä oikeaan pankkitiliin.</p>`);}
 }
-document.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;if(button.dataset.action)action(button.dataset.action);if(button.dataset.insight&&activeInsights){const card=activeInsights.insights.find(item=>item.id===button.dataset.insight);if(card)showChat.openInsight({customerId:profile.customer_id,card,asOf:activeInsights.as_of});}if(button.dataset.category)showTransactions(button.dataset.category,topicMonth(activeTopic));if(button.dataset.basket!==undefined)showBaskets(+button.dataset.basket);if(button.dataset.context)modal(button.dataset.context,`<p>Tämä on nykyisen S-mobiilin välilehden paikka. Tässä esittelyssä voit tutustua uuteen <strong>Oma talous</strong> -välilehteen.</p><button class="primary-button full-width" data-action="close">Takaisin omaan talouteen</button>`);});
+document.addEventListener('click',event=>{const button=event.target.closest('button');if(!button)return;if(button.dataset.action)action(button.dataset.action);if(button.dataset.insight&&activeInsights){const card=activeInsights.insights.find(item=>item.id===button.dataset.insight);if(card)showChat.openInsight({customerId:profile.customer_id,card,asOf:activeInsights.as_of,level:activeInsights.level});}if(button.dataset.category)showTransactions(button.dataset.category,topicMonth(activeTopic));if(button.dataset.basket!==undefined)showBaskets(+button.dataset.basket);if(button.dataset.context)modal(button.dataset.context,`<p>Tämä on nykyisen S-mobiilin välilehden paikka. Tässä esittelyssä voit tutustua uuteen <strong>Oma talous</strong> -välilehteen.</p><button class="primary-button full-width" data-action="close">Takaisin omaan talouteen</button>`);});
 document.addEventListener('click', event=>{
   const button = event.target.closest('button');
   if (!button) return;
@@ -445,7 +463,9 @@ document.addEventListener('click', event=>{
     else {
       const topic = explorationTopics.find(item=>item.id === button.dataset.topicChat);
       const period = topic.id === 'week' ? `Tiedot ${customerSession.as_of} asti.` : `Tarkasteltava kuukausi: ${topicMonth(topic.id)}.`;
-      showChat(`${topic.title} ${period}`, {autoSend:true});
+      showChat(`${translate(topic.title, getLanguage())} ${translate(period, getLanguage())}`, {
+        autoSend: true, displayQuestion: summaryLevel === 'simple' ? translate(topic.title, getLanguage()) : undefined,
+      });
     }
   }
 });

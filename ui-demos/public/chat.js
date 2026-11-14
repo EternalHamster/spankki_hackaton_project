@@ -1,7 +1,7 @@
 import { locale } from './language.js';
 import { getLanguage } from './language.js';
 import { translate } from './translations.js';
-import { formatCoachText, formatInline } from './coach-text.js';
+import { formatCoachText, formatInline, roundEuroText } from './coach-text.js';
 import { insightPeriod } from './insights.js';
 import { affordTemplate } from './exploration.js';
 import { createCustomerMemory } from './customer-memory.js';
@@ -25,7 +25,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
   const projects = createPurchaseProjects();
   const fresh = () => ({ messages: [], draft: '', pending: false, rewriting: null, error: '', memoryPending: false, memoryNotice: '', memoryWarning: false,
     projectProposal: null, projectBaseline: [], projectRevision: '', projectMemoryRevision: '', projectSaving: false, projectError: '',
-    insight: null, exploration: null, explorationBullets: null, controller: null, selection: getSelection() });
+    insight: null, exploration: null, explorationBullets: null, presentationLevel: null, controller: null, selection: getSelection() });
   let session = fresh();
   let displayedMemory = null;
 
@@ -63,7 +63,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       ${proposal.projected_months !== proposal.requested_months ? `<p class="project-proposal-note">Toivomasi aikataulu: ${proposal.requested_months} kk.</p>` : ''}
       ${previous ? `<p class="project-proposal-note">Tavoitetilisi demosaldo säilyy: ${euros(previous.saved_eur)}.</p>` : '<p class="project-proposal-note">Avaan sinulle S-Pankki Tavoitetilin tätä tavoitetta varten. Näet tilin saldon ja edistymisesi tavoitekortissa.</p>'}
       ${proposal.conditions.length ? `<ul class="project-proposal-conditions">${proposal.conditions.map(note => `<li>${escape(note)}</li>`).join('')}</ul>` : ''}
-      <p class="project-proposal-note">Arvio perustuu ${new Date(proposal.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' })} tietoihin. Demo: simuloitu tili tallentuu tähän selaimeen, eikä oikeaa pankkitiliä avata.</p>
+      <p class="project-proposal-note">${(session.presentationLevel ?? getAnswerLevel()) === 'simple' ? 'Arvio aiemmista tiedoista. Demotili tallentuu selaimeen; oikeaa tiliä ei avata.' : `Arvio perustuu ${new Date(proposal.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' })} tietoihin. Demo: simuloitu tili tallentuu tähän selaimeen, eikä oikeaa pankkitiliä avata.`}</p>
       <div class="project-proposal-actions"><button type="button" class="primary-button" data-project-confirm ${busy ? 'disabled' : ''}>${session.projectSaving ? 'Tallennetaan…' : previous ? 'Päivitä tavoite' : 'Avaa Tavoitetili'}</button><button type="button" data-project-dismiss ${busy ? 'disabled' : ''}>Jatka pohdintaa</button></div>
       ${session.projectError ? `<p class="project-proposal-error" role="alert">${escape(session.projectError)}</p>` : ''}
     </section>`;
@@ -91,7 +91,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       list.dataset.state = signature;
       list.innerHTML = state.facts.length
         ? `<ul>${state.facts.map(fact => `<li><span>${escape(fact.text)}</span><button type="button" data-memory-forget="${escape(fact.key)}" aria-label="Unohda: ${escape(fact.text)}" ${busy ? 'disabled' : ''}>Unohda</button></li>`).join('')}</ul>`
-        : `<p class="chat-memory-empty">${state.available ? 'Ei vielä muistettuja asioita. Kerro esimerkiksi ostotavoistasi, tavoitteistasi tai menoista, joista et halua tinkiä.' : 'Selaimen muisti ei ole käytettävissä. Voit silti jatkaa keskustelua.'}</p>`;
+        : state.available ? '' : '<p class="chat-memory-empty">Selaimen muisti ei ole käytettävissä. Voit silti jatkaa keskustelua.</p>';
     }
     const clear = panel.querySelector('[data-memory-clear]');
     clear.hidden = !state.facts.length;
@@ -115,14 +115,14 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (!log) return;
     const scrollTop = log.scrollTop;
     const busy = session.pending || session.memoryPending || session.projectSaving;
+    const latestAnswer = session.messages.findLastIndex(message => message.role === 'assistant');
     log.innerHTML = session.messages.map((m, i) => {
-      // Each answer keeps its own depth, including a summary opened from the main screen.
-      const index = levelIndex(m.level ?? 'simple');
-      const actions = m.role === 'assistant' ? `<div class="chat-depth-actions" role="group" aria-label="Muokkaa tätä vastausta">
-        <button type="button" data-depth="simpler" data-answer-index="${i}" ${busy || index <= 0 ? 'disabled' : ''}>Selitä yksinkertaisemmin</button>
-        <button type="button" data-depth="deeper" data-answer-index="${i}" ${busy || index >= LEVELS.length - 1 ? 'disabled' : ''}>Kerro tarkemmin</button>
+      // Older answers keep their content and depth, but only the latest has controls.
+      const actions = m.role === 'assistant' && i === latestAnswer ? `<div class="chat-depth-actions" role="group" aria-label="Muokkaa tätä vastausta">
+        <button type="button" data-depth="simpler" data-answer-index="${i}" ${busy ? 'disabled' : ''}>Selitä yksinkertaisemmin</button>
+        <button type="button" data-depth="deeper" data-answer-index="${i}" ${busy ? 'disabled' : ''}>Kerro tarkemmin</button>
         ${session.rewriting === i ? '<span class="chat-rewrite-status" role="status">Muokataan vastausta…</span>' : ''}</div>` : '';
-      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content)}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${m.accountReceipt ? `<button type="button" class="chat-account-link" data-project-view="${escape(m.accountReceipt)}">Näytä Tavoitetili ${icon('arrow')}</button>` : ''}${actions}</div>`;
+      return `<div class="chat-message ${m.role}" data-message-index="${i}" ${m.role === 'assistant' ? 'tabindex="-1"' : ''}><span>${m.role === 'user' ? 'Sinä' : 'Talousvalmentaja'}</span>${i === 1 && session.explorationBullets ? `<ul class="summary-bullets">${session.explorationBullets.map(bullet=>`<li>${formatInline(bullet)}</li>`).join('')}</ul>` : m.role === 'assistant' ? `<div class="coach-response">${formatCoachText(m.content, { keepCents: Boolean(m.keepCents || m.accountReceipt) })}</div>` : `<p>${escape(i === 0 && session.exploration ? session.exploration : m.content)}</p>`}${m.accountReceipt ? `<button type="button" class="chat-account-link" data-project-view="${escape(m.accountReceipt)}">Näytä Tavoitetili ${icon('arrow')}</button>` : ''}${actions}</div>`;
     }).join('');
     log.setAttribute('aria-busy', String(session.pending));
     detail.querySelector('#chat-progress').textContent = session.pending && session.rewriting === null ? 'Valmentaja vastaa…' : '';
@@ -138,15 +138,17 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     log.scrollTop = followLatest ? log.scrollHeight : scrollTop;
   }
 
-  // Every new question uses the main-menu default, independently of answer rewrites.
-  async function send() {
+  // Typed questions use the main-menu default. Boundary follow-ups keep the
+  // latest answer's level and leave any unfinished typed question in place.
+  async function send({ content: followup, level, preserveDraft = false } = {}) {
     const current = session;
-    if (current.pending || current.memoryPending || current.projectSaving || !ready(current.draft)) return;
+    const content = (followup ?? current.draft).trim();
+    if (current.pending || current.memoryPending || current.projectSaving || !ready(content)) return;
     if (!current.selection?.selection_id || current.selection.selection_id !== getSelection()?.selection_id) {
       reset(); onSelectionStale(); return;
     }
-    const depth = getAnswerLevel();
-    const content = current.draft.trim();
+    const depth = level ?? getAnswerLevel();
+    const draftBefore = current.draft;
     let history = current.messages.slice(-10).map(({ role, content }) => ({ role, content }));
     while (history.reduce((n, m) => n + m.content.length, 0) + content.length > 14000) history = history.slice(2);
     const memoryBefore = memory.read(current.selection.customer_id);
@@ -158,11 +160,11 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       ...(current.projectProposal ? { pending_project: current.projectProposal } : {}) };
     if (current.insight) body.insight = { insight_id: current.insight.card.id };
     current.messages.push({ role: 'user', content });
-    current.draft = ''; current.error = ''; current.pending = true;
+    current.draft = preserveDraft ? draftBefore : ''; current.error = ''; current.pending = true;
     current.memoryNotice = ''; current.memoryWarning = false;
     current.projectProposal = null; current.projectError = '';
     current.controller = new AbortController();
-    detail.querySelector('#chat-question').value = '';
+    detail.querySelector('#chat-question').value = current.draft;
     update();
     try {
       const response = await fetch('/api/chat', {
@@ -176,7 +178,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
       if (!response.ok) throw new Error(result.error || 'Vastausta ei saatu. Yritä uudelleen.');
       if (typeof result.answer !== 'string' || !result.answer.trim() || (result.language ?? 'fi') !== body.language) throw new Error('Vastausta ei saatu. Yritä uudelleen.');
-      current.messages.push({ role: 'assistant', content: result.answer, level: depth });
+      current.messages.push({ role: 'assistant', content: result.answer, level: depth, keepCents: validProjectProposal(result.project_proposal) });
       if (result.memory_updates !== undefined && !(Array.isArray(result.memory_updates) && result.memory_updates.length === 0)) {
         const saved = await memory.apply(current.selection.customer_id, result.memory_updates, memoryBefore.revision,
           { signal: current.controller.signal });
@@ -193,7 +195,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       }
     } catch (failure) {
       if (current !== session) return;
-      current.messages.pop(); current.draft = content;
+      current.messages.pop(); current.draft = preserveDraft ? draftBefore : content;
       current.error = failure.name === 'TimeoutError' ? 'Vastaus viipyy. Yritä uudelleen.' :
         failure instanceof TypeError || failure instanceof SyntaxError ? 'Yhteys katkesi. Yritä uudelleen.' : failure.message;
     } finally {
@@ -210,15 +212,23 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     const current = session;
     const message = current.messages[index];
     if (current.pending || current.memoryPending || current.projectSaving || message?.role !== 'assistant' ||
+        index !== current.messages.findLastIndex(row => row.role === 'assistant') ||
         !['simpler', 'deeper'].includes(direction)) return;
     if (!current.selection?.selection_id || current.selection.selection_id !== getSelection()?.selection_id) {
       reset(); onSelectionStale(); return;
     }
-    const from = levelIndex(message.level ?? 'simple');
+    const from = Math.max(0, levelIndex(message.level ?? 'simple'));
     const target = from + (direction === 'deeper' ? 1 : -1);
-    if (target < 0 || target >= LEVELS.length) return;
+    if (target < 0 || target >= LEVELS.length) {
+      const english = getLanguage() === 'en';
+      const content = direction === 'simpler'
+        ? english ? 'Explain this even more simply.' : 'Selitä tämä vielä yksinkertaisemmin.'
+        : english ? 'Give me more detail about this.' : 'Kerro tästä vielä tarkemmin.';
+      await send({ content, level: LEVELS[from].id, preserveDraft: true });
+      return;
+    }
     const depth = LEVELS[target].id;
-    // Stop at this answer's question, even when newer messages are visible below it.
+    // Rewrite the latest answer using its original question and full source text.
     let history = current.messages.slice(0, index).slice(-11).map(({ role, content }) => ({ role, content }));
     while (history.length > 1 && history.reduce((n, m) => n + m.content.length, 0) > 14000) history = history.slice(2);
     const remembered = memory.read(current.selection.customer_id);
@@ -266,21 +276,22 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
   }
 
   // autoSend: true sends the question right away (e.g. from Rahavuotesi's "Kysy valmentajalta" buttons).
-  function showChat(question = '', { autoSend = false } = {}) {
+  function showChat(question = '', { autoSend = false, displayQuestion } = {}) {
     const customer = getSelection();
     if (!customer) return;
     if (session.selection?.selection_id !== customer.selection_id) reset();
-    if (question) { reset(); session.draft = question; }
+    if (question) { reset(); session.draft = question; session.exploration = displayQuestion; }
+    const simple = (session.presentationLevel ?? getAnswerLevel()) === 'simple';
     const selected = session.insight;
     const period = selected ? insightPeriod(selected.card.period, selected.asOf) : null;
-    const date = customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' }) : '';
+    const date = !simple && customer.as_of ? new Date(customer.as_of + 'T12:00:00Z').toLocaleDateString(locale(), { timeZone: 'UTC' }) : '';
+    const privacy = 'Viestit, muistetut toiveet ja kysymykseen tarvittavat valitun demoasiakkaan tiedot lähetetään Claudelle. Keskustelu tyhjenee, kun vaihdat asiakasta, aloitat uuden keskustelun tai päivität sivun. Muistetut asiat säilyvät tässä selaimessa, kunnes poistat ne.';
     modal('Talousvalmentaja', `
       <div class="chat-status">${icon('chat')}<div><strong>Oma taloutesi. Omat kysymyksesi.</strong><span>${escape(customer.label || 'Demoasiakas')}${date ? ' · aineisto ' + escape(date) : ''}</span></div></div>
       <details id="chat-memory" class="chat-memory"><summary><span>Valmentajan muisti</span><small id="chat-memory-count"></small>${icon('chevron')}</summary>
-        <p class="chat-memory-description">Valmentaja poimii vastauksistasi hyödyllisiä muistiinpanoja: kertomiasi ostotapoja, toiveita, tavoitteita ja arjen rajoitteita. Ne tallentuvat tähän selaimeen valitulle demoasiakkaalle ja auttavat myös uusissa keskusteluissa. Voit tarkistaa ja poistaa muistetut asiat milloin tahansa.</p>
         <div id="chat-memory-facts"></div><button type="button" class="chat-memory-clear" data-memory-clear hidden>Tyhjennä muisti</button>
       </details>
-      ${selected ? `<div class="chat-insight"><span>${escape(period.label)} · ${escape(period.detail)}</span><strong>${escape(selected.card.title)}</strong><b>${escape(selected.card.headline_number)}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div><p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.</p></div>`}
+      ${selected ? `<div class="chat-insight"><span>${escape(period.label)}${simple ? '' : ' · ' + escape(period.detail)}</span><strong>${escape(roundEuroText(selected.card.title))}</strong><b>${escape(roundEuroText(selected.card.headline_number))}</b><p>${formatInline(selected.card.explanation)}</p><p><strong>Kokeile tätä:</strong> ${formatInline(selected.card.action)}</p></div>${simple ? '' : '<p class="chat-context-note">Voit suunnitella seuraavan askeleen valmentajan kanssa. Tiedot ovat historiallisia.</p>'}` : session.messages.length ? '' : `<div class="chat-intro"><div class="chat-greeting">Hei! Mistä haluaisit jutella?</div><p>${simple ? 'Kysy menoista, säästämisestä tai omasta tavoitteestasi.' : 'Voin auttaa valitun demoasiakkaan tuloissa, menoissa ja talouden suunnittelussa. Käytän vain tämän asiakkaan historiallisia tietoja ja ryhmätason vertailuja.'}</p></div>`}
       <div id="chat-messages" class="chat-messages" role="log" aria-label="Keskustelu" aria-live="polite" aria-relevant="additions text"></div>
       <div id="chat-project-proposal" aria-live="polite"></div>
       <div class="chat-suggestions">${SUGGESTIONS.map(q => `<button type="button" data-chat-question="${escape(q.text)}"><span>${escape(q.label || q.text)}${q.hint ? `<small>✎ ${escape(q.hint)}</small>` : ''}</span>${icon('arrow')}</button>`).join('')}</div>
@@ -289,7 +300,7 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
       <p id="chat-error" class="chat-error" role="alert" hidden></p>
       <form id="chat-form" class="chat-composer"><label class="sr-only" for="chat-question">Kirjoita kysymyksesi</label><textarea id="chat-question" rows="2" placeholder="Kirjoita kysymyksesi…" maxlength="2000" required>${escape(session.draft)}</textarea><button type="submit" class="chat-send" aria-label="Lähetä kysymys">${icon('arrow')}</button></form>
       <p id="chat-hint" class="chat-hint" hidden>Lisää [tuote], [hinta] ja [kuukaudet] ennen lähettämistä. Sarkain siirtää seuraavaan kohtaan.</p>
-      <div class="chat-footer"><span>Viestit, muistetut toiveet ja kysymykseen tarvittavat valitun demoasiakkaan tiedot lähetetään Claudelle. Keskustelu tyhjenee, kun vaihdat asiakasta, aloitat uuden keskustelun tai päivität sivun. Muistetut asiat säilyvät tässä selaimessa, kunnes poistat ne.</span><button type="button" id="chat-reset">Uusi keskustelu</button></div>
+      <div class="chat-footer">${simple ? `<details class="chat-data-note"><summary>Tietoa keskustelusta</summary><p>${privacy}</p></details>` : `<span>${privacy}</span>`}<button type="button" id="chat-reset">Uusi keskustelu</button></div>
     `, 'chat-dialog');
     const input = detail.querySelector('#chat-question');
     detail.querySelector('#chat-form').addEventListener('submit', event => { event.preventDefault(); void send(); });
@@ -397,19 +408,25 @@ export function createChatDialog({ modal, detail, icon, getSelection = () => nul
     if (autoSend && question) void send();
   }
   showChat.reset = reset;
+  showChat.refreshPresentation = () => {
+    session.presentationLevel = getAnswerLevel();
+    if (detail.open && detail.classList.contains('chat-dialog')) showChat();
+  };
   showChat.openExploration = ({ question, displayQuestion, answer, bullets, selectionId, level }) => {
     if (selectionId !== getSelection()?.selection_id) { onSelectionStale(); return; }
     reset();
     session.exploration = displayQuestion;
     session.explorationBullets = Array.isArray(bullets) && bullets.length >= 2 && bullets.length <= 3 && bullets.every(bullet=>typeof bullet === 'string') ? bullets : null;
     const depth = levelIndex(level) >= 0 ? level : 'simple';
+    session.presentationLevel = depth;
     session.messages = [{ role: 'user', content: question }, { role: 'assistant', content: answer, level: depth }];
     showChat();
     detail.querySelector('#chat-question').focus();
   };
-  showChat.openInsight = ({ customerId, card, asOf }) => {
+  showChat.openInsight = ({ customerId, card, asOf, level = getAnswerLevel() }) => {
     if (customerId !== getSelection()?.customer_id) { onSelectionStale(); return; }
     reset();
+    session.presentationLevel = levelIndex(level) >= 0 ? level : getAnswerLevel();
     session.insight = { customerId, card, asOf };
     session.draft = getLanguage() === 'en' ? `Help me take this step: ${card.action} Give me a brief practical plan for “${card.title}”.`
       : `Auta minua toteuttamaan tämä askel: ${card.action} Anna lyhyt käytännön suunnitelma havaintoon ”${card.title}”.`;

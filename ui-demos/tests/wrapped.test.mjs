@@ -34,7 +34,12 @@ test('every demo customer also has the previous year, and the latest story lists
     if (!changes) continue;
     seen++;
     assert.ok(changes.items.length >= 1 && changes.items.length <= 4, `${profile.customer_id}: ${changes.items.length} changes`);
-    for (const item of changes.items) assert.ok(item.label && item.detail && /^[+−]/.test(item.value), `${profile.customer_id} ${item.label}`);
+    for (const item of changes.items) {
+      assert.ok(item.label && /^[+−]/.test(item.value), `${profile.customer_id} ${item.label}`);
+      assert.equal(Boolean(item.detail), item.label !== 'Päivät plussalla');
+      assert.doesNotMatch(item.detail, /%/);
+      assert.doesNotMatch(item.value, /-yks\./);
+    }
     const html = renderSlide(changes, 0, cards.length);
     assert.match(html, /wr-deltas/);
     assert.ok(changes.items.every(item => html.includes(item.detail)));

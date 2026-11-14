@@ -1,7 +1,7 @@
 import { locale } from './language.js';
 import { getLanguage } from './language.js';
 import { translate } from './translations.js';
-const euros = value => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value);
+const euros = (value, digits = 0) => new Intl.NumberFormat(locale(), { style: 'currency', currency: 'EUR', maximumFractionDigits: digits }).format(value);
 const cents = value => Math.round(value * 100);
 const money = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 &&
   value <= 1000000 && Math.abs(value * 100 - cents(value)) < 1e-6;
@@ -37,7 +37,7 @@ export function weeklyPlan(week, selection, level = 'standard') {
     bullets = ['Viikon lisäostoraja on käytetty. Siirrä seuraava vapaaehtoinen ostos ensi viikkoon.',
       'Pidä laskuihin ja muihin välttämättömiin menoihin varatut rahat erillään lisäostoista.'];
   } else if (days > 0) {
-    bullets = [`Jaa jäljellä oleva ${euros(week.remaining_eur_week)} ${days === 1 ? 'viimeiselle päivälle' : `${days} päivälle`}: enintään ${euros(week.daily_remaining_eur)} päivässä.`,
+    bullets = [`Jaa jäljellä oleva ${euros(week.remaining_eur_week)} ${days === 1 ? 'viimeiselle päivälle' : `${days} päivälle`}: noin ${euros(week.daily_remaining_eur)} päivässä.`,
       'Jos käytät yhtenä päivänä enemmän, vähennä sama summa muiden päivien lisäostoista.'];
     if (days === 1) bullets[1] = 'Jos ostos ylittää jäljellä olevan rajan, siirrä se ensi viikkoon tai arvioi sitä valmentajan kanssa.';
   } else {
@@ -55,7 +55,7 @@ export function weeklyPlan(week, selection, level = 'standard') {
       bullets = ['Viikon lisäostovara on käytetty. Odota seuraavien lisäostosten kanssa ensi viikkoon.',
         'Pidä laskuihin ja muihin pakollisiin menoihin varatut rahat erillään.'];
     } else if (days > 0) {
-      bullets = [`Pidä loppuviikon lisäostot enintään ${euros(week.daily_remaining_eur)} päivässä, niin pysyt viikon arviossa.`,
+      bullets = [`Varaa loppuviikon lisäostoihin noin ${euros(week.daily_remaining_eur)} päivässä.`,
         days > 1 ? 'Jos käytät tänään enemmän, käytä muina päivinä vähemmän.' : 'Siirrä tätä suurempi ostos ensi viikkoon.'];
     } else {
       bullets = [`Viikon arviosta jäi ${euros(week.remaining_eur_week)} käyttämättä. Se ei tarkoita tilisi saldoa.`,
@@ -69,10 +69,13 @@ export function weeklyPlan(week, selection, level = 'standard') {
   }
   const language = getLanguage();
   if (language === 'en') bullets = bullets.map(text => translate(text, language));
-  const question = language === 'en' ? `How can I stay within my optional spending plan? Week ${week.week_start}–${week.week_end}, recorded through ${week.observed_through}. Estimated weekly limit ${euros(week.weekly_budget_eur)}, recorded spending ${euros(week.spent_eur_week)}, remaining allowance ${euros(week.remaining_eur_week)}. This difference is not an account balance or a fresh safe-to-spend estimate.`
+  const question = language === 'en' ? `How can I stay within my optional spending plan? Week ${week.week_start}–${week.week_end}, recorded through ${week.observed_through}. Estimated weekly limit ${euros(week.weekly_budget_eur, 2)}, recorded spending ${euros(week.spent_eur_week, 2)}, remaining allowance ${euros(week.remaining_eur_week, 2)}. This difference is not an account balance or a fresh safe-to-spend estimate.`
     : `Miten pysyn lisäostojen suunnittelurajassa? Aineiston viikko ${week.week_start}–${week.week_end}, tiedot ${week.observed_through} asti. ` +
-    `Viikkoraja on arvio ${euros(week.weekly_budget_eur)}, kirjattu kulutus ${euros(week.spent_eur_week)} ja rajasta jäljellä ${euros(week.remaining_eur_week)}. ` +
+    `Viikkoraja on arvio ${euros(week.weekly_budget_eur, 2)}, kirjattu kulutus ${euros(week.spent_eur_week, 2)} ja rajasta jäljellä ${euros(week.remaining_eur_week, 2)}. ` +
     'Rajan ja kulutuksen erotus ei ole tilin saldo eikä uusi turvallisen käyttövaran arvio.';
-  return { bullets, question, language, displayQuestion: language === 'en' ? `How should I use the rest of my weekly allowance? Data through ${week.observed_through}.` : `Miten käytän loppuviikon lisäostovaran? Tiedot ${week.observed_through} asti.`,
+  const displayQuestion = language === 'en'
+    ? `How should I use the rest of my weekly allowance?${level === 'simple' ? '' : ` Data through ${week.observed_through}.`}`
+    : `Miten käytän loppuviikon lisäostovaran?${level === 'simple' ? '' : ` Tiedot ${week.observed_through} asti.`}`;
+  return { bullets, question, language, displayQuestion,
     answer: bullets.map(text => `• ${text}`).join('\n'), selectionId: selection.selection_id, source: 'calculated', level };
 }

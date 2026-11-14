@@ -41,6 +41,8 @@ export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
       if (entries.has(key)) return entries.get(key).promise;
       const controller = new AbortController();
       const question = translate(explorationQuestion(topic, month, selection.as_of), language);
+      const displayQuestion = level === 'simple'
+        ? translate(explorationTopics.find(item => item.id === topic).title, language) : question;
       const entry = { controller };
       entry.promise = (async () => {
         const query = new URLSearchParams({ topic, ...(topic === 'week' ? {} : { month }), level, language });
@@ -62,7 +64,7 @@ export function createExplorationSummaries({ fetchImpl = fetch } = {}) {
           throw new Error('Yhteenvetoa ei saatu. Yritä uudelleen.');
         }
         const bullets = result.bullets.map(text => text.trim());
-        return { question, displayQuestion: question, bullets, answer: bullets.map(text => `• ${text}`).join('\n'), selectionId: selection.selection_id, level, language };
+        return { question, displayQuestion, bullets, answer: bullets.map(text => `• ${text}`).join('\n'), selectionId: selection.selection_id, level, language };
       })().catch(error => {
         if (entries.get(key) === entry) entries.delete(key);
         throw error;

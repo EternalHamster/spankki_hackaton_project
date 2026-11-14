@@ -92,7 +92,13 @@ class TestWrapped(unittest.TestCase):
             self.assertTrue(len(rows) <= 4, cid)
             for item in rows.values():
                 self.assertRegex(item['value'], r'^[+−]')
-                self.assertIn('→', item['detail'])
+                if item['label'] == 'Päivät plussalla':
+                    self.assertEqual(item['detail'], '')
+                    self.assertTrue(item['value'].endswith('%'))
+                else:
+                    self.assertIn('→', item['detail'])
+                self.assertNotIn('%', item['detail'])
+                self.assertNotIn('-yks.', item['value'])
         self.assertTrue(0.2 * len(src['facts']) < with_card, with_card)
 
     def test_finnish_compounds(self):

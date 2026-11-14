@@ -2,7 +2,7 @@ import { locale } from '../language.js';
 import { prepareDataset, breakdown, annualSpending, spendingRhythm, historySeries, canShift, shiftAnchor, monthEnd, dateOf } from './model.js';
 
 const escape = value => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-const money = (value, digits = 2) => value === null ? 'Ei aineistoa' : new Intl.NumberFormat(locale(), { style:'currency', currency:'EUR', minimumFractionDigits:digits, maximumFractionDigits:digits }).format(value || 0);
+const money = (value, digits = 0) => value === null ? 'Ei aineistoa' : new Intl.NumberFormat(locale(), { style:'currency', currency:'EUR', minimumFractionDigits:digits, maximumFractionDigits:digits }).format(value || 0);
 const number = (value, digits = 0) => new Intl.NumberFormat(locale(), { maximumFractionDigits:digits }).format(value || 0);
 const dateLabel = date => dateOf(date).toLocaleDateString(locale(), { day:'numeric', month:'numeric', year:'numeric', timeZone:'UTC' });
 const monthLabel = month => { const value = dateOf(month + '-01').toLocaleDateString(locale(), { month:'long', year:'numeric', timeZone:'UTC' }); return value[0].toUpperCase() + value.slice(1); };
@@ -50,7 +50,7 @@ function plot({ bins, comparison = true, income = false, selected = -1, patternI
 
 function donut(entries, total, caption) {
   let offset = 0;
-  return `<div class="fa-donut"><svg viewBox="0 0 220 220" role="img" aria-label="${escape(caption)} ${escape(money(total))}. Tarkat osuudet kaavion alla."><circle cx="110" cy="110" r="91" class="fa-donut-track"/>
+  return `<div class="fa-donut"><svg viewBox="0 0 220 220" role="img" aria-label="${escape(caption)} ${escape(money(total))}. Kategoriat kaavion alla."><circle cx="110" cy="110" r="91" class="fa-donut-track"/>
     ${entries.map((entry,i) => { const arc = total ? entry.value / total * 100 : 0; const result = `<circle cx="110" cy="110" r="91" pathLength="100" fill="none" stroke="${palette[i%palette.length]}" stroke-width="15" stroke-dasharray="${Math.max(0,arc-(entries.length>1?.65:0))} 100" stroke-dashoffset="${-offset}" transform="rotate(-90 110 110)"/>`; offset += arc; return result; }).join('')}</svg><div class="fa-donut-total"><span>${caption}</span><strong>${money(total)}</strong><small>yhteensä</small></div></div>`;
 }
 
@@ -91,20 +91,21 @@ export function createFinanceAnalytics(host, options) {
 
   function breakdownCard() {
     const model = breakdown(dataset, state.month, state.kind);
+    const showPercentages = config.showPercentages !== false;
     if (config.compactBreakdown) {
       const entries = model.entries.length <= 4 ? model.entries : [...model.entries.slice(0,3), {
         category: '__others', label: state.kind === 'expense' ? 'Muut menot' : 'Muut tulot',
         value: model.entries.slice(3).reduce((sum, entry) => sum + Math.round(entry.value * 100), 0) / 100,
         share: model.entries.slice(3).reduce((sum, entry) => sum + entry.share, 0),
       }];
-      const categoryButton = (entry, index) => `<button type="button" data-fa="category" data-value="${escape(entry.category)}" aria-label="${escape(entry.label)}: ${escape(money(entry.value))}, ${number(entry.share,1)} prosenttia${entry.category === '__others' ? ', näytä kaikki kategoriat' : ', avaa tapahtumat'}"><i class="fa-dot" style="--swatch:${palette[index % palette.length]}"></i><span><span class="fa-compact-category">${escape(entry.label)}</span><strong>${money(entry.value)}</strong><small>${number(entry.share,1)} %</small></span></button>`;
+      const categoryButton = (entry, index) => `<button type="button" data-fa="category" data-value="${escape(entry.category)}" aria-label="${escape(entry.label)}: ${escape(money(entry.value))}${showPercentages ? `, ${number(entry.share,1)} prosenttia` : ''}${entry.category === '__others' ? ', näytä kaikki kategoriat' : ', avaa tapahtumat'}"><i class="fa-dot" style="--swatch:${palette[index % palette.length]}"></i><span><span class="fa-compact-category">${escape(entry.label)}</span><strong>${money(entry.value)}</strong>${showPercentages ? `<small>${number(entry.share,1)} %</small>` : ''}</span></button>`;
       return `<section class="fa-section fa-compact-section" aria-label="Kuukauden tulojen ja menojen jakauma"><div class="fa-card fa-compact-breakdown"><div class="fa-segmented" role="group" aria-label="Jakauman sisältö">${[['expense','Menot'],['income','Tulot']].map(([kind,label])=>`<button type="button" data-fa="kind" data-value="${kind}" aria-pressed="${state.kind===kind}">${label}</button>`).join('')}</div><div class="fa-compact-visual">${halfDonut(entries, model.total, state.kind === 'expense' ? 'Menot yhteensä' : 'Tulot yhteensä')}<div class="fa-compact-legend">${entries.map(categoryButton).join('')}</div></div>${!model.total ? '<p class="fa-empty">Ei tapahtumia tässä ryhmässä.</p>' : ''}${model.entries.length > 4 ? `<button type="button" class="fa-text-button" data-fa="all-categories" aria-expanded="${state.allCategories}">${state.allCategories ? 'Piilota kategoriat' : 'Kaikki kategoriat'} ${chevron('down')}</button>${state.allCategories ? `<div class="fa-compact-expanded">${model.entries.map(categoryButton).join('')}</div>` : ''}` : ''}</div></section>`;
     }
     const entries = state.allCategories || model.entries.length <= 5 ? model.entries : [...model.entries.slice(0,4), { category:'__others', label:'Muut menot', value:model.entries.slice(4).reduce((n,e)=>n+e.value,0), share:model.entries.slice(4).reduce((n,e)=>n+e.share,0) }];
     return `<section class="fa-section"><div class="fa-section-heading"><h2>Mistä taloutesi koostuu?</h2><span>${monthLabel(state.month)}</span></div><div class="fa-card fa-breakdown-card">
       <div class="fa-segmented" role="group" aria-label="Jakauman sisältö">${[['expense','Menot'],['income','Tulot']].map(([kind,label])=>`<button type="button" data-fa="kind" data-value="${kind}" aria-pressed="${state.kind===kind}">${label}</button>`).join('')}</div>
       ${donut(entries,model.total,state.kind==='expense'?'Kuukauden menot':'Kuukauden tulot')}
-      ${model.total ? `<div class="fa-ring-legend">${entries.map((e,i)=>`<button type="button" data-fa="category" data-value="${escape(e.category)}"><span class="fa-dot" style="--swatch:${palette[i%palette.length]}"></span><span class="fa-category-name">${escape(e.label)}<small>${number(e.share,1)} %</small></span><strong>${money(e.value)}</strong>${chevron('right')}</button>`).join('')}</div>` : '<p class="fa-empty">Ei tapahtumia tässä ryhmässä.</p>'}
+      ${model.total ? `<div class="fa-ring-legend">${entries.map((e,i)=>`<button type="button" data-fa="category" data-value="${escape(e.category)}"><span class="fa-dot" style="--swatch:${palette[i%palette.length]}"></span><span class="fa-category-name">${escape(e.label)}${showPercentages ? `<small>${number(e.share,1)} %</small>` : ''}</span><strong>${money(e.value)}</strong>${chevron('right')}</button>`).join('')}</div>` : '<p class="fa-empty">Ei tapahtumia tässä ryhmässä.</p>'}
       ${model.entries.length>5?`<button type="button" class="fa-text-button" data-fa="all-categories">${state.allCategories?'Näytä tiivistelmä':'Näytä kaikki kategoriat'}</button>`:''}
     </div></section>`;
   }

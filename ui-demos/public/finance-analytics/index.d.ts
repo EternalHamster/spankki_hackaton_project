@@ -20,6 +20,8 @@ export interface FinanceAnalyticsOptions {
   sections?: Array<'breakdown' | 'annual' | 'history' | 'rhythm'>;
   /** Half-donut and integrated category labels, with full details available on demand. */
   compactBreakdown?: boolean;
+  /** Show category percentage labels; defaults to true. */
+  showPercentages?: boolean;
   onSelectMonth?: (month: string) => void;
   /** Omit to use the component's own transaction dialog. */
   onSelectCategory?: (category: string) => void;

@@ -133,8 +133,7 @@ def changes_card(prev, cur):
         diff = b - a
         if abs(diff) < min_eur or (a >= 1 and abs(diff) / a < min_pct):
             return
-        pct = f'{signed(100 * (b / a - 1), "%")} · ' if a >= 1 else ''
-        found.append((abs(diff), {'label': label, 'value': signed(diff, '€'), 'detail': f'{pct}{eur(a)} → {eur(b)}'}))
+        found.append((abs(diff), {'label': label, 'value': signed(diff, '€'), 'detail': f'{eur(a)} → {eur(b)}'}))
 
     money('Tulot', prev['income'], cur['income'])
     money('Menot', prev['spend'], cur['spend'])
@@ -151,13 +150,11 @@ def changes_card(prev, cur):
                       'detail': f'{num(n0)} → {num(n1)} kpl'})
     share = [round(100 * y['green_days'] / max(1, y['green_days'] + y['negative_days'])) for y in (prev, cur)]
     if share[1] - share[0] >= BIG_GREEN_POINTS:  # only as progress: a drop is never listed (tone rules)
-        items.append({'label': 'Päivät plussalla', 'value': signed(share[1] - share[0], '%-yks.'),
-                      'detail': f'{share[0]}{NBSP}% → {share[1]}{NBSP}% päivistä'})
+        items.append({'label': 'Päivät plussalla', 'value': signed(share[1] - share[0], '%'),
+                      'detail': ''})
     if not items:
         return None
-    body = ('Vuoden suurin muutos edellisvuoteen verrattuna.' if len(items) == 1
-            else 'Vuoden suurimmat muutokset edellisvuoteen verrattuna.')
-    return card('changes', 'changes', 'Mikä muuttui', 'Edellisvuodesta tähän vuoteen', body,
+    return card('changes', 'changes', 'Mikä muuttui', 'Edellisvuodesta tähän vuoteen',
                 items=items[:MAX_CHANGES], ask='Mikä taloudessani muuttui edellisvuodesta?', priority=86)
 
 
@@ -177,23 +174,20 @@ def build_cards(customer_id, src, year='current'):
     # 1. Intro
     cards.append(card('intro', 'intro', 'Edellinen rahavuotesi' if previous else 'Rahavuotesi',
                       period_title(src['previous_period'] if previous else src['period']),
-                      'Yksi vuosi, yksi tarina. Katsotaan, millainen rahavuotesi oli.',
+                      'Vuotesi tärkeimmät luvut.',
                       count=f['n_purchases'], suffix=' korttiostosta', priority=100))
 
     # 2. Year in numbers
     leftover = f['income'] - f['spend'] - max(f['saved'], 0)
     if leftover >= 50:
-        year_body = (f'Kaikkien menojen ja säästöjen jälkeen tuloista jäi vielä {eur(leftover)}.' if f['saved'] > 0
-                     else f'Kaikkien menojen jälkeen tuloista jäi vielä {eur(leftover)}.')
+        year_body = (f'Menojen ja säästöjen jälkeen jäi {eur(leftover)}.' if f['saved'] > 0
+                     else f'Menojen jälkeen jäi {eur(leftover)}.')
     elif leftover <= -50 and f['spend'] > f['income']:
-        year_body = f'Menot ylittivät tulot {num(-leftover)} eurolla. Lopussa on vinkki, jolla tasapaino löytyy.'
+        year_body = f'Menot ylittivät tulot {eur(-leftover)}.'
     elif leftover <= -50:
-        year_body = (f'Menot ja säästöt yhdessä ylittivät tulot {num(-leftover)} eurolla. '
-                     'Lopussa on vinkki, jolla tasapaino löytyy.')
+        year_body = f'Menot ja säästöt ylittivät tulot {eur(-leftover)}.'
     else:
         year_body = 'Tulot ja menot menivät lähes tasan.'
-    if previous:  # the forward-looking tip belongs to the latest year only
-        year_body = year_body.replace(' Lopussa on vinkki, jolla tasapaino löytyy.', '')
     items = [{'label': 'Tulot', 'value': eur(f['income'])}, {'label': 'Menot', 'value': eur(f['spend'])}]
     if f['saved'] > 0:
         items.append({'label': 'Säästöön', 'value': eur(f['saved'])})
@@ -210,7 +204,7 @@ def build_cards(customer_id, src, year='current'):
                                 'own': eur(sum(value['eur'] for value in f['categories'].values()) / f['n_purchases']),
                                 'peer': eur(peers['average_purchase_eur'])})
         peer_card = card('peers', 'comparison', 'Vertailu omaan ryhmään', 'Sinä ja verrokkiryhmäsi',
-                         'Sama ikäryhmä ja alue, sama rahavuosi. Ryhmän keskiarvo ei ole kulutustavoite.',
+                         'Sama ikä, alue ja vuosi. Keskiarvo ei ole tavoite.',
                          items=comparisons, note=f'{group} · {num(peers["count"])} muuta asiakasta',
                          ask=f'Vertaa rahavuoteni {period_title(src["period"]).lower()} menoja saman ikäryhmän ja alueen ryhmäkeskiarvoihin.',
                          priority=94)
@@ -222,7 +216,7 @@ def build_cards(customer_id, src, year='current'):
     top5 = list(cats.items())[:5]
     if top5:
         cards.append(card('top5', 'list', 'Top 5', 'Mihin korttiostokset menivät',
-                          f"Ykkösenä {CATEGORY_FI[top5[0][0]].lower()}. Korttiostoksia kertyi yhteensä {eur(total)}.",
+                          f'Korttiostokset yhteensä {eur(total)}.',
                           items=[{'label': CATEGORY_FI[c], 'value': eur(v['eur']), 'share': round(v['eur'] / total, 3)}
                                  for c, v in top5],
                           ask='Mihin rahani menivät viimeisen vuoden aikana?', priority=90))
@@ -232,19 +226,18 @@ def build_cards(customer_id, src, year='current'):
     if fav:
         c, v = fav
         cards.append(card('favourite', 'hero', 'Vuoden suosikkisi', CATEGORY_FI[c],
-                          f"Yhteensä {eur(v['eur'])} – keskimäärin {eur(v['eur'] / v['n'])} kerralla.",
+                          f"{eur(v['eur'])} yhteensä · keskimäärin {eur(v['eur'] / v['n'])}/ostos",
                           count=v['n'], suffix=' kertaa',
                           ask=f'Kerro {CATEGORY_ASK[c]} viime vuonna. Miten voisin säästää niissä?',
-                          note=(f'Samassa ikä- ja alueryhmässä tähän kului keskimäärin {eur(peers["categories"].get(c, 0))} vuodessa.' if peers else None),
+                          note=(f'Sama ikä ja alue: keskimäärin {eur(peers["categories"].get(c, 0))}/vuosi.' if peers else None),
                           priority=85))
 
     # 5. Go-to place
     tm = f['top_merchant']
     if tm and tm['visits'] >= 10:
         place = f"{MCC_FI.get(tm['mcc'], 'Kauppa')} #{int(tm['id'][-4:])}"
-        peer = (f' Samassa ikä- ja alueryhmässä keskimäärin {num(peers["unique_merchants"])} paikassa.' if peers else '')
         cards.append(card('place', 'hero', 'Kanta-asiakas', place,
-                          f"Vuoden kantapaikkasi. Kaikkiaan asioit {f['unique_merchants']} eri paikassa.{peer}",
+                          f"Asioit vuoden aikana {f['unique_merchants']} eri paikassa.",
                           count=tm['visits'], suffix=' käyntiä', note='Kauppojen nimiä ei ole aineistossa.',
                           priority=60))
 
@@ -254,17 +247,16 @@ def build_cards(customer_id, src, year='current'):
         phrase = slot_phrase(slot['weekday'], slot['daypart'])
         h = f['top_hour']
         cards.append(card('rhythm', 'hero', 'Sinun aikasi', phrase[0].upper() + phrase[1:],
-                          'Silloin teit enemmän ostoksia kuin minään muuna ajankohtana. '
-                          f'Vilkkain tuntisi oli klo{NBSP}{h}⁠–⁠{h + 1}.',
+                          f'Vilkkain tuntisi: klo{NBSP}{h}⁠–⁠{h + 1}.',
                           count=slot['n'], suffix=' ostosta', priority=75))
 
     # 7. Small purchases add up (latte factor)
     if f['small_n'] >= 30:
         cards.append(card('small', 'hero', 'Pienistä puroista', f"{eur(f['small_eur'])} yhteensä",
-                          'Alle 10 euron ostokset huomaa harvoin. Siksi ne kannattaa välillä laskea yhteen.',
+                          'Alle 10 euron ostoksistakin kertyy.',
                           count=f['small_n'], suffix=' pientä ostosta',
                           ask='Paljonko pienet ostokset maksavat minulle vuodessa?',
-                          note=(f'Samassa ikä- ja alueryhmässä alle 10 euron ostoksiin kului keskimäärin {eur(peers["small_eur"])} vuodessa.' if peers else None),
+                          note=(f'Sama ikä ja alue: keskimäärin {eur(peers["small_eur"])}/vuosi.' if peers else None),
                           priority=70))
 
     # 8. Biggest single purchase
@@ -281,7 +273,7 @@ def build_cards(customer_id, src, year='current'):
         top_m = max(ms, key=ms.get)
         low_m = min(ms, key=ms.get)
         cards.append(card('month', 'hero', 'Vuoden kallein kuukausi', month_name(top_m).capitalize(),
-                          f'Hiljaisin kuukausi oli {month_name(low_m)}: {eur(ms[low_m])}.',
+                          f'Hiljaisin: {month_name(low_m)}, {eur(ms[low_m])}.',
                           count=ms[top_m], suffix=' €',
                           ask=f'Miksi menoni olivat {month_name(top_m)}ssa vuoden suurimmat?', priority=80))
 
@@ -289,7 +281,7 @@ def build_cards(customer_id, src, year='current'):
     days = f['green_days'] + f['negative_days']
     if f['negative_days'] == 0:
         cards.append(card('green', 'hero', 'Koko vuosi plussalla', 'Ei yhtään miinuspäivää',
-                          'Tilisi ei käynyt kertaakaan miinuksella. Hieno saavutus!',
+                          'Tilisi pysyi plussalla koko vuoden.',
                           count=days, suffix=f' / {days} päivää', priority=88))
     elif f['green_days'] >= days / 2:
         back = ', ja palasit plussalle joka kerta' if f['ends_green'] else ''
@@ -299,8 +291,7 @@ def build_cards(customer_id, src, year='current'):
                           ask='Miten saisin tilini pysymään plussalla palkkapäivään asti?', priority=78))
     else:
         cards.append(card('green', 'hero', 'Sinnikkyyttä', 'kertaa takaisin plussalle',
-                          f"Pisin plussaputkesi kesti {f['best_green_streak']} päivää. Pieni puskuri auttaisi "
-                          'pysymään plussalla palkkapäivään asti.',
+                          f"Pisin plussaputkesi: {f['best_green_streak']} päivää.",
                           count=f['recoveries'], suffix='',
                           ask='Miten saisin tilini pysymään plussalla palkkapäivään asti?', priority=78))
 
@@ -310,7 +301,7 @@ def build_cards(customer_id, src, year='current'):
             f"Säästit {f['saving_months']} kuukautena 12:sta."
         cards.append(card('saving', 'hero', 'Säästäjä', 'siirretty säästöön', every,
                           count=f['saved'], suffix=' €',
-                          note=(f'Ryhmän nettosiirrot säästöön keskimäärin {eur(peers["saved"])} vuodessa. Nostoja on vähennetty siirroista.' if peers else None),
+                          note=(f'Sama ikä ja alue: nettosäästö keskimäärin {eur(peers["saved"])}/vuosi.' if peers else None),
                           priority=82))
 
     # 12. What changed drastically since the previous year
@@ -323,7 +314,7 @@ def build_cards(customer_id, src, year='current'):
         # The spender type and the savings tip describe the customer today, so the older story skips them
         # and hands over to the latest year instead.
         outro = card('outro', 'outro', 'Tarina jatkuu', 'Entä sen jälkeen?',
-                     f"Tuorein rahavuotesi ({period_title(src['period']).lower()}) kertoo, miten vuosi jatkui.",
+                     f"Seuraavaksi: {period_title(src['period']).lower()}.",
                      ask='Mikä taloudessani muuttui edellisvuodesta?')
         for c in cards:  # the coach's ready-made questions are about the latest year
             c['ask'] = None
@@ -335,8 +326,8 @@ def build_cards(customer_id, src, year='current'):
     parts = [ARCHETYPE_FI.get(p.strip(), p.strip()) for p in label.replace('(and a saver)', '').split(' and ')]
     title = ' ja '.join([parts[0]] + [p[0].lower() + p[1:] for p in parts[1:]])
     lines = [LINE_FI[l] for l in sp.get('top_lines', '').split(',') if l in LINE_FI]
-    body = (f"Käytät saman ikä- ja alueryhmän tasoa enemmän: {', '.join(lines)}." if lines
-            else 'Menosi ovat lähellä saman ikä- ja alueryhmän tasoa kaikilla alueilla.')
+    body = (f"Ryhmääsi enemmän: {', '.join(lines)}." if lines
+            else 'Menosi ovat lähellä ryhmäsi keskiarvoja.')
     cards.append(card('personality', 'hero', 'Kuluttajatyyppisi', title + (' · säästäjä' if saver else ''),
                       body, note=f'Verrokkiryhmä: {group}', ask='Millainen kuluttaja olen?', priority=92))
 
@@ -347,23 +338,20 @@ def build_cards(customer_id, src, year='current'):
     if to_save > 0:
         first = ' Aloita puskurirahastosta.' if gap > 0 else ''
         outro = card('outro', 'outro', 'Ensi vuoden tavoite', 'lisää säästöön',
-                     f'Siirrä {eur(to_save)} kuussa säästöön heti palkkapäivänä. Syyskuussa 2027 sinulla on '
-                     f'{eur(12 * to_save)} enemmän – nykyisillä tavoillasi.{first}',
+                     f'Säästä {eur(to_save)}/kk palkkapäivänä.{first}',
                      count=12 * to_save, suffix=' €', ask='Miten pääsen ensi vuoden säästötavoitteeseeni?')
     elif net < -10 and extras > 0:
         trim = min(100, max(1, math.ceil(-net / extras * 100)))
         outro = card('outro', 'outro', 'Ensi vuoden tavoite', 'vähemmän ylimääräisiä menoja',
-                     f'Kun arjen ylimääräiset menot pienenevät noin {trim} %, tulot ja menot ovat tasapainossa. '
-                     'Pieni muutos riittää.',
+                     'Tällä vähennyksellä tulot ja menot tasapainottuisivat.',
                      count=trim, suffix=' %', ask='Miten saisin tuloni ja menoni tasapainoon?')
     elif gap > 0:
         outro = card('outro', 'outro', 'Ensi vuoden tavoite', 'puskuriin',
-                     f'Yllättävät menot tulevat aina joskus. {eur(gap)}:n puskuri suojaa seuraavalta '
-                     'pesukoneen hajoamiselta.',
+                     'Kokoa puskuri yllättäviin menoihin.',
                      count=gap, suffix=' €', ask='Miten kerään puskurirahaston?')
     else:
         outro = card('outro', 'outro', 'Ensi vuoden tavoite', 'Jatka samaan malliin',
-                     'Taloutesi on hyvässä tasapainossa: tulot riittävät menoihin ja puskuri on kunnossa.',
+                     'Tulot kattavat menot ja puskuri on kunnossa.',
                      ask='Miten voisin kehittää talouttani?')
     return finish(cards, outro)
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatCoachText, formatInline } from '../public/coach-text.js';
+import { formatCoachText, formatInline, roundEuroText } from '../public/coach-text.js';
 import { insightPeriod } from '../public/insights.js';
 import { screenshotReply } from './fixtures/coach-reply.mjs';
 
@@ -20,6 +20,16 @@ test('model formatting never creates executable HTML or links', () => {
   assert.doesNotMatch(result, /<img|<script|<a\b|onerror="/);
   assert.equal(formatInline('`**<tag>**` & **saldo**'), '<code>**&lt;tag&gt;**</code> &amp; <strong>saldo</strong>');
   assert.equal(formatInline('Kesken **merkintä'), 'Kesken **merkintä');
+});
+
+test('euro text rounds Finnish and English amounts without changing other numbers or goal precision', () => {
+  assert.equal(roundEuroText('1 234,56 €; €1,234.56; 1.234,56 euroa; +12,50 EUR; −12,50 €; -0,20 €').replace(/\s/g, ' '),
+    '1 235 €; €1 235; 1 235 euroa; +13 EUR; −13 €; 0 €');
+  assert.equal(roundEuroText('1 234 €; 1,234 EUR; 14.11.2026; 12,50 %; 3.14; 1.2.3 €'),
+    '1 234 €; 1,234 EUR; 14.11.2026; 12,50 %; 3.14; 1.2.3 €');
+  assert.equal(formatCoachText('Menot **12,50** € ja **€12.49**.'), '<p>Menot <strong>13</strong> € ja <strong>€12</strong>.</p>');
+  assert.equal(formatCoachText('Tavoite **12,50 €**.', { keepCents: true }), '<p>Tavoite <strong>12,50 €</strong>.</p>');
+  assert.equal(roundEuroText('€12.49. Säästöt kasvavat 12,50 eurolla.'), '€12. Säästöt kasvavat 13 eurolla.');
 });
 
 test('the reported coach answer renders all five bold spans and both lists', () => {
