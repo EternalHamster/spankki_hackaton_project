@@ -1,4 +1,4 @@
-# Oma talous: Personal Economic Trainer
+# Pocket Coach: Personal Economic Trainer
 
 Junction 2026 · S-Pankki challenge: an AI money coach inside the S-mobiili app that lets a customer talk with
 their own banking data and learn from it. This is an independent hackathon prototype on synthetic data, not an
